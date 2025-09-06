@@ -2,7 +2,7 @@
 
 ![Nest Your CSS Github Banner](https://github.com/user-attachments/assets/193bee28-d84c-4e47-8241-b152aa1b0f3a)
 
-An Awwwards-inspired online converter tool to minify, beautify, denest, and nest CSS code according to the latest CSS specs. This project started as a simple utility and evolved into a personal masterclass in modern, framework-less front-end development, focusing on performance, accessibility, and cutting-edge CSS features.
+An Awwwards-inspired online converter tool to minify, beautify, denest, and nest CSS code according to the latest CSS specs. Originally created as a [personal portfolio project](https://github.com/TimChinye/NestYourCSS), it has since evolved into a well-rounded, publicly open-source tool for the modern front-end developer.
 
 <p align="center">
   <a href="https://nestyourcss.com/">View Website</a>
@@ -19,7 +19,6 @@ An Awwwards-inspired online converter tool to minify, beautify, denest, and nest
 - [About The Project](#about-the-project)
 - [Built With](#built-with)
 - [Features](#features)
-- [Key Learning Points](#key-learning-points)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
 - [License](#license)
@@ -29,13 +28,13 @@ An Awwwards-inspired online converter tool to minify, beautify, denest, and nest
 
 ## About The Project
 
-About a year ago, I learned about the native CSS Nesting module but was surprised to find no simple, pure CSS converters online. The available tools were primarily CSS-to-SCSS converters that often produced code requiring significant manual cleanup.
+With the arrival of the native CSS Nesting module, there was a clear need for a simple, pure CSS converter. The available tools were often CSS-to-SCSS converters that produced code requiring significant manual cleanup.
 
-So, I built my own.
+**Nest Your CSS was created to fill that gap.**
 
-What began as a simple MVP spiralled into a personal challenge: could a basic A-to-B converter be transformed into a portfolio-worthy, "Awwwards-level" website? While I'm not a designer, this journey was an incredible learning experience that massively solidified my front-end fundamentals.
+The project began with a simple goal: create a reliable A-to-B converter. This goal expanded into a mission to build a portfolio-worthy, "Awwwards-level" application that champions high-quality user experience, accessibility, and modern web standards.
 
-**The result is [`nestyourcss.com`](https://nestyourcss.com/) a free, open-source tool with no backend and no sign-up required.**
+The result is [`nestyourcss.com`](https://nestyourcss.com/), a free, open-source tool with no backend and no sign-up required, now maintained as a public, open-source application.
 
 ## Built With
 
@@ -58,20 +57,6 @@ This project is a testament to the power of web fundamentals, built with **zero 
 -   **Deep Accessibility:** Fully navigable and usable with screen readers, thanks to extensive ARIA implementation.
 -   **Awwwards-Inspired UI/UX:** A focus on smooth animations, visual appeal, and a high-quality user experience.
 
-## Key Learning Points
-
-This project accidentally became a masterclass modern-day front-end web development. Here are the biggest takeaways:
-
-- **The 'Why' Behind Frameworks:** I now have a fundamental appreciation for why frameworks exist. Experiencing the frustrations of vanilla CSS & JS firsthand really gives you a deep understanding of the problems frameworks solve, but I also now value the fine-grained control you get from them.
-
-- **Performance, by Default:** Treating Lighthouse as a guide rather than a final score, explored the Performance and Rendering tabs in DevTools, and began naturally favouring composite-only CSS properties for animations while I code.
-
-- **The Hidden Cost of AI:** Dabbled in using a little AI to speed up boilerplate JS code - it worked well, but also introduced subtle bugs that often decided not to surface until days, sometimes weeks later. This taught me the importance of genuinely understanding every line of code you ship. `// TODO: completely revamp nesting logic`.
-
-- **Real-World Accessibility:** Writing crawler-friendly, semantic HTML wasn't enough. Dove deep into the world of ARIA's roles and properties to make the site genuinely usable with screen readers.
-
-- **Modern CSS is awesome:** I got to play with everything from `@layer` and container queries to relative color syntax. It pushed me to follow W3C drafts, and now I seriously can't wait for native mixins and functions (currently on the standards track!).
-
 ## Getting Started
 
 To get a local copy up and running for development or contribution, follow these simple steps.
@@ -85,7 +70,7 @@ Make sure you have Node.js and npm installed on your machine.
 
 1.  Clone the repo:
     ```sh
-    git clone https://github.com/TimChinye/NestYourCSS.git
+    git clone https://github.com/NestYourCSS/NestYourCSS.git
     ```
 2.  Navigate to the project directory:
     ```sh
@@ -103,7 +88,7 @@ If you simply want to view the raw, `in-development` files without running the b
 
 ## Contributing
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. While I don't expect any, if you have suggestions to improve this project, please feel free to fork the repo and create a pull request, or simply open an issue with the "enhancement" tag.
+Contributions are the lifeblood of the open-source community and are **greatly appreciated**. If you have suggestions to improve this project, please feel free to fork the repo and create a pull request, or simply open an issue with the "enhancement" tag.
 
 1.  Fork the Project
 2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
