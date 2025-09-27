@@ -1829,7 +1829,7 @@
                             display: inline-block;
                             text-align: left;
                             border: 0.125em dashed rgb(from var(--shades-white) r g b / var(--opacity-low));
-                            background: rgb(from var(--pri-colour-darkest) r g b / var(--opacity-high));
+                            background: rgb(from var(--pri-colour-darkest) r g b / var(--opacity-low));
         
                             &::before,
                             &::after {
@@ -1839,7 +1839,7 @@
                                 pointer-events: none;
                                 position: absolute;
                                 content: attr(data-text);
-                                inset: -0.25rem;
+                                inset: -0.1em;
                                 animation: 10s linear both infinite 5s;
                             }
                             
