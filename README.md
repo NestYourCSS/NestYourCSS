@@ -34,7 +34,7 @@ With the arrival of the native CSS Nesting module, there was a clear need for a 
 
 The project began with a simple goal: create a reliable A-to-B converter. This goal expanded into a mission to build a portfolio-worthy, "Awwwards-level" application that champions high-quality user experience, accessibility, and modern web standards.
 
-The result is [`nestyourcss.com`](https://nestyourcss.com/), a free, open-source tool with no backend and no sign-up required, now maintained as a public, open-source application.
+The result is [nestyourcss.com](https://nestyourcss.com/): a free, open-source tool with no backend and no sign-up required, now maintained as a public, open-source application.
 
 ## Built With
 
