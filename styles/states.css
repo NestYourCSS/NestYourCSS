@@ -1,0 +1,134 @@
+/* --- State Scopes (Homepage State) --- */
+
+@scope (#siteWrapper > main:not(.nesting)) {
+    & #mainContent {
+        gap: var(--padding);
+
+        > #editorSide {
+            animation: moveRight 2s cubic-bezier(1, 0, 0.5, 1) both;
+
+            > #codeEditor > .editorWrapper {
+                transition: 1s 0.5s;
+
+                /* &#inputEditorWrapper { */
+                &:first-child {
+                    display: block;
+                    padding: var(--padding);
+                    padding-left: 0;
+                    border-left: calc(1rem / 16) solid
+                        rgb(
+                            from var(--shades-darker) r g b /
+                                var(--opacity-medium)
+                        );
+                    border-color: rgb(
+                        from var(--shades-darker) r g b / var(--opacity-low)
+                    );
+                    background-color: rgb(from var(--shades-white) r g b / 3%);
+
+                    &,
+                    > .editorGroup {
+                        max-width: 100%;
+                    }
+                }
+
+                /* &#outputEditorWrapper { */
+                &:last-child {
+                    padding-block: var(--padding);
+                    margin-right: -3.25rem;
+                    width: 0;
+                    opacity: 0;
+                }
+            }
+
+            > #codeEditor > :last-child {
+                display: none;
+            }
+        }
+    }
+}
+
+/* --- State Scopes (Nesting / Editor State) --- */
+
+@scope (#siteWrapper:has(> main.nesting)) {
+    & > main {
+        height: 100dvh;
+        transition: height 1s;
+
+        & + article,
+        & + article section {
+            top: 100dvh;
+            height: 0;
+            gap: 0;
+            opacity: 0;
+            transition:
+                gap 1s 1s,
+                height 1s 1s,
+                opacity 1s,
+                top 1s;
+            pointer-events: none;
+
+            &article {
+                top: 0dvh;
+            }
+        }
+
+        #mainSettings {
+            /* A manually calculated minimum width based on it's children elements, but due to `contain` use, getting in dynamically isn't possible. */
+            min-width: calc((58.441558ch * 1.232));
+            margin-right: var(--padding);
+        }
+
+        #mainContent {
+            > #textSide {
+                width: 0%;
+                opacity: 0;
+                padding: 0;
+            }
+
+            > #editorSide {
+                width: 100%;
+                align-content: center;
+
+                > #nestBtn {
+                    opacity: 0.75;
+                    font-size: 0.75rem;
+                    translate: 0% 0%;
+                    --nestBtn-shadow-direction: -1;
+
+                    > div {
+                        transform-origin: top right;
+
+                        &::before {
+                            content: "Home";
+                        }
+                    }
+                }
+
+                > #codeEditor {
+                    align-items: center;
+                    margin-left: auto;
+                    width: calc(
+                        100vw - (5 * var(--padding)) - (58.441558ch * 1.232)
+                    );
+                    max-width: 100%;
+                    max-height: 100%;
+                    aspect-ratio: var(--total-width) / 7;
+                    animation: moveLeft 2s cubic-bezier(1, 0, 0.5, 1) both;
+
+                    #editorGap {
+                        height: 100%;
+                        aspect-ratio: var(--gutter-width) / 6.625;
+                    }
+
+                    .editorWrapper#inputEditorWrapper
+                        > #shadowEditorsWrapper
+                        > .shadowEditorWrapper {
+                        translate: 0 !important;
+                        opacity: 0 !important;
+                        transition: 2s;
+                    }
+                }
+            }
+        }
+    }
+}

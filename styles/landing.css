@@ -1,0 +1,861 @@
+/* --- Article Section Scopes --- */
+
+@scope (#reducingBoilerplateCode) {
+    & {
+        > a {
+            margin: 0;
+            position: absolute;
+            top: 0.75em;
+            right: 0;
+            color: var(--shades-white);
+            text-decoration: none;
+            text-transform: uppercase;
+            line-height: 100%;
+            font-family: "Poppins", "Calibri", sans-serif;
+            font-weight: 500;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 1ch;
+
+            &::after {
+                position: relative;
+                content: "";
+                height: 0.125em;
+                width: 6em;
+                background: var(--shades-white);
+            }
+        }
+
+        > #repeatingText {
+            margin: 0;
+            position: absolute;
+            top: 8em;
+            left: 4em;
+            cursor: text;
+            color: var(--shades-white);
+            font-family: "Poppins", "Calibri", sans-serif;
+            font-weight: 300;
+            font-size: 2em;
+            width: 52ch;
+
+            .repeat {
+                pointer-events: none;
+                mask-image: linear-gradient(
+                    transparent,
+                    var(--shades-black) 75%
+                );
+                position: relative;
+                padding: 3lh 0 0.04lh;
+
+                &::before {
+                    content: attr(data-text) "\A" attr(data-text) "\A"
+                        attr(data-text) "\A" attr(data-text);
+                    inset: 0;
+                    z-index: -1;
+                    position: absolute;
+                    color: rgb(from var(--shades-white) r g b / 0.5);
+                    animation: repeatText 2s linear infinite;
+                    animation-composition: add;
+                }
+
+                &.hidden::before {
+                    animation-play-state: paused;
+                }
+            }
+        }
+
+        > #parallaxText {
+            position: absolute;
+            bottom: calc(4em / 3);
+            right: calc(4em / 3);
+            color: var(--shades-white);
+            text-transform: uppercase;
+            letter-spacing: calc(1em / 6);
+            font-family: "Orelo Semi Expanded", sans-serif;
+            font-size: 6em;
+            height: 3lh;
+            width: fit-content;
+            display: flex;
+            flex-direction: column;
+
+            > span {
+                cursor: text;
+                height: 1lh;
+                overflow: hidden;
+                line-height: 100%;
+                text-shadow: 0 1lh;
+
+                > p {
+                    margin: 0;
+                    display: inline-block;
+                    vertical-align: middle;
+                    translate: 0 -1lh;
+                }
+
+                @supports (animation-range: normal) {
+                    animation: swapText linear 1ms;
+                    animation-timeline: view();
+                    animation-range-start: cover -0.5lh;
+
+                    &:nth-child(1) {
+                        animation-range-end: contain
+                            calc(min(100dvh, 1600px) - 1lh);
+                    }
+
+                    &:nth-child(2) {
+                        animation-range-end: contain
+                            calc(min(100dvh, 1600px) - 0.5lh);
+                    }
+
+                    &:nth-child(3) {
+                        animation-range-end: contain
+                            calc(min(100dvh, 1600px) - 0lh);
+                    }
+                }
+
+                &:nth-child(1) {
+                    margin-left: 0.5ch;
+                    text-align: left;
+                }
+
+                &:nth-child(2) {
+                    text-align: center;
+                }
+
+                &:nth-child(3) {
+                    margin-right: 0.5ch;
+                    text-align: right;
+                }
+            }
+        }
+    }
+}
+
+@scope (#easierMaintenance) {
+    & {
+        > #mergingText {
+            position: absolute;
+            top: calc(4em / 5);
+            left: 50%;
+            translate: -50%;
+            color: var(--shades-white);
+            text-align: center;
+            text-transform: capitalize;
+            letter-spacing: 0.25ch;
+            font-family: "Orelo Semi Expanded", sans-serif;
+            font-weight: 400;
+            font-size: 5em;
+            display: flex;
+            flex-direction: column;
+
+            > span {
+                cursor: text;
+                height: 1lh;
+                line-height: 100%;
+                overflow: hidden;
+                position: relative;
+
+                @supports (animation-range: normal) {
+                    padding-top: 1lh;
+
+                    &:first-child {
+                        text-shadow: 0 0.5lh;
+                        animation: showText linear forwards 1ms;
+                        animation-timeline: view();
+                        animation-range-start: cover
+                            calc(min(50dvh, 800px) - 1lh);
+                        animation-range-end: cover
+                            calc(min(100dvh, 1600px) - 3.15lh);
+                    }
+
+                    &:last-child {
+                        text-shadow: 0 -2lh;
+                        animation: showText linear forwards 1ms;
+                        animation-timeline: view();
+                        animation-range-start: cover
+                            calc(min(50dvh, 800px) - 1lh);
+                        animation-range-end: cover
+                            calc(min(100dvh, 1600px) - 3.15lh);
+                    }
+                }
+            }
+        }
+
+        > #changingText {
+            position: absolute;
+            right: 5vw;
+            bottom: 6em;
+            color: var(--shades-white);
+            font-family: "Poppins", "Calibri", sans-serif;
+            font-weight: 300;
+            font-size: 2em;
+            width: 56ch;
+            text-align: right;
+
+            @supports (animation-range: normal) {
+                animation: slideDown linear both 1ms;
+                animation-timeline: view();
+                animation-range-start: cover -20lh;
+                animation-range-end: contain 5lh;
+            }
+
+            s {
+                text-decoration: none;
+                font-size: 0.75em;
+                color: var(--red-colour-medium); /* oklch(0.75 0.13 15) */
+                position: relative;
+                display: inline-flex;
+                clip-path: inset(0);
+
+                &:nth-child(1) {
+                    --animation-delay: -1s;
+                }
+                &:nth-child(3) {
+                    --animation-delay: 0s;
+                }
+                &:nth-child(5) {
+                    --animation-delay: -1.5s;
+                }
+
+                &::before {
+                    position: absolute;
+                    content: "";
+                    width: 100%;
+                    height: 0.1em;
+                    background: color-mix(
+                        in oklch,
+                        currentColor,
+                        var(--shades-white) 25%
+                    );
+                    top: 50%;
+                    animation: strikethrough 2.5s infinite
+                        var(--animation-delay);
+                    animation-timing-function: linear(
+                        0 0%,
+                        0 1.8%,
+                        0.01 3.6%,
+                        0.03 6.35%,
+                        0.07 9.1%,
+                        0.13 11.4%,
+                        0.19 13.4%,
+                        0.27 15%,
+                        0.34 16.1%,
+                        0.54 18.35%,
+                        0.66 20.6%,
+                        0.72 22.4%,
+                        0.77 24.6%,
+                        0.81 27.3%,
+                        0.85 30.4%,
+                        0.88 35.1%,
+                        0.92 40.6%,
+                        0.94 47.2%,
+                        0.96 55%,
+                        0.98 64%,
+                        0.99 74.4%,
+                        1 86.4%,
+                        1 100%
+                    );
+                }
+
+                + b {
+                    text-decoration: none;
+                    font-weight: bold;
+                    color: oklch(
+                        from var(--red-colour-medium) l c calc(h + 135)
+                    ); /* oklch(0.75 0.13 150) */
+                }
+
+                &.hidden::before {
+                    animation-play-state: paused;
+                }
+            }
+        }
+    }
+}
+
+@scope (#improvedCodeReadability) {
+    & {
+        > #backgroundText {
+            margin: 0;
+            color: var(--shades-white);
+            contain: layout;
+            pointer-events: none;
+            font-size: 20em;
+            line-height: 100%;
+            font-family: "Orelo Semi Condensed", sans-serif;
+            text-transform: capitalize;
+            letter-spacing: 0.0025em;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+
+            span {
+                translate: -4ch;
+                padding: 0 calc(1em / 10);
+                width: 100%;
+                color: rgb(from var(--shades-white) r g b / var(--opacity-low));
+                position: relative;
+
+                &:first-child,
+                &:last-child {
+                    text-align: right;
+                    translate: 10ch;
+
+                    &:last-child {
+                        color: rgb(
+                            from var(--shades-white) r g b / var(--opacity-high)
+                        );
+                    }
+                }
+
+                @supports (animation-range: normal) {
+                    animation: slideIn ease-out forwards 1ms;
+                    animation-timeline: view();
+                    animation-range-start: cover -0.5lh;
+                    animation-range-end: cover calc(2lh + 2.5lh);
+
+                    &:first-child {
+                        animation-range-start: cover 0lh;
+                        animation-range-end: cover calc(2.5lh + 2.5lh);
+                    }
+
+                    &:last-child {
+                        animation-range-start: cover -1.5lh;
+                        animation-range-end: cover calc(1.5lh + 2.5lh);
+                    }
+                }
+            }
+        }
+
+        > #visibleText {
+            position: absolute;
+            z-index: 1;
+            right: 7.5vw;
+            bottom: 10em;
+            color: var(--shades-white);
+            font-family: "Poppins", "Calibri", sans-serif;
+            font-weight: 300;
+            font-size: 2em;
+            line-height: 1.5em;
+            width: 50ch;
+
+            @supports (animation-range: normal) {
+                animation:
+                    boostUp linear both 1ms,
+                    slideUp linear both 1ms;
+                animation-range:
+                    cover 16em,
+                    cover;
+                animation-timeline: view(), view();
+                animation-composition: add;
+            }
+
+            @supports not (animation-range: normal) {
+                translate: -3lh;
+            }
+
+            u {
+                color: var(--shades-white);
+
+                b {
+                    font-size: 1.25em;
+                    /* line-height: inherit; */
+                    transition: color 0.5s;
+
+                    &:hover {
+                        /* line-height: inherit; */
+                        color: var(--pri-colour-lightest);
+                    }
+
+                    > span {
+                        transition: 0.125s;
+
+                        &:hover {
+                            color: var(--shades-white);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@scope (#groupingStylesTogether) {
+    & {
+        align-content: center;
+
+        > #groupedText {
+            position: absolute;
+            bottom: 67%;
+            left: 10vw;
+            color: var(--shades-white);
+            margin: 0;
+            letter-spacing: 0.25rem;
+            font-family: "Orelo Semi Expanded", sans-serif;
+            font-weight: 400;
+            font-size: 2em;
+            padding: 1.5em 2em;
+            display: inline-block;
+            text-align: left;
+            border: 0.125em dashed
+                rgb(from var(--shades-white) r g b / var(--opacity-low));
+            background: rgb(
+                from var(--pri-colour-darkest) r g b / var(--opacity-high)
+            );
+
+            &::before,
+            &::after {
+                border: inherit;
+                padding: inherit;
+                background: inherit;
+                pointer-events: none;
+                position: absolute;
+                content: attr(data-text);
+                inset: -0.25rem;
+                animation: 10s linear both infinite 5s;
+            }
+
+            &::before {
+                z-index: -1;
+                animation-name: changeCard, changeCardBefore;
+            }
+
+            &::after {
+                z-index: 1;
+                animation-name: changeCard, changeCardAfter;
+            }
+
+            :is(body.hidden &) {
+                &::before,
+                &::after {
+                    animation-play-state: paused;
+                }
+            }
+        }
+
+        > #miniEditor {
+            position: relative;
+            margin-left: auto;
+            margin-right: 7.5vw;
+            font-family: "Fira Code", monospace;
+            font-size: 2em;
+            line-height: 1em;
+            gap: 3ch;
+            width: fit-content;
+            color: var(--shades-white);
+
+            @supports (animation-range: normal) {
+                animation: viewed linear;
+                animation-timeline: view();
+                animation-range-start: contain;
+                animation-range-end: cover calc(0% + 5lh);
+
+                div :is(> div, span) {
+                    --charIndex: -1;
+                    animation: slideInLines linear forwards;
+                    animation-timeline: view();
+                    animation-range-start: cover 0%;
+                    animation-range-end: cover 5lh;
+                }
+            }
+
+            > .visually-hidden {
+                border: 0;
+                clip: rect(0 0 0 0);
+                height: 1px;
+                margin: -1px;
+                overflow: hidden;
+                padding: 0;
+                position: absolute;
+                width: 1px;
+                white-space: nowrap; /* 1 */
+                word-wrap: normal; /* 2 */
+            }
+
+            > .visual-presentation {
+                display: flex;
+                gap: 3ch;
+
+                > #lineNumbers {
+                    width: 2ch;
+                    opacity: 0.25;
+                    font-family: inherit;
+                    text-align: right;
+                }
+
+                > pre {
+                    opacity: 0.75;
+                    font-family: inherit;
+                    letter-spacing: 0.2em;
+                    margin: 0;
+                    --maxLines: 20;
+                    --activeLine: 1;
+                    --intensityPos: 100%;
+
+                    > code > div {
+                        padding-right: 5ch;
+
+                        &:first-child {
+                            position: relative;
+
+                            &::before {
+                                position: absolute;
+                                content: "";
+                                top: 0;
+                                right: 0;
+                                height: 100%;
+                                width: calc(100% + 5ch);
+                                background: linear-gradient(
+                                    to right,
+                                    transparent,
+                                    rgb(
+                                            from var(--pri-colour-m-darker) r g
+                                                b / var(--opacity-medium)
+                                        )
+                                        calc(var(--intensityPos) - 20%),
+                                    rgb(
+                                            from var(--pri-colour-darker) r g
+                                                b / var(--opacity-medium)
+                                        )
+                                        var(--intensityPos),
+                                    rgb(
+                                            from var(--pri-colour-m-darker) r g
+                                                b / var(--opacity-medium)
+                                        )
+                                        calc(var(--intensityPos) + 20%),
+                                    transparent
+                                );
+                                z-index: -1;
+                                translate: 0
+                                    calc(
+                                        (
+                                                clamp(
+                                                        1,
+                                                        var(--activeLine),
+                                                        var(--maxLines)
+                                                    ) -
+                                                    1
+                                            ) *
+                                            1lh
+                                    );
+                                transition: 0.5s ease;
+                            }
+                        }
+
+                        span {
+                            display: inline-block;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@scope (#mechanicsOfNesting) {
+    & {
+        contain: size layout;
+        display: flex;
+
+        &:has(.hover-animation) {
+            touch-action: none;
+
+            &:has(> :not(#backToStart):hover) {
+                cursor: none;
+
+                > #nycssCursor {
+                    scale: 0.25;
+                    animation-duration: 1.5s;
+                }
+            }
+
+            > #nycssCursor {
+                opacity: 1;
+                animation: rotate 12.5s linear infinite;
+            }
+        }
+
+        > #nycssCursor {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            z-index: 999;
+            background-color: rgb(
+                from var(--pri-colour-lightest) r g b / var(--opacity-low)
+            );
+            border-radius: 50%;
+            aspect-ratio: 1 / 1;
+            font-size: 10em;
+            padding: 0.0625em;
+            height: auto;
+            width: 1em;
+            translate: calc(50vw - 50%) calc(50vh - 50%);
+            transition:
+                opacity 1s 0.1s,
+                scale 0.5s;
+
+            :is(:has(.hover-animation):has(> &):hover &) {
+                will-change: transform;
+            }
+
+            &.hidden {
+                animation-play-state: paused;
+            }
+        }
+
+        > #splittingText {
+            position: absolute;
+            top: 4lh;
+            right: 8ch;
+            color: var(--shades-white);
+            font-family: "Poppins", "Calibri", sans-serif;
+            font-weight: 300;
+            font-size: 1.75rem;
+            height: 4lh;
+            width: 60ch;
+            text-align: justify;
+            text-align-last: left;
+            column-count: 2;
+            gap: 6ch;
+            word-spacing: 0.3ch;
+            color: transparent;
+            user-select: none;
+            @supports (animation-range: normal) {
+                animation: unblur ease-out both 1ms;
+                animation-timeline: view();
+                animation-range: cover contain calc(min(50dvh, 800px));
+            }
+
+            &::before,
+            &::after {
+                color: var(--shades-white);
+                content: attr(data-text);
+                position: absolute;
+                inset: 0;
+                column-count: inherit;
+                gap: inherit;
+                animation: widenGap 3s ease-in-out infinite alternate backwards;
+            }
+
+            &::before {
+                clip-path: inset(0 50% 0 0);
+                transform-origin: left;
+            }
+
+            &::after {
+                clip-path: inset(0 0 0 50%);
+                transform-origin: right;
+            }
+
+            &.hidden {
+                &::before,
+                &::after {
+                    animation-play-state: paused;
+                }
+            }
+
+            > a {
+                color: inherit;
+            }
+        }
+
+        > #strechingText {
+            position: absolute;
+            top: calc(4em / 3);
+            left: calc(8em / 3);
+            color: var(--shades-white);
+            line-height: 200%;
+            font-family: "Orelo Semi Condensed";
+            font-weight: 600;
+            font-size: 3em;
+            scale: 1;
+            @supports (animation-range: normal) {
+                animation: moveDown linear both 1ms;
+                animation-timeline: view();
+                animation-range-start: cover -2lh;
+                animation-range-end: cover 2lh;
+            }
+
+            > span {
+                display: inline-block;
+                transition: 1s;
+
+                &:hover {
+                    scale: 1 2;
+                    transition: 0s;
+                }
+            }
+        }
+
+        > #nestingText {
+            position: absolute;
+            bottom: calc(8em / 5);
+            right: calc(24em / 5);
+            color: var(--shades-white);
+            font-size: 5em;
+            contain: layout;
+
+            > * {
+                margin: 0;
+                white-space: nowrap;
+            }
+
+            > h3 {
+                font-size: 1em;
+                font-weight: 900;
+                font-family: "Poppins", "Calibri", sans-serif;
+                @supports (animation-range: normal) {
+                    animation: moveDown linear both 1ms;
+                    animation-timeline: view();
+                    animation-range-start: cover -2lh;
+                    animation-range-end: cover 2lh;
+                }
+                transition:
+                    scale 1s,
+                    text-shadow 1s;
+
+                &:hover {
+                    scale: 1.1;
+                    text-shadow: 0 -0.1lh calc(1em / 5) var(--shades-black);
+                }
+            }
+
+            > p {
+                position: absolute;
+                z-index: -1;
+                top: 0;
+                left: 0;
+                line-height: 1em;
+                font-size: 1.125em;
+                font-weight: 600;
+                letter-spacing: -0.05em;
+                font-family: "Orelo Expanded";
+                color: rgb(
+                    from var(--shades-white) r g b / var(--opacity-medium)
+                );
+                @supports (animation-range: normal) {
+                    animation: fadeUp linear both 1ms;
+                    animation-timeline: view();
+                    animation-range-start: cover;
+                    animation-range-end: cover calc(1lh + 1.98em);
+                }
+                @supports not (animation-range: normal) {
+                    translate: -0.96ch -0.31em;
+                    opacity: 1;
+                }
+            }
+
+            a {
+                color: unset;
+                text-decoration: unset;
+            }
+        }
+
+        > #nycssLogoGroup {
+            user-select: none;
+            align-self: flex-end;
+            contain: layout;
+            display: inline-flex;
+            flex-direction: column;
+            margin-left: 8vw;
+            margin-bottom: 8vw;
+            position: relative;
+            z-index: 1;
+
+            > * {
+                pointer-events: none;
+            }
+
+            > img {
+                height: 16em;
+                width: auto;
+                aspect-ratio: 1 / 1;
+            }
+
+            > img#nycssNest {
+                color: transparent;
+                filter: drop-shadow(0 -0.5em) drop-shadow(0.7em 0.3em)
+                    drop-shadow(5.4em 1em) drop-shadow(7.1em 1.1em)
+                    drop-shadow(1.6em 0.4em) drop-shadow(4.3em 0.9em);
+                clip-path: circle(47.2%);
+            }
+
+            > img#nycssBadge {
+                /* Badge Scroll Positions */
+                --main-x: 80vw;
+                --main-y: calc(max(-600dvh, -9600px) - 150%);
+                --reducingBoilerplateCode-y: calc(max(-600dvh, -9600px) + 0%);
+                --easierMaintenance-y: calc(max(-450dvh, -7200px) + 50%);
+                --improvedCodeReadability-y: calc(max(-300dvh, -4800px) - 50%);
+                --groupingStylesTogether-y: calc(max(-150dvh, -2400px) + 66%);
+                --mechanicsOfNesting-y: 50%;
+
+                /* backface-visibility: hidden; */
+                pointer-events: none;
+                filter: drop-shadow(
+                        0 var(--shadow-distance) 0 var(--shadow-color)
+                    )
+                    drop-shadow(
+                        0 calc(-1 * var(--shadow-distance)) 0
+                            var(--shadow-color)
+                    );
+                --shadow-color: #1474b833; /* Taken directly from the CSS Logo */
+                --shadow-distance: 0;
+                transition: 1s;
+
+                &.main-animation {
+                    animation: fall linear 1ms;
+                    animation-timeline: scroll(nearest);
+                }
+
+                &.idle-animation {
+                    animation:
+                        fall linear 1ms,
+                        idle 2.5s infinite alternate;
+                    animation-timeline:
+                        scroll(nearest), auto; /* convert to view() if possible */
+                    animation-composition: add;
+
+                    &.hidden {
+                        animation-play-state: paused;
+                    }
+                }
+
+                &.hover-animation {
+                    animation: hover 2s infinite alternate;
+                    --shadow-color: #1474b833; /* Taken directly from the CSS Logo */
+                    --shadow-distance: 1.5em;
+
+                    &.hidden {
+                        animation-play-state: paused;
+                    }
+                }
+            }
+
+            &:has(img.hover-animation) {
+                clip-path: inset(19.3% 1.3% 1.3% 7.3%);
+
+                &:hover #nycssBadge.hover-animation {
+                    --shadow-color: #26a2d933; /* Taken directly from the CSS Logo */
+                    --shadow-distance: 2em;
+                }
+            }
+        }
+
+        > #backToStart {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+
+            &:has(~ #nycssLogoGroup > img.hover-animation) {
+                display: block;
+            }
+        }
+    }
+}
+
+/* --- Media Queries with Scopes --- */

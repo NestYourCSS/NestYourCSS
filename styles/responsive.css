@@ -1,0 +1,282 @@
+/* 1235 x 1125 - Breaking point between mobile & desktop */
+
+@media (max-aspect-ratio: 1.097 / 1) {
+    @scope (#siteWrapper) {
+        /* --- Main Section Scope --- */
+
+        & > main {
+            &.nesting > #settingsBtn {
+                display: flex;
+                margin: 0 auto 1rem auto;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #mainContent {
+                border-radius: 1rem;
+            }
+
+            #mainSettings:not(.mobile-open),
+            #mainContent :is(#textSide, #shadowEditorsWrapper) {
+                display: none;
+            }
+
+            #mainSettings.mobile-open {
+                display: flex !important;
+                position: fixed;
+                z-index: 1001;
+                top: calc(
+                    2rem + 4rem
+                ); /* Header padding + button height approximately */
+                left: 2rem;
+                right: 2rem;
+                width: calc(100% - 4rem);
+                max-height: calc(100vh - 8rem);
+                overflow-y: auto;
+                padding: 0;
+                background: rgb(from var(--shades-black) r g b / 0.5);
+                margin-right: 0;
+                min-width: 0;
+
+                > section {
+                    border-radius: 2rem;
+                    padding: 1.25rem;
+                    display: flex;
+                    position: relative;
+                    flex-direction: column;
+                    gap: 1.25rem;
+                    box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.05) inset;
+                    background: rgb(
+                        from var(--pri-colour-m-darker) r g b / 0.25
+                    );
+                    min-width: 0;
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        inset: 0;
+                        border-radius: inherit;
+                        backdrop-filter: blur(25px) saturate(100%)
+                            brightness(1.5);
+                        z-index: -1;
+                    }
+
+                    > ul {
+                        --component-background: rgb(
+                            from var(--shades-black) r g b / 0.25
+                        );
+
+                        > li {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 0.5rem;
+
+                            > span {
+                                font-size: 1rem;
+                            }
+
+                            > div {
+                                width: 100%;
+                            }
+
+                            > div
+                                > :is(.dropdown, .combobox):focus-within
+                                > input:checked
+                                ~ ul {
+                                --component-background: rgb(
+                                    from var(--shades-black) r g b / 0.75
+                                );
+                            }
+                        }
+                    }
+
+                    > :has(> table) {
+                        --table-background: color-mix(
+                            in srgb,
+                            var(--pri-colour-em-darker),
+                            var(--shades-black)
+                        );
+
+                        --track-colour: color-mix(
+                            in srgb,
+                            var(--pri-colour-em-darker),
+                            var(--shades-black)
+                        );
+                    }
+                }
+
+                > nav {
+                    display: none;
+                }
+            }
+
+            #editorSide {
+                animation: none !important;
+                width: calc(var(--single-editor-width));
+
+                #codeEditor {
+                    max-width: 100%;
+                    justify-content: left;
+
+                    > .editorWrapper {
+                        max-width: inherit;
+                    }
+                }
+            }
+        }
+
+        /* --- Article Section Scopes --- */
+
+        & > article {
+            font-size: clamp(1.1px, 1.15dvw, 22.5px);
+
+            > section {
+                contain: size;
+                position: relative;
+                height: min(100dvh, 1600px);
+
+                &#reducingBoilerplateCode > a {
+                    font-size: 5vw;
+                }
+
+                > #repeatingText {
+                    font-size: 2.5vw;
+                    top: 50%;
+                    translate: 0 calc(-50% - 7.5em);
+                }
+
+                > #parallaxText {
+                    font-size: 2.5vw;
+                    bottom: 50%;
+                    translate: 0 calc(-50% + 6em);
+                }
+
+                > #mergingText {
+                    font-size: 8vw;
+                    top: calc(4em / 3);
+                }
+
+                > #changingText {
+                    font-size: 2.5vw;
+                    bottom: 16vw;
+                    translate: 0 calc(-50% + 5em);
+                }
+
+                > #backgroundText {
+                    font-size: 20vw;
+                    top: 50%;
+                    translate: 0 -50%;
+                }
+
+                > #visibleText {
+                    font-size: 2.5vw;
+                    top: 50%;
+                    translate: 0 -25%;
+                }
+
+                > #groupedText {
+                    font-size: 5vw;
+                    top: calc(50% - 50vw);
+                    bottom: auto;
+                    translate: 0 -50%;
+                    height: fit-content;
+                }
+
+                > #miniEditor {
+                    font-size: 2.5vw;
+                }
+
+                > #splittingText {
+                    font-size: 2.1vw;
+                    top: 50%;
+                    translate: 0 calc(-50% - 12.5em);
+                }
+
+                > #strechingText {
+                    font-size: 7.5vw;
+                    top: 64rem;
+                    translate: 0 calc(-50% - 12.5em);
+                    animation: none;
+                }
+
+                > #nestingText {
+                    font-size: 4vw;
+                    bottom: calc(20em / 5);
+                }
+
+                > #nycssLogoGroup {
+                    font-size: 2vw;
+                }
+            }
+        }
+
+        /* --- State Scopes (Homepage State) --- */
+
+        @scope (& > main:not(.nesting)) {
+            #mainContent#mainContent {
+                justify-content: center;
+
+                > #editorSide > #codeEditor {
+                    margin: 0 auto;
+                    /* animation: fadeIn 2s linear both; */
+
+                    > #inputEditorWrapper {
+                        border: none;
+                        border-radius: 1rem;
+                        background: none;
+                        padding: 0;
+                    }
+
+                    > #outputEditorWrapper > .editorGroup {
+                        opacity: 0;
+                    }
+                }
+            }
+        }
+
+        /* --- State Scopes (Nesting / Editor State) --- */
+
+        @scope (& > main.nesting) {
+            #mainContent {
+                min-width: 100%;
+                transition: unset;
+
+                > #editorSide#editorSide#editorSide {
+                    /*
+             * Remove the slide in animation, just make it fade out & fade in
+             * And make the editors stack on top of each other, aspect-ratio
+             * can be ignored - just fill the screen
+             */
+
+                    > #codeEditor {
+                        height: 100%;
+                        width: 100%;
+                        animation: none;
+                        flex-direction: column;
+
+                        #editorGap {
+                            height: var(--padding);
+                            aspect-ratio: auto;
+                            flex: none;
+                        }
+
+                        .editorWrapper {
+                            flex: 1;
+                        }
+
+                        .editorGroup {
+                            aspect-ratio: auto;
+                        }
+
+                        .editor {
+                            height: 100%;
+                            width: 100%;
+                            aspect-ratio: auto;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

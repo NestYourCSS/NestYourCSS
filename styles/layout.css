@@ -1,0 +1,203 @@
+/* --- Main Site Wrapper Scope --- */
+
+@scope (#siteWrapper) {
+    & {
+        margin: 0 auto;
+        width: clamp(0px, 100%, 3200px);
+        height: 100dvh;
+        contain: paint;
+        overflow: hidden auto;
+        animation: lightenBackgroundColour linear 1ms;
+        animation-timeline: scroll(self);
+
+        &:has(> .nesting) {
+            overflow: hidden;
+        }
+
+        /* --- Main Section Styles --- */
+        > main {
+            --padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            height: 96dvh;
+            width: 100%;
+            padding: var(--padding);
+
+            > #settingsBtn {
+                display: none;
+            }
+
+            .header-btn {
+                cursor: pointer;
+                padding: 1rem 1.75ch;
+                text-align: center;
+                align-content: center;
+                border-radius: 1rem;
+                font-family: "Poppins", "Calibri", sans-serif;
+                font-size: 1.125rem;
+                font-weight: 300;
+                border: none;
+                color: var(--shades-lightest);
+                box-shadow: inset 0 1px oklch(100% none none / 0.25);
+                min-width: 8rem;
+
+                --top-colour: var(--shades-m-darker);
+                --bottom-colour: var(--shades-em-darker);
+
+                background:
+                    linear-gradient(
+                            to bottom,
+                            var(--top-colour),
+                            var(--bottom-colour) 45%,
+                            transparent 55%
+                        )
+                        0% 100% / 100% 210% no-repeat,
+                    rgb(from var(--shades-black) r g b / 0.25);
+                transition:
+                    background-position 0.125s ease-out,
+                    transform 0.2s,
+                    filter 0.2s;
+                background-position: 0% 100%;
+
+                &:hover {
+                    filter: brightness(1.2);
+                    transform: translateY(-2px);
+                }
+
+                &.vibrant {
+                    --top-colour: var(--sec-colour-m-darker);
+                    --bottom-colour: var(--pri-colour-darkest);
+                    background-position: 0% 0%;
+                }
+            }
+
+            > #mainWrapper {
+                height: 100%;
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+            }
+            --padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            height: 96dvh;
+            width: 100%;
+            padding: var(--padding);
+        }
+
+        /* --- Article Section Styles --- */
+        > article {
+            position: relative;
+            top: 0;
+            font-size: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: min(50dvh, 800px);
+
+            > section {
+                contain: size;
+                position: relative;
+                height: min(100dvh, 1600px);
+                font-size: clamp(0.5rem, 16px, 1.5rem);
+
+                > p a {
+                    text-decoration: none;
+                    color: color-mix(
+                        in srgb,
+                        var(--shades-white) 50%,
+                        var(--pri-colour-darker)
+                    );
+                    transition: color 0s;
+
+                    * {
+                        transition: inherit;
+                    }
+
+                    &:hover {
+                        color: color-mix(
+                            in srgb,
+                            var(--shades-white) 75%,
+                            var(--pri-colour-darker)
+                        );
+                    }
+                }
+            }
+
+            .optimize {
+                content-visibility: auto;
+            }
+        }
+    }
+}
+
+/* --- Main Content Scope (Section With Fancy Background) --- */
+
+@scope (#mainContent) {
+    & {
+        --background:
+            url("https://ucarecdn.com/380d4e4c-268c-4913-8c92-e049c44234ec/-/preview/189x189/")
+                0 0.1dvh / 5dvh repeat,
+            linear-gradient(
+                    to right,
+                    rgb(from var(--shades-black) r g b / var(--opacity-medium)),
+                    rgb(
+                        from var(--pri-colour-em-darker) r g b /
+                            var(--opacity-medium)
+                    )
+                )
+                0 0 / 100dvw 100dvh,
+            linear-gradient(
+                    45deg,
+                    transparent,
+                    rgb(
+                            from var(--pri-colour-m-darker) r g b /
+                                var(--opacity-medium)
+                        )
+                        50%,
+                    transparent
+                )
+                0 0 / 100dvw 100dvh,
+            var(--shades-black);
+        display: flex;
+        justify-content: space-between;
+        container-type: size;
+        flex: 1;
+        width: fit-content;
+        position: relative;
+        background: var(--background);
+        border-radius: 3rem;
+        transform-origin: center;
+
+        @supports (animation-range: normal) {
+            animation: scaleDown linear 1ms;
+            animation-timeline: view();
+            animation-range-start: contain 100%;
+            animation-range-end: cover 100%;
+        }
+    }
+}
+
+/* --- Text Side Scope (On Homepage: Left Side Text) --- */
+
+@scope (#textSide) {
+    & {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        padding: 2rem 0;
+        flex-direction: column;
+        justify-content: space-between;
+        container-type: inline-size;
+        contain: paint;
+        transition:
+            width 2s,
+            opacity 2s,
+            padding 2s;
+
+        > header {
+            margin: 2rem 2rem 0 4rem;
+            font-size: clamp(0.5rem, 16px, 1.5rem);
+        }
+    }
+}

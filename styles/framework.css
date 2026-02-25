@@ -1,0 +1,246 @@
+/* The actual main CSS file for this website */
+
+/* Useful Regex Search Patterns - For Development */
+/* Hexcodes (without case-sensitivity) - #([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})(?=[^0-9a-z]) */
+/* Hexcodes (with/without case-sensitivity) - #([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})(?=[^0-9a-zA-Z]) */
+/* Selector with an ID - #.*\s\{ */
+
+/* Useful Regex Search Patterns - For Development
+ *
+ * Hexcodes (without case-sensitivity) - #([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})(?=[^0-9a-z])
+ * Hexcodes (with/without case-sensitivity) - #([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})(?=[^0-9a-zA-Z])
+ * Selector with an #iD - #.*\s\{
+ */
+
+@layer base, framework;
+
+/* --- Global and Root Element Styles --- */
+
+@layer framework {
+    @starting-style {
+        #mainContent
+            > #textSide
+            > header
+            :is(nav > button, hgroup > :is(h1, p)),
+        #mainContent > #textSide > figure > :is(figcaption, figcaption + div),
+        #mainContent > #editorSide > #codeEditor .editorWrapper {
+            opacity: 0;
+        }
+
+        #inputEditorWrapper {
+            display: none;
+            background-color: transparent;
+        }
+
+        #outputEditorWrapper {
+            opacity: 0;
+            background-color: transparent;
+        }
+
+        #outputEditorWrapper {
+            opacity: 0;
+        }
+    }
+
+    :root {
+        font-size: clamp(0px, 1.5dvh, 24px);
+
+        --lightness-darkest: 20%;
+        --chroma-darkest: 0.0424;
+
+        --lightness-em-darker: 25%;
+        --chroma-em-darker: 0.0424;
+
+        --lightness-m-darker: 40%;
+        --chroma-m-darker: 0.0679;
+
+        --lightness-darker: 55%;
+        --chroma-darker: 0.0935;
+
+        --lightness-medium: 75%;
+        --chroma-medium: 0.1278;
+
+        --lightness-lighter: 85%;
+        --chroma-lighter: 0.0821;
+
+        --lightness-lightest: 90%;
+        --chroma-lightest: 0.0522;
+
+        --hue-pri-colour: 235;
+        --hue-sec-colour: 205;
+        --hue-red-colour: 15;
+        --hue-shades: 360;
+
+        --pri-colour-darkest: oklch(
+            var(--lightness-darkest) var(--chroma-darkest) var(--hue-pri-colour)
+        ); /* #051823 */
+        --pri-colour-em-darker: oklch(
+            var(--lightness-em-darker) var(--chroma-em-darker)
+                var(--hue-pri-colour)
+        ); /* #092533 */
+        --pri-colour-m-darker: oklch(
+            var(--lightness-m-darker) var(--chroma-m-darker)
+                var(--hue-pri-colour)
+        ); /* #1c4d67 */
+        --pri-colour-darker: oklch(
+            var(--lightness-darker) var(--chroma-darker) var(--hue-pri-colour)
+        ); /* #307aa0 */
+        --pri-colour-medium: oklch(
+            var(--lightness-medium) var(--chroma-medium) var(--hue-pri-colour)
+        ); /* #4dbaf3 */
+        --pri-colour-lighter: oklch(
+            var(--lightness-lighter) var(--chroma-lighter) var(--hue-pri-colour)
+        ); /* #98d7fc */
+        --pri-colour-lightest: oklch(
+            var(--lightness-lightest) var(--chroma-lightest)
+                var(--hue-pri-colour)
+        ); /* #bde4fc */
+
+        --sec-colour-darkest: oklch(
+            var(--lightness-darkest) var(--chroma-darkest) var(--hue-sec-colour)
+        ); /* #001a1d */
+        --sec-colour-em-darker: oklch(
+            var(--lightness-em-darker) var(--chroma-em-darker)
+                var(--hue-sec-colour)
+        ); /* #00272b */
+        --sec-colour-m-darker: oklch(
+            var(--lightness-m-darker) var(--chroma-m-darker)
+                var(--hue-sec-colour)
+        ); /* #015259 */
+        --sec-colour-darker: oklch(
+            var(--lightness-darker) var(--chroma-darker) var(--hue-sec-colour)
+        ); /* #02818b */
+        --sec-colour-medium: oklch(
+            var(--lightness-medium) var(--chroma-medium) var(--hue-sec-colour)
+        ); /* #03c4d4 */
+        --sec-colour-lighter: oklch(
+            var(--lightness-lighter) var(--chroma-lighter) var(--hue-sec-colour)
+        ); /* #8aDee7 */
+        --sec-colour-lightest: oklch(
+            var(--lightness-lightest) var(--chroma-lightest)
+                var(--hue-sec-colour)
+        ); /* #b6e9ee */
+
+        --red-colour-darkest: oklch(
+            var(--lightness-darkest) var(--chroma-darkest) var(--hue-red-colour)
+        ); /* #230f11 */
+        --red-colour-em-darker: oklch(
+            var(--lightness-em-darker) var(--chroma-em-darker)
+                var(--hue-red-colour)
+        ); /* #33191b */
+        --red-colour-m-darker: oklch(
+            var(--lightness-m-darker) var(--chroma-m-darker)
+                var(--hue-red-colour)
+        ); /* #67383c */
+        --red-colour-darker: oklch(
+            var(--lightness-darker) var(--chroma-darker) var(--hue-red-colour)
+        ); /* #a15a60 */
+        --red-colour-medium: oklch(
+            var(--lightness-medium) var(--chroma-medium) var(--hue-red-colour)
+        ); /* #f48a94 */
+        --red-colour-lighter: oklch(
+            var(--lightness-lighter) var(--chroma-lighter) var(--hue-red-colour)
+        ); /* #ffb8bc */
+        --red-colour-lightest: oklch(
+            var(--lightness-lightest) var(--chroma-lightest)
+                var(--hue-red-colour)
+        ); /* #ffd1d3 */
+
+        --shades-darkest: oklch(
+            var(--lightness-darkest) none none
+        ); /* #161616 */
+        --shades-em-darker: oklch(
+            var(--lightness-em-darker) none none
+        ); /* #222222 */
+        --shades-m-darker: oklch(
+            var(--lightness-m-darker) none none
+        ); /* #484848 */
+        --shades-darker: oklch(var(--lightness-darker) none none); /* #717171 */
+        --shades-medium: oklch(var(--lightness-medium) none none); /* #aeaeae */
+        --shades-lighter: oklch(
+            var(--lightness-lighter) none none
+        ); /* #cecece */
+        --shades-lightest: oklch(
+            var(--lightness-lightest) none none
+        ); /* #dedede */
+
+        --shades-black: black;
+        --shades-white: white;
+
+        --opacity-low: 0.25;
+        --opacity-medium: 0.5;
+        --opacity-high: 0.75;
+
+        /* I need to update the code accordingly at some point: */
+        --vh: 1vh;
+        --dvh: var(--vh);
+        --dvh: 1dvh;
+        --svh: var(--vh);
+        --svh: 1svh;
+        --lvh: var(--vh);
+        --lvh: 1lvh;
+    }
+
+    * {
+        box-sizing: border-box;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    html {
+        background-color: color-mix(
+            in srgb,
+            #000 50%,
+            var(--sec-colour-darkest)
+        );
+        /* scroll-behavior: smooth; */
+
+        overflow: hidden;
+
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+    }
+
+    body {
+        visibility: visible;
+        opacity: 1;
+        margin: 0;
+        height: 100dvh;
+        background-color: var(--shades-black);
+
+        /* --- Skip Link Styles --- */
+        > .skip-to-section {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            font-size: 1rem;
+
+            &:focus {
+                height: auto;
+                width: auto;
+                left: 50%;
+                translate: -50%;
+                padding: 1rem 2rem;
+                background-color: rgb(from var(--shades-black) r g b / 0.5);
+                outline: none !important;
+                border: 0.2rem solid
+                    rgb(from var(--shades-darker) r g b / var(--opacity-medium));
+                border-top: none;
+                border-radius: 0 0 0.5rem 0.5rem;
+                font-family: "Poppins", "Calibri", sans-serif;
+                color: var(--shades-white);
+                z-index: 9999;
+                text-decoration: none;
+            }
+
+            a&:has(~ #siteWrapper > main.nesting) {
+                display: none;
+            }
+        }
+    }
+}

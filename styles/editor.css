@@ -1,0 +1,361 @@
+/* --- Editor Side Scope (Homepage's Input Editor) --- */
+
+@scope (#editorSide) {
+    & {
+        container-type: inline-size;
+        flex: none;
+        max-width: 100%;
+
+        & {
+            --gutter-width: 0.25;
+            --editor-width: 5;
+            --total-width: (
+                var(--editor-width) + var(--gutter-width) + var(--editor-width)
+            );
+            --vertical-padding: (2 * var(--padding));
+            --horizontal-padding: (2 * var(--padding));
+            --code-editor-height: (100cqh);
+            --code-editor-width: (100cqw);
+            --content-height: (
+                var(--code-editor-height) - var(--vertical-padding)
+            );
+            --total-editor-width: (
+                (var(--total-width) / 7) * var(--content-height)
+            );
+            --single-editor-width: (
+                (var(--editor-width) / 7) * var(--content-height)
+            );
+            --gutter-real-width: (
+                (var(--gutter-width) / 7) * var(--content-height)
+            );
+            --settings-panel-width: (58.441558ch * 1.232);
+        }
+
+        > #codeEditor {
+            flex: none;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            width: calc(
+                (var(--code-editor-height) - var(--vertical-padding)) *
+                    (var(--editor-width) / 7)
+            );
+            transition: opacity 0.5s ease-out;
+
+            &.loading {
+                visibility: hidden;
+                opacity: 0;
+            }
+
+            /* moveLeft Animation Variables */
+            & {
+                --screen-width: (100lvw);
+                --editor-canvas-width: (100cqw);
+                --code-editor-height: (100cqh);
+                --code-editor-width: (100%);
+                --content-height: (
+                    var(--code-editor-height) - var(--vertical-padding)
+                );
+                --combined-editor-width: (
+                    (var(--total-width) / 7) * var(--content-height)
+                );
+                --difference-of-both-full-widths: (
+                    var(--code-editor-width) - var(--combined-editor-width)
+                );
+                --align-left: (
+                    0% - (var(--difference-of-both-full-widths) / 2)
+                );
+                --editor-canvas-inner-width: calc(
+                    var(--editor-canvas-width) - var(--horizontal-padding)
+                );
+            }
+        }
+    }
+}
+
+/* --- Editor Side Scope (#editorSide > #codeEditor) --- */
+
+@scope (#codeEditor) {
+    & {
+        .editorWrapper {
+            &:not(.shadowEditorWrapper):is(
+                    #inputEditorWrapper,
+                    #outputEditorWrapper
+                ):is(#inputEditorWrapper, #outputEditorWrapper):is(
+                    #inputEditorWrapper,
+                    #outputEditorWrapper
+                ) {
+                width: calc(
+                    (var(--code-editor-height) - var(--vertical-padding)) *
+                        (var(--editor-width) / 7)
+                );
+
+                &#inputEditorWrapper {
+                    position: relative;
+                    border-radius: 0 3rem 3rem 0;
+                    transition:
+                        opacity 1s,
+                        border-color 1s,
+                        background-color 1s;
+
+                    > #shadowEditorsWrapper {
+                        position: absolute;
+                        inset: 0;
+
+                        > .shadowEditorWrapper {
+                            position: absolute;
+                            overflow: hidden;
+                            height: 100%;
+                            transition:
+                                translate 2s,
+                                opacity 2s;
+                        }
+
+                        &,
+                        * {
+                            pointer-events: none;
+                        }
+                    }
+                }
+
+                &#outputEditorWrapper {
+                    transition:
+                        opacity 1s,
+                        display 1s;
+                    transition-behavior: allow-discrete;
+                }
+            }
+        }
+
+        .editorGroup {
+            transform-origin: left;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: auto;
+            aspect-ratio: var(--editor-width) / 7;
+
+            &:has(button:active) {
+                --onClickValue1: 0.75;
+                --opacity-medium: var(--onClickValue2, unset);
+                animation: onClick 1s;
+            }
+
+            &:has(#inputEditor.drag-hover) {
+                --opacity-medium: 0.75;
+            }
+        }
+
+        .editorTab {
+            --background-colour: rgb(
+                from var(--shades-black) r g b / var(--opacity-low)
+            );
+            --window-text-colour: rgb(
+                from var(--shades-darker) r g b / var(--opacity-medium)
+            );
+            line-height: 100%;
+            color: rgb(from var(--shades-medium) r g b / 50%);
+            font-family: "Fira Code", monospace;
+            border: 0.125rem solid var(--window-text-colour);
+            border-radius: 1rem 1rem 0 0;
+            border-bottom: none;
+            background-color: var(--background-colour);
+            flex: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+
+            > .fileName {
+                font-size: 1rem;
+                align-content: center;
+
+                &[cursor]::after {
+                    font-size: 0.75em;
+                    content: attr(cursor);
+                    color: var(--shades-m-darker);
+                }
+            }
+
+            > .tabButtons {
+                display: flex;
+                gap: 1em;
+
+                > button {
+                    font-size: inherit;
+                    height: 2rem;
+                    width: 2rem;
+                    padding: 0;
+                    border: none;
+                    outline: none !important;
+                    border-radius: 50%;
+                    background-color: transparent;
+                    background-position: center;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    /* I could've just editing the .svg files to make them gray, but this is the lazy approach */
+                    filter: invert(0.4431);
+                    opacity: var(--opacity-medium);
+                    cursor: pointer;
+                    transition: 0.1s;
+
+                    &.tabCopyAll {
+                        background-image: url("../assets/images/icon-copy.svg");
+                    }
+                    &.tabOpenRaw {
+                        background-image: url("../assets/images/icon-open-external.svg");
+                    }
+                    &.tabInsertCSS {
+                        background-image: url("../assets/images/icon-add-file.svg");
+                    }
+                    &.tabDeleteAll {
+                        background-image: url("../assets/images/icon-erase.svg");
+                    }
+
+                    &:hover {
+                        filter: invert(0.8832);
+                    }
+
+                    &:focus {
+                        z-index: 1;
+                        outline: 1px solid var(--shades-medium) !important;
+                        box-shadow: 0 0 calc((3 / 4) * var(--padding))
+                            var(--shades-medium);
+                        background-size: calc(100% - 8px);
+                    }
+                }
+            }
+        }
+
+        .editor {
+            flex: 1;
+        }
+    }
+}
+
+/* --- Editor Side Scope (#editorSide > #nestBtn) --- */
+
+@scope (#nestBtn) {
+    & {
+        /* Container styles - positioning and animation */
+        cursor: pointer;
+        font-size: 0.75rem;
+        position: absolute;
+        top: 0;
+        right: 0;
+        translate: -2rem calc(96dvh - 6rem - 100%);
+        z-index: 10;
+        background: none;
+        border: none;
+        border-radius: 50%;
+        outline: none !important;
+        padding: 0;
+        --nestBtn-shadow-direction: 1;
+        animation: bounceInTop 1.5s 0.5s both;
+        transition:
+            opacity 1s,
+            font-size 1s,
+            translate 1s,
+            --nestBtn-shadow-direction 1s;
+
+        &:disabled {
+            cursor: not-allowed;
+            filter: brightness(0.5);
+            color: var(--shades-black);
+
+            > div:hover {
+                scale: unset;
+            }
+        }
+
+        &:focus {
+            box-shadow: 0 0 calc((3 / 4) * var(--padding)) var(--shades-lighter);
+
+            > div {
+                outline: 1px solid var(--shades-medium) !important;
+            }
+        }
+
+        > div {
+            /* Main button face styles */
+            border-radius: inherit;
+            padding: 1.5em;
+            aspect-ratio: 1 / 1;
+            font-family: "Poppins", "Calibri", sans-serif;
+            font-weight: 500;
+            text-align: center;
+            align-content: center;
+            transform-origin: bottom right;
+            transition:
+                scale 0.5s,
+                background-color 1s;
+
+            /* Visuals */
+            background-color: var(--pri-colour-lighter);
+            box-shadow: inset 0 0 1em 0 var(--shades-black);
+
+            &:hover {
+                scale: 1.333;
+                background-color: var(--shades-white);
+            }
+
+            &::before {
+                content: "Nest!";
+            }
+        }
+
+        > span {
+            /* Animated background layers */
+            position: absolute;
+            inset: 1em;
+            opacity: 0;
+            z-index: -1;
+            border-radius: inherit;
+            transition:
+                inset 0.5s,
+                opacity 2s,
+                background-color 2s;
+            animation: shadowRotate 3s infinite both;
+            /* --nestBtn-shadow-direction: -1; */
+
+            /* Show spans on hover of the main div */
+            :is(#nestBtn:not(:disabled):has(> div:hover) > &) {
+                inset: 0.5em;
+                opacity: 1;
+            }
+
+            /* Individual layer colors and animation delays */
+            &:nth-of-type(1) {
+                background-color: rgb(
+                    from var(--pri-colour-medium) r g b / var(--opacity-medium)
+                );
+                animation-delay: 0s;
+            }
+
+            &:nth-of-type(2) {
+                background-color: rgb(
+                    from var(--sec-colour-medium) r g b / var(--opacity-medium)
+                );
+                animation-delay: -1s;
+            }
+
+            &:nth-of-type(3) {
+                background-color: rgb(
+                    from
+                        color-mix(
+                            in srgb,
+                            var(--pri-colour-medium),
+                            var(--sec-colour-medium)
+                        )
+                        r g b / var(--opacity-medium)
+                );
+                animation-delay: -2s;
+            }
+        }
+
+        /* Pause animations when hidden or main content is not hovered */
+        &.hidden > span {
+            animation-play-state: paused;
+        }
+    }
+}
