@@ -364,7 +364,7 @@
     display: flex;
     flex-direction: column;
     --component-gap: calc(var(--padding) / 4);
-    --component-background: rgb(from var(--shades-black) r g b / 0.25);
+    --component-background: color-mix(in srgb, var(--shades-black), var(--shades-darkest));
     --component-background-selected: linear-gradient(
       to right,
       var(--shades-m-darker),
@@ -2676,18 +2676,26 @@
             z-index: -1;
           }
 
-          > ul > li {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
+          > ul {
+            --component-background: rgb(from var(--shades-black) r g b / 0.25);
 
-            > span {
-              font-size: 1rem;
-            }
-
-            > div {
-              width: 100%;
+            > li {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 0.5rem;
+  
+              > span {
+                font-size: 1rem;
+              }
+  
+              > div {
+                width: 100%;
+              }
+  
+              > div > :is(.dropdown, .combobox):focus-within > input:checked ~ ul {
+                --component-background: rgb(from var(--shades-black) r g b / 0.75);
+              }
             }
           }
           
