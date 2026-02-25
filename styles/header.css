@@ -1,0 +1,205 @@
+/* --- Text Side Scope (Site's Title & Scrambled Subtitle) --- */
+
+@scope (#textSide > header > hgroup) {
+    & {
+        display: flex;
+        flex-direction: column-reverse;
+        color: rgb(from var(--shades-white) r g b / var(--opacity-high));
+        font-family: "Poppins", "Calibri", sans-serif;
+
+        > * {
+            margin: 0;
+        }
+
+        > h1 {
+            display: inline-block;
+            white-space: nowrap;
+            line-height: 125%;
+            font-weight: 900;
+            font-size: 6em;
+            transition: opacity 3s 1.5s;
+
+            &:hover {
+                color: var(--shades-white);
+            }
+        }
+
+        > h2 {
+            line-height: 125%;
+            font-weight: 200;
+            font-size: 3em;
+            height: 2lh;
+            width: 24ch;
+            transition: opacity 3s 3s;
+            transform: translateZ(0);
+        }
+    }
+}
+
+/* --- Text Side Scope (Homepage's Navbar) --- */
+
+@scope (#textSide > header > nav) {
+    & {
+        display: inline-flex;
+        --primary-colour: var(--shades-darker);
+        --secondary-colour: color-mix(
+            in srgb,
+            var(--shades-lightest),
+            var(--primary-colour) 50%
+        );
+        gap: 0.33em;
+        margin: 1em 0;
+        padding: 0;
+
+        > a {
+            /* --- Animation Duration & Delay Variables --- */
+
+            /* Part 1: Icon changing (on hover) */
+            --anim-duration-icon-in: 0.5s;
+            --anim-duration-bg-in: 0s;
+            --delay-icon-in-paths: 0s;
+            --delay-icon-in-bg: calc(
+                var(--delay-icon-in-paths) + var(--anim-duration-icon-in) + 0s
+            );
+
+            /* Part 2: Text being shown (on hover) */
+            --anim-duration-text-show: 0.5s;
+            --anim-duration-text-opacity-show: 0.25s;
+            --delay-text-show-font: calc(var(--delay-icon-in-bg) + 0s);
+            --delay-text-show-opacity: calc(
+                var(--delay-text-show-font) + var(--anim-duration-text-show) +
+                    0s
+            );
+
+            /* Part 3: Text being hidden (on mouse out) */
+            --anim-duration-text-hide: 0.5s;
+            --anim-duration-text-opacity-hide: 0.25s;
+            --delay-text-hide-opacity: 0s;
+            --delay-text-hide-font: 0.5s;
+
+            /* Part 4: Icon changing back (on mouse out) */
+            --anim-duration-icon-out: 0.5s;
+            --anim-duration-bg-out: 0s;
+            --delay-icon-out-paths: calc(
+                var(--delay-text-hide-font) + var(--anim-duration-text-hide) +
+                    0s
+            );
+            --delay-icon-out-bg: calc(var(--delay-icon-out-paths) + 0s);
+
+            display: flex;
+            font-size: inherit;
+            font-family: "Poppins", "Calibri", sans-serif;
+            text-decoration: none;
+            flex-direction: row;
+            align-items: center;
+            position: relative;
+            padding: 0;
+            outline: none !important;
+            border: none;
+            background: radial-gradient(
+                circle at 1.5em,
+                transparent calc(1.5em - 0.125em),
+                var(--button-bg) 0,
+                var(--button-bg) 100%
+            );
+            border-radius: 999px;
+
+            /* Initial state of icon fills and button background */
+            --button-bg: transparent;
+            transition:
+                opacity 3s 1s,
+                --button-bg var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+
+            > svg {
+                height: 3em;
+                width: auto;
+                aspect-ratio: 1 / 1;
+                border-radius: inherit;
+                box-sizing: border-box;
+
+                /* Transitions for HOVER-OUT */
+                --icon-path-one-fill: var(--primary-colour);
+                --icon-path-two-fill: transparent;
+
+                --icon-paths-fill-transition:
+                    --icon-path-one-fill var(--anim-duration-icon-out)
+                        var(--delay-icon-out-paths),
+                    --icon-path-two-fill var(--anim-duration-icon-out)
+                        var(--delay-icon-out-paths);
+            }
+
+            > span {
+                flex: 1;
+                display: block;
+                color: transparent;
+                font-weight: 600;
+                font-size: 0;
+                opacity: 0;
+                line-height: 1;
+                padding: 1.5ch 0;
+                padding-right: 3ch;
+                translate: 1ch;
+                background: var(--background);
+                background-clip: text;
+
+                /* Transitions for HOVER-OUT */
+                transition:
+                    font-size var(--anim-duration-text-hide)
+                        var(--delay-text-hide-font),
+                    opacity var(--anim-duration-text-opacity-hide)
+                        var(--delay-text-hide-opacity),
+                    color var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+            }
+
+            &:not([aria-disabled="true"]) {
+                &:hover {
+                    /* Hover state of icon fills and button background */
+                    --button-bg: var(--secondary-colour);
+                    transition: --button-bg var(--anim-duration-bg-in)
+                        var(--delay-icon-in-bg);
+
+                    > svg {
+                        /* Transitions for HOVER-IN */
+                        --icon-path-one-fill: transparent;
+                        --icon-path-two-fill: var(--secondary-colour);
+
+                        --icon-paths-fill-transition: fill
+                            var(--anim-duration-icon-in)
+                            var(--delay-icon-in-paths);
+                    }
+
+                    > span {
+                        translate: 1ch 0;
+                        font-size: unset;
+                        opacity: 1;
+
+                        /* Transitions for HOVER-IN */
+                        transition:
+                            font-size var(--anim-duration-text-show)
+                                var(--delay-text-show-font),
+                            opacity var(--anim-duration-text-opacity-show)
+                                var(--delay-text-show-opacity),
+                            color var(--anim-duration-icon-in)
+                                var(--delay-icon-in-bg);
+                    }
+                }
+
+                &:focus {
+                    z-index: 1;
+                    outline: 1px solid var(--shades-medium) !important;
+                    box-shadow: 0 0 calc((3 / 4) * var(--padding))
+                        var(--shades-lighter);
+                }
+            }
+
+            &[aria-disabled="true"] {
+                cursor: not-allowed;
+                opacity: 0.5;
+
+                use {
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+}

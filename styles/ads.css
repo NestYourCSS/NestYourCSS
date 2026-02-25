@@ -1,0 +1,89 @@
+/* --- Text Side Scope (Homepage's Ads Section) --- */
+
+@scope (#textSide > figure) {
+    & {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin: 0;
+        margin-left: 4rem;
+        margin-right: 2rem;
+        height: 100%;
+        width: min(50vw, calc(100% - 6rem)); /* margin-left + right */
+        container: ads-container / size;
+
+        > figcaption {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            color: rgb(from var(--shades-white) r g b / var(--opacity-high));
+            font-family: "Poppins", "Calibri", sans-serif;
+            font-weight: 200;
+            font-size: 1.25rem;
+            height: 2rem;
+            align-content: center;
+            transition: opacity 3s;
+        }
+
+        > div {
+            display: flex;
+            flex-flow: row;
+            width: fit-content;
+            max-width: 100%;
+            contain: paint;
+            overflow-clip-margin: content-box;
+            border: 0.125rem solid
+                rgb(from var(--shades-darker) r g b / var(--opacity-low));
+            padding: 1rem;
+            gap: 1rem;
+            animation: slideInLeft 0.5s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+                both;
+            transition:
+                0.25s,
+                opacity 3s 1s;
+
+            > picture {
+                width: 17.637rem;
+                aspect-ratio: 1 / 1;
+                transition: filter 0.25s;
+
+                > * {
+                    cursor: pointer;
+                    height: 100%;
+                    width: auto;
+                    aspect-ratio: 1 / 1;
+                    object-fit: contain;
+
+                    &.adsbygoogle:not([data-ad-status="filled"]) {
+                        display: none;
+
+                        & ~ img {
+                            display: block;
+                        }
+                    }
+
+                    & ~ img {
+                        display: none;
+                    }
+                }
+            }
+
+            &:hover {
+                border-color: rgb(
+                    from var(--shades-lighter) r g b / var(--opacity-low)
+                );
+
+                &:has(> picture:hover) {
+                    border-color: rgb(
+                        from var(--shades-lighter) r g b / var(--opacity-medium)
+                    );
+                }
+
+                picture:not(:hover) {
+                    filter: grayscale(1);
+                }
+            }
+        }
+    }
+}

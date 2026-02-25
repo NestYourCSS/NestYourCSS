@@ -1,0 +1,651 @@
+/* --- Settings Panel Scope (Nesting Editor Settings) --- */
+
+@scope (#mainSettings) {
+    & {
+        flex: 0;
+        height: 100%;
+        min-width: 0;
+        margin-right: 0;
+        display: flex;
+        flex-direction: column;
+        contain: paint inline-size;
+        gap: var(--padding);
+        padding-bottom: calc((3 / 4) * var(--padding));
+        overflow: hidden auto;
+        transition:
+            margin-right 2s,
+            min-width 2s;
+
+        > section {
+            border-radius: 3rem;
+            --panel-background: color-mix(
+                in srgb,
+                var(--shades-darkest),
+                var(--shades-black) 75%
+            );
+            background-color: var(--panel-background);
+            padding: var(--padding);
+            min-width: 58.441558ch;
+            display: flex;
+            flex-direction: column;
+            gap: var(--padding);
+            font-family: "Poppins", "Calibri", sans-serif;
+
+            /* &:not(:nth-last-child(1)) { display: none; } */
+
+            > h2 {
+                margin: 0;
+                font-size: 1.25rem;
+                font-weight: normal;
+                color: var(--shades-medium);
+            }
+        }
+    }
+}
+
+/* --- Settings Panel Scope (Settings Form Fields) --- */
+
+@scope (#mainSettings > section > ul) {
+    & {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        --component-gap: calc(var(--padding) / 4);
+        --component-background: color-mix(
+            in srgb,
+            var(--shades-black),
+            var(--shades-darkest)
+        );
+        --component-background-selected: linear-gradient(
+            to right,
+            var(--shades-m-darker),
+            var(--shades-em-darker)
+        );
+        --component-box-shadow-selected: inset 0 calc(1rem / 16)
+            oklch(100% none none / var(--opacity-low));
+        --component-box-shadow-focused: 0 0 1.5em var(--shades-medium);
+        --component-text: color-mix(
+            in srgb,
+            var(--shades-darker),
+            var(--shades-medium)
+        );
+        --component-text-hover: var(--shades-medium);
+        gap: var(--component-gap);
+
+        > li {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+
+            > span {
+                cursor: auto;
+                grid-column: span 3;
+                align-content: center;
+                font-size: 1.125rem;
+                font-weight: 300;
+                color: var(--component-text);
+
+                > p {
+                    margin: 0;
+                    font-size: 0.625rem;
+                    color: var(--shades-m-darker);
+                }
+            }
+
+            > div {
+                grid-column: span 7;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: var(--component-gap);
+                color: var(--component-text);
+                font-size: 1rem;
+
+                /* Generic Components */
+
+                > label {
+                    flex: 1;
+                }
+
+                > #externalCss {
+                    max-width: 100%;
+                }
+
+                > #fontsizes {
+                    width: auto;
+                    margin: 0;
+                    flex: 0;
+                }
+
+                > #indentationSize {
+                    flex: 0;
+                    display: flex;
+                    align-items: center;
+                    gap: var(--component-gap);
+                }
+
+                /* Specific Components */
+
+                > .dropdown,
+                > .combobox {
+                    user-select: none;
+                    display: inline-flex;
+                    flex-direction: column;
+                    width: auto;
+                    margin: 0;
+                    text-align: left;
+                    box-sizing: content-box;
+                    position: relative;
+
+                    > input {
+                        appearance: none;
+                        position: absolute;
+                        margin: 0;
+                    }
+
+                    &:focus-within > input:checked {
+                        + output {
+                            border-radius: 1rem 1rem 0 0;
+                        }
+
+                        ~ ul {
+                            position: absolute;
+                            z-index: 999;
+                            top: 100%;
+                            width: 100%;
+                            display: flex;
+                            margin: 0;
+                            margin-top: 0.25rem;
+                            padding: 1em;
+                            gap: 0.5em;
+                            flex-direction: column;
+                            background: var(--component-background);
+                            border-bottom-left-radius: 1rem;
+                            border-bottom-right-radius: 1rem;
+                            box-shadow: 0px 10px 10px 2.5px
+                                rgb(from var(--shades-black) r g b / 0.5);
+
+                            > li {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                outline: none !important;
+
+                                &:hover {
+                                    color: var(--component-text-hover);
+                                    cursor: pointer;
+                                }
+
+                                &:focus {
+                                    color: var(--component-text-hover);
+                                }
+
+                                &:disabled {
+                                    color: rgb(
+                                        from var(--component-text) r g b / 0.5
+                                    );
+                                    cursor: not-allowed;
+
+                                    &:hover {
+                                        color: inherit;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    > output {
+                        outline: none !important;
+                        cursor: pointer;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: clip;
+                        background:
+                            url("data:image/svg+xml,%3Csvg fill='%23484848' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11.178 19.569a.998.998 0 0 0 1.644 0l9-13A.999.999 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13z'%3E%3C/path%3E%3C/svg%3E")
+                                right 1rem top 50% / 1ch no-repeat,
+                            var(--component-background);
+                        border-radius: 1rem;
+                        padding: 1rem;
+                        padding-right: calc(1rem + 2ch);
+
+                        &:hover {
+                            color: var(--component-text-hover);
+                        }
+                    }
+
+                    /* Component Specific */
+
+                    &.dropdown:has(:is(input, ul > li):focus) > output {
+                        z-index: 1;
+                        box-shadow: var(--component-box-shadow-focused);
+                    }
+
+                    &.combobox {
+                        &:has(:is(input, output > div, ul > li):focus)
+                            > output {
+                            z-index: 1;
+                            box-shadow: var(--component-box-shadow-focused);
+                        }
+
+                        > output {
+                            &&:hover > div:empty::before {
+                                color: var(--shades-darker);
+                            }
+
+                            > div {
+                                cursor: auto;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                outline: none !important;
+
+                                &:focus {
+                                    overflow-x: scroll;
+                                    scrollbar-width: none;
+                                    text-overflow: clip;
+                                }
+
+                                &:not(:focus):empty {
+                                    align-content: center;
+                                    font-size: 75%;
+                                    padding: 0.25em 0;
+
+                                    &::before {
+                                        pointer-events: none;
+                                        content: attr(placeholder);
+                                        color: var(--shades-m-darker);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                > .number {
+                    user-select: none;
+                    position: relative;
+                    width: fit-content;
+                    color: var(--component-text);
+                    border: none;
+                    padding: 1rem;
+                    gap: calc(2 * var(--component-gap));
+                    background: var(--component-background);
+                    border-radius: 1rem;
+
+                    &:hover {
+                        color: var(--component-text-hover);
+                    }
+
+                    &:has(input:focus, input:active) {
+                        z-index: 1;
+                        box-shadow: var(--component-box-shadow-focused);
+                    }
+
+                    > output > input {
+                        cursor: auto;
+                        display: inline-block;
+                        margin-right: 1ch;
+                        outline: none !important;
+
+                        ~ div {
+                            position: absolute;
+                            width: 1ch;
+                            top: 50%;
+                            right: 1rem;
+                            translate: 0 -50%;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.25em;
+
+                            > svg {
+                                cursor: pointer;
+                            }
+                        }
+
+                        &[type="text"] {
+                            appearance: none;
+                            background: inherit;
+                            border: inherit;
+                            color: inherit;
+                            font: inherit;
+                            overflow: visible !important;
+                            overflow-wrap: break-word;
+                            text-align: inherit;
+                            -webkit-user-modify: read-write;
+                        }
+                    }
+                }
+
+                > .checkbox {
+                    outline: none !important;
+                    user-select: none;
+                    position: relative;
+                    display: flex;
+                    border-radius: 1rem;
+                    background: var(--component-background);
+
+                    &::before {
+                        position: absolute;
+                        content: "";
+                        height: 100%;
+                        left: 0%;
+                        width: 50%;
+                        border-radius: inherit;
+                        background: var(--component-background-selected);
+                        box-shadow: var(--component-box-shadow-selected);
+                        z-index: 0;
+                        transition: 0.25s;
+                    }
+
+                    &:has(:checked)::before {
+                        left: 50%;
+                    }
+
+                    &:has(input:focus, input:active) {
+                        z-index: 1;
+                        box-shadow: var(--component-box-shadow-focused);
+                    }
+
+                    > input {
+                        appearance: none;
+                        position: absolute;
+                        margin: 0;
+                    }
+
+                    > span {
+                        position: relative;
+                        cursor: pointer;
+                        flex: 1;
+                        padding: 1rem 2.5ch;
+                        text-align: center;
+                        align-content: center;
+
+                        &:hover {
+                            color: var(--component-text-hover);
+                        }
+                    }
+                }
+
+                > .radio-group {
+                    user-select: none;
+                    display: flex;
+                    gap: var(--component-gap);
+
+                    > label {
+                        outline: none !important;
+                        flex: 1;
+                        cursor: pointer;
+                        padding: 1rem 1.75ch;
+                        text-align: center;
+                        align-content: center;
+                        border-radius: 1rem;
+                        --top-colour: var(--shades-m-darker);
+                        --bottom-colour: var(--shades-em-darker);
+                        background:
+                            linear-gradient(
+                                    to bottom,
+                                    var(--top-colour),
+                                    var(--bottom-colour) 45%,
+                                    var(--component-background) 55%
+                                )
+                                0% 100% / 100% 210% no-repeat,
+                            var(--component-background);
+                        transition: background-position 0.125s ease-out;
+
+                        &:has(:disabled) {
+                            &,
+                            &:hover {
+                                --shades-true-darkest: color-mix(
+                                    in srgb,
+                                    var(--shades-black),
+                                    var(--shades-darkest)
+                                );
+                                background: linear-gradient(
+                                    to bottom,
+                                    var(--shades-black),
+                                    var(--shades-true-darkest)
+                                );
+                                box-shadow: inset 0 calc(-1rem / 16)
+                                    var(--shades-darkest);
+                                color: var(--shades-m-darker);
+                                cursor: not-allowed;
+                            }
+                        }
+
+                        &:has(:checked) {
+                            box-shadow: var(--component-box-shadow-selected);
+                            background-position: 0% 0%;
+                        }
+
+                        &:hover {
+                            color: var(--component-text-hover);
+                        }
+
+                        &:has(> input:focus) {
+                            z-index: 1;
+                            box-shadow: var(--component-box-shadow-focused);
+                        }
+
+                        > input {
+                            appearance: none;
+                            position: absolute;
+                            margin: 0;
+                        }
+                    }
+
+                    &.button {
+                        > label {
+                            --top-colour: var(--sec-colour-m-darker);
+                            --bottom-colour: var(--pri-colour-darkest);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* --- Settings Panel Scope (Editor Errors Table) --- */
+
+@scope (#mainSettings > section > :has(> table)) {
+    & {
+        overflow-y: scroll;
+        max-height: 16rem;
+        padding: calc(var(--padding) / 2);
+        border-radius: 1.5rem;
+        --table-background: color-mix(
+            in srgb,
+            var(--shades-darkest),
+            var(--panel-background) 75%
+        );
+        background-color: var(--table-background);
+        scrollbar-width: 0.75rem;
+
+        > table {
+            width: 100%;
+            font-size: 0.75rem;
+            color: var(--shades-medium);
+
+            > colgroup > col:last-child {
+                width: 0;
+            }
+
+            > thead {
+                tr {
+                    &:first-child th {
+                        font-weight: normal;
+                        color: var(--shades-darker);
+
+                        &:first-child {
+                            text-align: left;
+                        }
+                    }
+
+                    &:last-child th {
+                        font-weight: normal;
+                        color: var(--shades-m-darker);
+                    }
+                }
+            }
+
+            > tbody {
+                &:empty:before {
+                    content: "There are no errors.";
+                }
+
+                > tr {
+                    color: var(--shades-medium);
+                    cursor: pointer;
+                    font-weight: normal;
+
+                    &:hover {
+                        background-color: rgb(
+                            from var(--shades-em-darker) r g b /
+                                var(--opacity-low)
+                        );
+                    }
+
+                    > th {
+                        text-align: start;
+                        font-weight: normal;
+                    }
+
+                    > td {
+                        text-align: center;
+                    }
+                }
+            }
+        }
+
+        --track-colour: var(--panel-background);
+        --thumbnail-colour: var(--shades-m-darker);
+        --scrollbar-padding: 4px;
+        --scrollbar-width: 12px;
+
+        /* Non-Standard Properties */
+        @supports selector(::-webkit-scrollbar) {
+            &::-webkit-scrollbar {
+                width: var(--scrollbar-width);
+                height: var(--scrollbar-width);
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: var(--thumbnail-colour);
+                border-radius: 999px;
+                border: var(--scrollbar-padding) solid transparent;
+                background-clip: padding-box;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: var(--track-colour);
+                border-radius: 999px;
+            }
+        }
+
+        /* Standard Properties */
+        @supports not selector(::-webkit-scrollbar) {
+            scrollbar-color: var(--thumbnail-colour) var(--track-colour);
+            scrollbar-width: thin;
+        }
+    }
+}
+
+/* --- Settings Panel Scope (Nesting mode's Navbar) --- */
+
+@scope (#mainSettings > nav) {
+    & {
+        display: inline-flex;
+        padding: 0 4ch;
+        justify-content: space-evenly;
+        margin: 0;
+
+        > a {
+            height: calc(100% - 4px);
+            outline: none !important;
+            display: grid;
+            --icon-size: 4rem;
+            grid: var(--icon-size) / var(--icon-size);
+            position: relative;
+            padding: 0;
+            border: none;
+            background: none;
+            border-radius: 999px;
+
+            &:nth-of-type(1) > figure {
+                clip-path: url(#iconGithub);
+            }
+            &:nth-of-type(2) > figure {
+                clip-path: url(#iconHistory);
+            }
+            &:nth-of-type(3) > figure {
+                clip-path: url(#iconSettings);
+            }
+            &:nth-of-type(4) > figure {
+                clip-path: url(#iconBug);
+                margin-top: -2px;
+            }
+            &:nth-of-type(5) > figure {
+                clip-path: url(#iconShareYourMind);
+            }
+
+            > * {
+                border-radius: inherit;
+                height: 100%;
+                width: 100%;
+            }
+
+            > figure {
+                margin: 0;
+                container-type: size;
+                background: rgb(from var(--shades-white) r g b / 0.25);
+
+                > svg {
+                    contain: size;
+
+                    > clipPath {
+                        scale: 0.012;
+                        translate: -7cqw -11cqh;
+                    }
+                }
+
+                &.hidden.inner-cursor::after {
+                    animation-play-state: paused;
+                }
+            }
+
+            &:not([aria-disabled="true"]) {
+                > figure.inner-cursor::after {
+                    pointer-events: none;
+                    border-radius: inherit;
+                    position: fixed;
+                    content: "";
+                    top: 0;
+                    left: 0;
+                    z-index: -999;
+                    translate: calc(var(--cursor-x-pos) - 50%)
+                        calc(var(--cursor-y-pos) - 50%);
+                    height: 75cqh;
+                    width: 75cqw;
+                    filter: blur(1rem);
+                    background-color: var(--shades-white);
+                    animation: blink 3s infinite alternate-reverse;
+                }
+
+                &:focus {
+                    z-index: 1;
+                    outline: 1px solid var(--shades-darker) !important;
+                    box-shadow: 0 0 calc((3 / 4) * var(--padding))
+                        var(--shades-medium);
+                }
+            }
+
+            &[aria-disabled="true"] {
+                cursor: not-allowed;
+                opacity: 0.5;
+
+                use {
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+}
