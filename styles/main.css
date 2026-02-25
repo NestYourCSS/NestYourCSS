@@ -818,10 +818,7 @@
       }
     }
 
-    --track-colour: color-mix(in srgb,
-      var(--shades-black),
-      var(--panel-background) 75%
-    );
+    --track-colour: var(--panel-background);
     --thumbnail-colour: var(--shades-m-darker);
     --scrollbar-padding: 4px;
     --scrollbar-width: 12px;
