@@ -26,8 +26,8 @@ function initializeAceEditors() {
     let codeChanged = false;
     let isProcessing = false;
   
-    inputEditorInstance.getSession().on('change', () => ((typeof window.appIsInitializing !== 'undefined' && !window.appIsInitializing) && (window.processAuto ?? true)) && (codeChanged = true));
-  
+    inputEditorInstance.getSession().on('change', () => ((!window.appIsInitializing) && (window.processAuto ?? true)) && (codeChanged = true));
+
     inputEditorInstance.getSession().on('changeAnnotation', () => {
       if ((!window.appIsInitializing) && (window.processAuto ?? true) && !isProcessing) {
         isProcessing = true;
@@ -393,22 +393,18 @@ function initializeAceEditors() {
     let { row, column } = editor.getCursorPosition();
   
     let cursorText = "";
-    switch (window.coordDisplayMode ??= 3) {
-      case 0:
-        cursorText = ` | Ln ${++row}, Col ${column}`;
-        break;
-      case 1:
-        cursorText = ` | Ln ${++row}`;
-        break;
-      case 2:
-        cursorText = ` | Col ${column}`;
-        break;
-      case 3:
-      default:
-        cursorText = "";
+    if (window.coordDisplayMode == null) window.coordDisplayMode = 3;
+    if (window.coordDisplayMode === 0) {
+      cursorText = "";
+    } else if (window.coordDisplayMode === 1) {
+      cursorText = ` | Ln ${++row}`;
+    } else if (window.coordDisplayMode === 2) {
+      cursorText = ` | Col ${column}`;
+    } else {
+      cursorText = ` | Ln ${++row}, Col ${column}`;
     }
   
-    editor.container.previousElementSibling.firstElementChild.setAttribute('cursor', cursorText);
+    editor.container.previousElementSibling.firstElementChild.setAttribute('caret-pos', cursorText);
   };
   
   /**

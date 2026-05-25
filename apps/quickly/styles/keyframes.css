@@ -1,0 +1,3 @@
+@keyframes onClick {
+    from { --onClickValue2: var(--onClickValue1); }
+}

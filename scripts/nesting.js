@@ -72,12 +72,11 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     
 function nestCode(onClick = false) {  
     if (nestBtn.hasAttribute('disabled')) return;  
-  
-    mainElement.classList.toggle('nesting', !(onClick && window.isNesting));  
-  
-    if (onClick) {  
+
+    if (onClick) {
+        mainElement.classList.toggle('nesting', !window.isNesting);
         if (window.isNesting) return;  
-        else scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
+        scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
     }  
   
     if (typeof outputEditorInstance === 'undefined' || !inputEditorInstance) return;  

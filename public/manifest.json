@@ -1,0 +1,12 @@
+{
+  "name": "Nest Your CSS",
+  "short_name": "NestCSS",
+  "description": "Nest, un-nest, and minify your CSS in seconds",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#00272b",
+  "theme_color": "#00272b",
+  "icons": [
+    { "src": "/assets/images/nycss-logo.png", "sizes": "256x256", "type": "image/png" }
+  ]
+}

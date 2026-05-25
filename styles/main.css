@@ -12,7 +12,7 @@
  * Selector with an #iD - #.*\s\{  
  */
 
-@layer base, framework;
+@layer ui-base, base, framework;
 
 /* --- Global and Root Element Styles --- */
 
@@ -123,6 +123,18 @@
     &[hidden] {
       display: none !important;
     }
+  }
+
+  /* Observed elements must keep layout so IntersectionObserver can re-detect them */
+  body[hidden],
+  #nestBtn[hidden],
+  #mainSettings > nav > a > figure.inner-cursor[hidden],
+  #repeatingText span.repeat[hidden],
+  #changingText s[hidden],
+  #groupedText[hidden],
+  #nycssCursor[hidden],
+  #splittingText[hidden] {
+    display: revert !important;
   }
 
   html {
@@ -255,13 +267,6 @@
         display: flex;
         justify-content: flex-end;
       }
-      --padding: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      height: 96dvh;
-      width: 100%;
-      padding: var(--padding);
     }
 
     /* --- Article Section Styles --- */
@@ -409,12 +414,6 @@
         color: var(--component-text);
         font-size: 1rem;
 
-        /* Generic Components */
-
-        > label {
-          flex: 1;
-        }
-
         > #externalCss {
           max-width: 100%;
         }
@@ -432,314 +431,19 @@
           gap: var(--component-gap);
         }
 
-        /* Specific Components */
-
-        > .dropdown,
-        > .combobox {
-          user-select: none;
-          display: inline-flex;
-          flex-direction: column;
-          width: auto;
-          margin: 0;
-          text-align: left;
-          box-sizing: content-box;
-          position: relative;
-
-          > input {
-            appearance: none;
-            position: absolute;
-            margin: 0;
-          }
-
-          &:focus-within > input:checked {
-            + output {
-              border-radius: 1rem 1rem 0 0;
-            }
-
-            ~ ul {
-              position: absolute;
-              z-index: 999;
-              top: 100%;
-              width: 100%;
-              display: flex;
-              margin: 0;
-              margin-top: 0.25rem;
-              padding: 1em;
-              gap: 0.5em;
-              flex-direction: column;
-              background: var(--component-background);
-              border-bottom-left-radius: 1rem;
-              border-bottom-right-radius: 1rem;
-              box-shadow: 0px 10px 10px 2.5px
-                rgb(from var(--shades-black) r g b / 0.5);
-
-              > li {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                outline: none !important;
-
-                &:hover {
-                  color: var(--component-text-hover);
-                  cursor: pointer;
-                }
-
-                &:focus {
-                  color: var(--component-text-hover);
-                }
-
-                &:disabled {
-                  color: rgb(from var(--component-text) r g b / 0.5);
-                  cursor: not-allowed;
-
-                  &:hover {
-                    color: inherit;
-                  }
-                }
-              }
-            }
-          }
-
-          > output {
-            outline: none !important;
-            cursor: pointer;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: clip;
-            background:
-              url("data:image/svg+xml,%3Csvg fill='%23484848' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11.178 19.569a.998.998 0 0 0 1.644 0l9-13A.999.999 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13z'%3E%3C/path%3E%3C/svg%3E")
-                right 1rem top 50% / 1ch no-repeat,
-              var(--component-background);
-            border-radius: 1rem;
-            padding: 1rem;
-            padding-right: calc(1rem + 2ch);
-
-            &:hover {
-              color: var(--component-text-hover);
-            }
-          }
-
-          /* Component Specific */
-
-          &.dropdown:has(:is(input, ul > li):focus) > output {
-            z-index: 1;
-            box-shadow: var(--component-box-shadow-focused);
-          }
-
-          &.combobox {
-            &:has(:is(input, output > div, ul > li):focus) > output {
-              z-index: 1;
-              box-shadow: var(--component-box-shadow-focused);
-            }
-
-            > output {
-              &&:hover > div:empty::before {
-                color: var(--shades-darker);
-              }
-
-              > div {
-                cursor: auto;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                outline: none !important;
-
-                &:focus {
-                  overflow-x: scroll;
-                  scrollbar-width: none;
-                  text-overflow: clip;
-                }
-
-                &:not(:focus):empty {
-                  align-content: center;
-                  font-size: 75%;
-                  padding: 0.25em 0;
-
-                  &::before {
-                    pointer-events: none;
-                    content: attr(placeholder);
-                    color: var(--shades-m-darker);
-                  }
-                }
-              }
-            }
-          }
+        > label,
+        > nycss-dropdown,
+        > nycss-combobox,
+        > nycss-toggle,
+        > nycss-stepper,
+        > nycss-radio-group {
+          flex: 1;
         }
 
-        > .number {
-          user-select: none;
-          position: relative;
-          width: fit-content;
-          color: var(--component-text);
-          border: none;
-          padding: 1rem;
-          gap: calc(2 * var(--component-gap));
-          background: var(--component-background);
-          border-radius: 1rem;
-
-          &:hover {
-            color: var(--component-text-hover);
-          }
-
-          &:has(input:focus, input:active) {
-            z-index: 1;
-            box-shadow: var(--component-box-shadow-focused);
-          }
-
-          > output > input {
-            cursor: auto;
-            display: inline-block;
-            margin-right: 1ch;
-            outline: none !important;
-
-            ~ div {
-              position: absolute;
-              width: 1ch;
-              top: 50%;
-              right: 1rem;
-              translate: 0 -50%;
-              display: flex;
-              flex-direction: column;
-              gap: 0.25em;
-
-              > svg {
-                cursor: pointer;
-              }
-            }
-
-            &[type="text"] {
-              appearance: none;
-              background: inherit;
-              border: inherit;
-              color: inherit;
-              font: inherit;
-              overflow: visible !important;
-              overflow-wrap: break-word;
-              text-align: inherit;
-              -webkit-user-modify: read-write;
-            }
-          }
-        }
-
-        > .checkbox {
-          outline: none !important;
-          user-select: none;
-          position: relative;
-          display: flex;
-          border-radius: 1rem;
-          background: var(--component-background);
-
-          &::before {
-            position: absolute;
-            content: "";
-            height: 100%;
-            left: 0%;
-            width: 50%;
-            border-radius: inherit;
-            background: var(--component-background-selected);
-            box-shadow: var(--component-box-shadow-selected);
-            z-index: 0;
-            transition: 0.25s;
-          }
-
-          &:has(:checked)::before {
-            left: 50%;
-          }
-
-          &:has(input:focus, input:active) {
-            z-index: 1;
-            box-shadow: var(--component-box-shadow-focused);
-          }
-
-          > input {
-            appearance: none;
-            position: absolute;
-            margin: 0;
-          }
-
-          > span {
-            position: relative;
-            cursor: pointer;
-            flex: 1;
-            padding: 1rem 2.5ch;
-            text-align: center;
-            align-content: center;
-
-            &:hover {
-              color: var(--component-text-hover);
-            }
-          }
-        }
-
-        > .radio-group {
-          user-select: none;
-          display: flex;
-          gap: var(--component-gap);
-
+        > nycss-radio-group.button {
           > label {
-            outline: none !important;
-            flex: 1;
-            cursor: pointer;
-            padding: 1rem 1.75ch;
-            text-align: center;
-            align-content: center;
-            border-radius: 1rem;
-            --top-colour: var(--shades-m-darker);
-            --bottom-colour: var(--shades-em-darker);
-            background:
-              linear-gradient(
-                  to bottom,
-                  var(--top-colour),
-                  var(--bottom-colour) 45%,
-                  var(--component-background) 55%
-                )
-                0% 100% / 100% 210% no-repeat,
-              var(--component-background);
-            transition: background-position 0.125s ease-out;
-
-            &:has(:disabled) {
-              &,
-              &:hover {
-                --shades-true-darkest: color-mix(
-                  in srgb,
-                  var(--shades-black),
-                  var(--shades-darkest)
-                );
-                background: linear-gradient(
-                  to bottom,
-                  var(--shades-black),
-                  var(--shades-true-darkest)
-                );
-                box-shadow: inset 0 calc(-1rem / 16) var(--shades-darkest);
-                color: var(--shades-m-darker);
-                cursor: not-allowed;
-              }
-            }
-
-            &:has(:checked) {
-              box-shadow: var(--component-box-shadow-selected);
-              background-position: 0% 0%;
-            }
-
-            &:hover {
-              color: var(--component-text-hover);
-            }
-
-            &:has(> input:focus) {
-              z-index: 1;
-              box-shadow: var(--component-box-shadow-focused);
-            }
-
-            > input {
-              appearance: none;
-              position: absolute;
-              margin: 0;
-            }
-          }
-
-          &.button {
-            > label {
-              --top-colour: var(--sec-colour-m-darker);
-              --bottom-colour: var(--pri-colour-darkest);
-            }
+            --top-colour: var(--sec-colour-m-darker);
+            --bottom-colour: var(--pri-colour-darkest);
           }
         }
       }
@@ -912,7 +616,7 @@
           }
         }
 
-        &.hidden.inner-cursor::after {
+        &[hidden].inner-cursor::after {
           animation-play-state: paused;
         }
       }
@@ -1377,13 +1081,7 @@
 @scope (#codeEditor) {
   & {
     .editorWrapper {
-      &:not(.shadowEditorWrapper):is(
-          #inputEditorWrapper,
-          #outputEditorWrapper
-        ):is(#inputEditorWrapper, #outputEditorWrapper):is(
-          #inputEditorWrapper,
-          #outputEditorWrapper
-        ) {
+      &:not(.shadowEditorWrapper):is(#inputEditorWrapper, #outputEditorWrapper) {
         width: calc(
           (var(--code-editor-height) - var(--vertical-padding)) *
             (var(--editor-width) / 7)
@@ -1469,9 +1167,9 @@
         font-size: 1rem;
         align-content: center;
 
-        &[cursor]::after {
+        &[caret-pos]::after {
           font-size: 0.75em;
-          content: attr(cursor);
+          content: attr(caret-pos);
           color: var(--shades-m-darker);
         }
       }
@@ -1652,7 +1350,7 @@
     }
 
     /* Pause animations when hidden or main content is not hovered */
-    &.hidden > span {
+    &[hidden] > span {
       animation-play-state: paused;
     }
   }
@@ -1846,7 +1544,7 @@
           animation-composition: add;
         }
 
-        &.hidden::before {
+        &[hidden]::before {
           animation-play-state: paused;
         }
       }
@@ -2045,7 +1743,7 @@
           ); /* oklch(0.75 0.13 150) */
         }
 
-        &.hidden::before {
+        &[hidden]::before {
           animation-play-state: paused;
         }
       }
@@ -2204,7 +1902,7 @@
         animation-name: changeCard, changeCardAfter;
       }
 
-      :is(body.hidden &) {
+      :is(body[hidden] &) {
         &::before,
         &::after {
           animation-play-state: paused;
@@ -2367,7 +2065,7 @@
         will-change: transform;
       }
 
-      &.hidden {
+      &[hidden] {
         animation-play-state: paused;
       }
     }
@@ -2416,7 +2114,7 @@
         transform-origin: right;
       }
 
-      &.hidden {
+      &[hidden] {
         &::before,
         &::after {
           animation-play-state: paused;
@@ -2578,7 +2276,7 @@
             scroll(nearest), auto; /* convert to view() if possible */
           animation-composition: add;
 
-          &.hidden {
+          &[hidden] {
             animation-play-state: paused;
           }
         }
@@ -2588,7 +2286,7 @@
           --shadow-color: #1474b833; /* Taken directly from the CSS Logo */
           --shadow-distance: 1.5em;
 
-          &.hidden {
+          &[hidden] {
             animation-play-state: paused;
           }
         }

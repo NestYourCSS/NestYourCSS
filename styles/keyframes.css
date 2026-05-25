@@ -142,16 +142,6 @@
 	to { rotate: 360deg; }
 }
 
-@keyframes revealText { /* No longer used */
-	from { letter-spacing: -1.5ch; }
-	0% { opacity: 0; }
-	25% { opacity: 0.1; }
-	50% { opacity: 0.3; }
-	75% { opacity: 0.5; }
-	100% { opacity: 1; }
-	to { letter-spacing: 0ch; }
-}
-
 @keyframes widenGap {
 	to { scale: 1 1; }
 	to { scale: 0.85 1; opacity: 0.99; }
@@ -170,12 +160,6 @@
 @keyframes moveLeft {
 	from { translate: calc(50% + (var(--gutter-real-width) / 2) - var(--padding)); } /* 0.125rem is the width of the editor's border */
 	to { translate: calc(0% - var(--padding)); }
-}
-
-@keyframes moveRight {
-	from { translate: calc((var(--code-editor-width) - var(--screen-width)) + var(--horizontal-padding) + var(--settings-panel) + var(--horizontal-padding)); }
-	to { translate: calc(0% + 0px); }
-	/* to { translate: calc(var(--editor-canvas-inner-width) - var(--code-editor-width)); } */
 }
 
 @keyframes moveRight {

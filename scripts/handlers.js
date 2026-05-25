@@ -1,12 +1,3 @@
-mainContent.querySelectorAll('nav > button').forEach((btn) => {
-  function repositionButtonBG(e) {
-    let { top, left } = e.target.getBoundingClientRect();
-    e.target.style.backgroundPosition = `top -${top}px left -${left}px`;
-  }
-
-  ['transitionrun', 'transitionstart', 'transitioncancel', 'transitionend'].forEach(event => btn.lastElementChild.addEventListener(event, repositionButtonBG));
-});
-
 const mainContentBackgroundString = (horizValue) => `
 url("https://ucarecdn.com/380d4e4c-268c-4913-8c92-e049c44234ec/-/preview/189x189/") 0 0.1dvh / 5dvh repeat,
 linear-gradient(to right, rgb(from var(--shades-black) r g b / var(--opacity-medium)), rgb(from var(--pri-colour-em-darker) r g b / var(--opacity-medium))) 0 0 / 100dvw 100dvh,
@@ -49,19 +40,18 @@ document.body.addEventListener('pointermove', (e) => {
   });
 });
 
-document.addEventListener('visibilitychange', () => document.body.classList.toggle('hidden', document.hidden));
+document.addEventListener('visibilitychange', () => document.body.hidden = document.hidden);
 
 const elements = [
   '#nestBtn',
-  '#mainSettings > nav > button > figure.inner-cursor',
+  '#mainSettings > nav > a > figure.inner-cursor',
   '#repeatingText span.repeat',
   '#changingText s',
   '#groupedText',
   '#nycssCursor',
-  '#splittingText',
-  '#nycssBadge'
+  '#splittingText'
 ];
-const intersectionObserver = new IntersectionObserver((entries) => entries.forEach(entry => entry.target.classList.toggle('hidden', !entry.isIntersecting)), { threshold: 0.01 });
+const intersectionObserver = new IntersectionObserver((entries) => entries.forEach(entry => entry.target.hidden = !entry.isIntersecting), { threshold: 0.01 });
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
 scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof updateLogoState !== 'undefined' && updateLogoState())));

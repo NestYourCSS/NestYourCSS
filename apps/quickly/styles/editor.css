@@ -1,0 +1,347 @@
+/*
+  Theme: Pure CSS
+  Author: Tim Chinye (https://github.com/timchinye)
+  License: Unlicense
+  Last Updated: 01.04.2024
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
+  
+.ace-tm.ace_editor {
+  --window-text-colour: color-mix(in srgb, var(--shades-darker), transparent calc((1 - var(--opacity-medium)) * 100%));
+  --background-colour: #091F2A;
+  --background-colour: transparent;
+
+  --code-text-colour: color-mix(in srgb, var(--shades-em-lighter), transparent calc((1 - var(--opacity-high)) * 100%));
+  --code-selection-shadow-colour: color-mix(in srgb, var(--shades-darkest), transparent calc((1 - var(--opacity-low)) * 100%));
+  --code-punctuation-colour: color-mix(in srgb, var(--shades-lightest), transparent calc((1 - var(--opacity-medium)) * 100%));
+  --code-parenthesis-colour: color-mix(in srgb, var(--shades-em-lighter), transparent calc((1 - var(--opacity-medium)) * 100%));
+  
+  border-radius: 0 0 1rem 1rem;
+  border: 0.25ch solid var(--window-text-colour);
+  background-color: color-mix(in srgb, var(--shades-darkest), transparent 75%);
+  color: var(--code-text-colour);
+  
+  font-family: "Fira Code", monospace;
+  font-size: 1.1rem;
+}
+
+.ace-tm .ace_gutter {
+  background: transparent;
+  color: var(--window-text-colour);
+}
+
+.ace-tm .ace_gutter-cell {
+  padding-right: 32px;
+
+  > span:first-child {
+    translate: 4px;
+  }
+}
+
+.ace-tm .ace_gutter-active-line {
+  font-weight: bold;
+  background: color-mix(in srgb, color-mix(in srgb, var(--pri-colour-darkest), var(--sec-colour-darkest)), transparent);
+}
+
+.ace-tm .ace_marker-layer .ace_active-line {
+  background: color-mix(in srgb, color-mix(in srgb, var(--pri-colour-darkest), var(--sec-colour-darkest)), transparent);
+}
+
+.ace-tm .ace_scroller {
+  background-color: transparent;
+}
+
+.ace-tm .ace_paren {  /*  {  }  */
+  color: var(--code-parenthesis-colour);
+}
+
+.ace-tm .ace_constant {  /*  main article  */
+  color: var(--sec-colour-medium);
+}
+
+.ace-tm .ace_support.ace_type {  /*  min-width  */
+  color: var(--pri-colour-medium);
+}
+
+.ace-tm .ace_string {  /*  :focus  */
+  color: var(--sec-colour-lighter);
+}
+
+.ace-tm .ace_support.ace_constant {  /*  inline-flex  */
+  color: var(--sec-colour-medium);
+}
+
+.ace-tm .ace_support.ace_constant.ace_fonts {  /*  cursive  */
+  color: var(--sec-colour-lightest);
+  font-style: italic;
+}
+
+.ace-tm .ace_string + .ace_keyword {  /*  @media  */
+  color: var(--sec-colour-lighter);
+}
+
+.ace-tm .ace_keyword:has(~ .ace_lparen) {  /*  #id  */
+  color: var(--sec-colour-medium);
+}
+
+.ace-tm .ace_keyword {  /*  rem  */
+  color: var(--sec-colour-m-darker);
+}
+
+.ace-tm .ace_constant.ace_numeric {  /*  0.75  */
+  color: var(--sec-colour-darker);
+}
+
+.ace-tm .ace_punctuation.ace_operator {  /*  : ;  */
+  color: var(--code-punctuation-colour);
+}
+
+.ace-tm .ace_fold {  /*  <-->  */
+  background-color: var(--pri-colour-m-darker);
+}
+
+.ace-tm .ace_cursor {  /*  |  */
+  color: var(--code-text-colour);
+}
+
+.ace-tm .ace_support.ace_function {  /*  url() */
+  color: var(--sec-colour-medium);
+}
+
+.ace-tm .ace_comment {  /*  //  */
+  color: var(--pri-colour-m-darker);
+}
+
+.ace-tm .ace_variable {  /*  .class  */
+  color: var(--sec-colour-medium);
+}
+
+.ace-tm:has(.ace_marker-layer > .ace_selection) {
+  &.ace_multiselect .ace_selection.ace_start {
+    z-index: 5;
+  }
+  
+  .ace_selection.ace_br12 {
+    z-index: 6;
+  }
+
+  &.ace_multiselect .ace_selection.ace_start,
+  .ace_marker-layer .ace_selection {
+    background: color-mix(in srgb, var(--pri-colour-m-darker), transparent);
+    box-shadow: 0px 0px 0px 8px var(--code-selection-shadow-colour);
+    clip-path: inset(0 0 -20px 0px);
+  }
+}
+
+.ace-tm .ace_marker-layer .ace_selected-word {  /* *** Get Back To This Later *** */
+  background: transparent;
+  border: none;
+}
+
+.ace-tm .ace_marker-layer .ace_bracket {
+  margin: unset;
+  border: none;
+  background: color-mix(in srgb, var(--pri-colour-em-darker), var(--pri-colour-m-darker) 30%);
+  box-shadow: 0px 0px 8px 0px var(--pri-colour-m-darker);
+}
+
+.ace-tm .ace_indent-guide {
+  background: none;
+  border-right: 1px solid color-mix(in srgb, var(--code-parenthesis-colour), transparent 50%);
+  /* border: none; */
+}
+
+.ace-tm .ace_indent-guide-active {
+  border-color: color-mix(in srgb, var(--code-parenthesis-colour), white 25%);
+}
+
+.ace-tm :is(.language_highlight_text, .language_highlight_read, .language_highlight_write) {
+  border: none;
+  --highlight-colour: var(--sec-colour-m-darker);
+  background: color-mix(in srgb, var(--highlight-colour), transparent 50%);
+  box-shadow: 0px 0px 8px 0px var(--highlight-colour);
+  clip-path: inset(-8px 0);
+  z-index: 7;
+}
+
+.ace-tm .language_highlight_write {
+  --highlight-colour: color-mix(in srgb, var(--shades-medium), transparent 75%);
+}
+
+.ace-tm .ace_highlight-marker {
+  background-color: color-mix(in srgb, var(--shades-medium), transparent 75%);
+}
+
+.ace_scrollbar {
+  align-self: flex-end;
+  margin: 8px;
+
+  &.ace_scrollbar-v {
+    height: calc(100% - 22px) !important;
+    bottom: 0 !important;
+    z-index: 7;
+  }
+
+  --thumbnail-colour: var(--sec-colour-darker);
+  --track-colour: color-mix(in srgb, var(--shades-darkest), transparent 75%);
+
+  /* Non-Standard Properties */
+  @supports selector(::-webkit-scrollbar) {
+    &::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    &:has(.ace_scrollbar-inner) {
+      &::-webkit-scrollbar-thumb {
+        background: var(--thumbnail-colour);
+        border-radius: 999px;
+        border: 4px solid transparent;
+        background-clip: padding-box;
+      }
+  
+      &::-webkit-scrollbar-thumb:vertical { background-color: var(--thumbnail-colour); }
+      &::-webkit-scrollbar-thumb:vertical:hover { background-color: color-mix(in srgb, var(--thumbnail-colour), white); }
+      &::-webkit-scrollbar-thumb:horizontal { background-color: color-mix(in srgb, var(--thumbnail-colour), transparent); }
+      &::-webkit-scrollbar-thumb:horizontal:hover { background-color: var(--thumbnail-colour); }
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--track-colour);
+      border-radius: 999px;
+    }
+  }
+
+  /* Standard Properties */
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-color: var(--thumbnail-colour) var(--track-colour);
+    scrollbar-width: thin;
+  }
+}
+
+.ace-tm .ace_invalid {  /*  <no-width space>  */
+  background-color: color-mix(in srgb, var(--red-colour-darkest), transparent) !important;
+  color: var(--red-colour-medium) !important;
+}
+
+.ace-tm.ace_tooltip {
+  padding: 1rem;
+  background-color: color-mix(in srgb, var(--pri-colour-em-darker), transparent 10%);
+  border: 1px solid var(--pri-colour-m-darker);
+  border-radius: 8px;
+  color: var(--shades-lighter);
+  font-size: 16px;
+  min-width: 15em;
+
+  &:hover {
+    border-color: var(--pri-colour-darker);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--shades-darker);
+  }
+}
+
+.ace-tm.ace_tooltip code {
+  font-family: "Fira Code", monospace;
+  font-size: 12px;
+  font-style: normal;
+  color: var(--shades-medium);
+}
+
+.ace-tm.ace_tooltip p {
+  font-family: "Poppins", Calibri, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  color: var(--shades-lighter);
+}
+
+.ace-tm.ace_tooltip a {
+  color: var(--sec-colour-medium);
+  text-decoration: none;
+}
+
+.ace-tm .ace_constant.ace_language {  /*  Escaped characters within quotes  */
+  color: var(--pri-colour-lightest);
+  background: unset;
+}
+
+/* Everything Above is Fixed */
+
+.ace-tm .ace_invisible {  /*  Unknown  */
+  background-color: rgb(255 255 255 / 10%);
+  /* color: var(--code-punctuation-colour); */
+  background-color: orange;
+}
+
+.ace-tm .ace_storage {  /*  Unknown  */
+  color: blue;
+  background-color: orange;
+}
+
+.ace-tm .ace_constant.ace_buildin {  /*  Unknown  */
+  color: rgb(88, 72, 246);
+  background: orange;
+}
+
+.ace-tm .ace_constant.ace_library {  /*  Unknown  */
+  color: rgb(6, 150, 14);
+  background: orange;
+}
+
+.ace-tm .ace_keyword.ace_operator {  /*  Unknown  */
+  color: rgb(104, 118, 135);
+  background: orange;
+}
+
+.ace-tm .ace_comment.ace_doc {  /*  Unknown  */
+  color: rgb(0, 102, 255);
+  background: orange;
+}
+
+.ace-tm .ace_comment.ace_doc.ace_tag {  /*  Unknown  */
+  color: rgb(128, 159, 191);
+  background: orange;
+}
+
+.ace-tm .ace_xml-pe {  /*  Unknown  */
+  color: rgb(104, 104, 91);
+  background: orange;
+}
+
+.ace-tm .ace_entity.ace_name.ace_function {  /*  Unknown  */
+  color: #0000A2;
+  background: orange;
+}
+
+.ace-tm .ace_heading {  /*  Unknown  */
+  color: rgb(12, 7, 255);
+  background: orange;
+}
+
+.ace-tm .ace_list {  /*  Unknown  */
+  color:rgb(185, 6, 144);
+  background: orange;
+}
+
+.ace-tm .ace_meta.ace_tag {  /*  Unknown  */
+  color:rgb(0, 22, 142);
+  background: orange;
+}
+
+.ace-tm .ace_string.ace_regex {  /*  Unknown  */
+  color: rgb(255, 0, 0);
+  background: orange;
+}
+
+.ace-tm .ace_marker-layer .ace_step {  /*  Unknown  */
+  background: rgb(252, 255, 0);
+  background: orange;
+}
+
+.ace-tm .ace_marker-layer .ace_stack {
+  background: rgb(164, 229, 101);  /*  Unknown  */
+  background: orange;
+}
