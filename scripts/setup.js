@@ -7,8 +7,8 @@ function initializeAceEditors() {
     await waitForVar('LanguageProvider');
     const languageProvider = LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
   
-    inputEditorInstance = initEditor("inputEditor", "The editor to input CSS code that will be minified/nested/denested.", sample || '/* Your input CSS should go here */');
-    outputEditorInstance = initEditor("outputEditor", "The editor that outputs the CSS code that will be minified/nested/denested.", '/* Your output CSS will appear here */');
+    inputEditorInstance = initEditor("inputEditor", i18n.inputEditorLabel, sample || i18n.inputPlaceholder);
+    outputEditorInstance = initEditor("outputEditor", i18n.outputEditorLabel, i18n.outputPlaceholder);
   
   
     if (!(inputEditorInstance && outputEditorInstance)) return;
@@ -168,9 +168,9 @@ function initializeAceEditors() {
       const tabButtons = document.createElement("div");
       tabButtons.classList.add('tabButtons');
       tabButtons.setAttribute('role', 'toolbar');
-      tabButtons.setAttribute('aria-label', `${editorName}.css editor controls`);
-  
-      tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, 'Copy all input code'));
+      tabButtons.setAttribute('aria-label', i18n.editorControls.replace('{name}', editorName));
+
+      tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, i18n.copyAll));
   
       if (isInputEditor) {
         if (!isShadowEditor) {
@@ -191,12 +191,12 @@ function initializeAceEditors() {
           window.insertCSSFileInput = fileInput;
         }
         
-        tabButtons.appendChild(createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, 'Insert sample CSS into input'));
+        tabButtons.appendChild(createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, i18n.insertCSSFile));
       } else {
-        tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, 'Open CSS as Raw'));
+        tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, i18n.openRawOutput));
       }
-  
-      tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor, 'Delete all input code'));
+
+      tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor, i18n.deleteAll));
   
       editorTab.appendChild(fileName);
       editorTab.appendChild(tabButtons);

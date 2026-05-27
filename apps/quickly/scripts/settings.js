@@ -255,8 +255,6 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     initQuicklySettings(window.__store);
-    const skipLink = document.querySelector('.skip-link');
-    if (skipLink) skipLink.textContent = i18n.skipLink;
     const settingsToggle = document.getElementById('settings-toggle');
     if (settingsToggle) settingsToggle.setAttribute('aria-label', i18n.settings);
     const mainSettings = document.getElementById('mainSettings');

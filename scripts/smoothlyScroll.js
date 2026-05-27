@@ -72,9 +72,9 @@ function initializeSmoothScrollAndNestingController() {
     if (nestBtn) nestBtn.disabled = false;
   
     // Update UI state (Editor <-> Homepage)
-    document.title = 'Nest Your CSS - ' + (window.isNesting ? 'Editor' : 'Homepage');
-    if (nestBtn) nestBtn.setAttribute('aria-label', window.isNesting ? "View Homepage" : "Start Nesting");
-    toggleBtn.textContent = (window.isNesting) ? 'Start Nesting' : 'Visit Homepage';
+    document.title = window.isNesting ? i18n.pageTitleEditor : i18n.pageTitleHomepage;
+    if (nestBtn) nestBtn.setAttribute('aria-label', window.isNesting ? i18n.viewHomepage : i18n.startNesting);
+    toggleBtn.textContent = window.isNesting ? i18n.startNesting : i18n.visitHomepage;
   };
   
   const observer = new MutationObserver(() => {

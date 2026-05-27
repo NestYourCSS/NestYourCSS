@@ -13,12 +13,12 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     
     if (annotations.length === 0) {  
       // --- POSITIVE FEEDBACK: Announce that errors are gone ---  
-      outputEditorInstance.getSession().setValue('/* CSS is valid! */');  
+      outputEditorInstance.getSession().setValue(i18n.cssIsValid);  
         
       // Create a single, reassuring row for screen reader users.  
       const successRow = tableBodyElem.insertRow();  
       const successCell = successRow.insertCell();  
-      successCell.textContent = "No errors found.";  
+      successCell.textContent = i18n.noErrorsFound;  
       successCell.colSpan = 3; // Span across all columns.  
         
       // No need to scroll into view if there are no errors.  
@@ -26,7 +26,7 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     }  
     
     // --- NEGATIVE FEEDBACK: Announce errors exist and populate the table ---  
-    outputEditorInstance.getSession().setValue('/* Your input CSS contains errors. See table below. */');  
+    outputEditorInstance.getSession().setValue(i18n.cssContainsErrors);  
     
     // 2. Loop through annotations and create an ACCESSIBLE row for each.  
     annotations.forEach(({ column, row, text }) => {  
@@ -81,18 +81,19 @@ function nestCode(onClick = false) {
   
     if (typeof outputEditorInstance === 'undefined' || !inputEditorInstance) return;  
 
+    if (typeof announce === 'function') announce(i18n.processing);
     const wrapper = document.getElementById('codeEditor') || document.getElementById('siteWrapper');
     if (wrapper) wrapper.setAttribute('aria-busy', 'true');
   
     let tableBodyElem = errorTable.tBodies[0];  
 	const annotations = inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
 	if (annotations.length == 0) {  
-		outputEditorInstance.getSession().setValue(convertToNestedCSS(inputEditorInstance.getValue()) || '/* Your output CSS will appear here */');  
+		outputEditorInstance.getSession().setValue(convertToNestedCSS(inputEditorInstance.getValue()) || i18n.outputPlaceholder);  
          
         if (tableBodyElem.rows.length) tableBodyElem.innerHTML = '';  
         if (typeof announce === 'function') announce(i18n.conversionComplete);
 	} else {  
-		outputEditorInstance.getSession().setValue('/* Your input CSS contains errors */');  
+		outputEditorInstance.getSession().setValue(i18n.cssContainsErrors);  
 		console.log('Code Errors:', annotations);  
 		  
         updateAccessibleErrorTable(  

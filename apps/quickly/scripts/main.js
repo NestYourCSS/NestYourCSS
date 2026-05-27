@@ -3,7 +3,6 @@
  * All user-visible strings are defined here.
  */
 const i18n = {
-    skipLink: 'Skip to content',
     settings: 'Settings',
     editorSettings: 'Editor settings',
     convertCSS: 'Convert CSS',
