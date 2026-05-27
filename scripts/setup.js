@@ -1,6 +1,5 @@
 function initializeAceEditors() {
   window.setupEditors = async () => {
-    if (codeEditorElem) codeEditorElem.classList.add('loading');
   
     await waitForVar('cssSamples');
     let sample = cssSamples[window.cssSample] ?? cssSamples["unnestedShowcase"];
@@ -11,14 +10,6 @@ function initializeAceEditors() {
     inputEditorInstance = initEditor("inputEditor", "The editor to input CSS code that will be minified/nested/denested.", sample || '/* Your input CSS should go here */');
     outputEditorInstance = initEditor("outputEditor", "The editor that outputs the CSS code that will be minified/nested/denested.", '/* Your output CSS will appear here */');
   
-    if (codeEditorElem && inputEditorInstance) {
-      inputEditorInstance.renderer.once('afterRender', () => {
-        // Wait for next paint cycle
-        setTimeout(() => {
-          codeEditorElem.classList.remove('loading');
-        }, 0);
-      });
-    }
   
     if (!(inputEditorInstance && outputEditorInstance)) return;
   
@@ -176,6 +167,8 @@ function initializeAceEditors() {
   
       const tabButtons = document.createElement("div");
       tabButtons.classList.add('tabButtons');
+      tabButtons.setAttribute('role', 'toolbar');
+      tabButtons.setAttribute('aria-label', `${editorName}.css editor controls`);
   
       tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, 'Copy all input code'));
   
@@ -404,7 +397,11 @@ function initializeAceEditors() {
       cursorText = ` | Ln ${++row}, Col ${column}`;
     }
   
-    editor.container.previousElementSibling.firstElementChild.setAttribute('caret-pos', cursorText);
+    const fileNameEl = editor.container.previousElementSibling.firstElementChild;
+    fileNameEl.setAttribute('caret-pos', cursorText);
+    
+    const baseName = fileNameEl.textContent;
+    fileNameEl.setAttribute('aria-label', baseName + cursorText);
   };
   
   /**

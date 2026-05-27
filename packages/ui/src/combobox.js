@@ -20,7 +20,7 @@ export class NycssCombobox extends HTMLElement {
     this.innerHTML = `
       <input type="checkbox" id="${cbId}" class="combobox-toggle-cb" aria-hidden="true" tabindex="-1">
       <output>
-        <div contenteditable="true" placeholder="${placeholder}" class="combobox-input" id="${inputId}" role="textbox"${labelId ? ` aria-labelledby="${labelId}"` : ''} aria-autocomplete="list" aria-controls="${listId}" aria-activedescendant="" tabindex="-1"></div>
+        <div contenteditable="true" placeholder="${placeholder}" class="combobox-input" id="${inputId}" role="textbox"${labelId ? ` aria-labelledby="${labelId}"` : ''} aria-autocomplete="list" aria-controls="${listId}" tabindex="0"></div>
       </output>
       <ul hidden id="${listId}" class="combobox-list" role="listbox"${labelId ? ` aria-labelledby="${labelId}"` : ''}>
         ${this._renderItems()}

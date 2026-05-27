@@ -16,15 +16,38 @@
     });
   }
 
+  function openSettings() {
+    popover.removeAttribute('hidden');
+    closeDropdowns();
+    // Focus the first focusable element in the panel
+    const focusable = popover.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label');
+    if (focusable.length) focusable[0].focus();
+  }
+
+  function closeSettings() {
+    popover.setAttribute('hidden', '');
+    toggleBtn.focus();
+  }
+
   toggleBtn.addEventListener('click', (e) => {
-    popover.toggleAttribute('hidden');
+    if (popover.hasAttribute('hidden')) {
+      openSettings();
+    } else {
+      closeSettings();
+    }
     closeDropdowns();
     e.stopPropagation();
   });
 
+  popover.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeSettings();
+    }
+  });
+
   document.addEventListener('mousedown', (e) => {
     if (!popover.contains(e.target) && e.target !== toggleBtn) {
-      popover.setAttribute('hidden', '');
+      closeSettings();
     }
     if (!e.target.closest('nycss-dropdown')) {
       closeDropdowns();
@@ -39,15 +62,17 @@
       if (!nestBtn || !settingsBtn) return;
       nestBtn.classList.remove('vibrant');
       if (window.processAuto) {
-        nestBtn.innerText = 'Auto';
+        nestBtn.innerText = i18n.auto;
         nestBtn.disabled = true;
       } else {
-        const labels = { 0: 'Minify!', 1: 'Beautify!', 2: 'Denest!', 3: 'Nest!' };
-        nestBtn.innerText = labels[window.processMode] || 'Nest!';
+        const labels = { 0: i18n.minify, 1: i18n.beautify, 2: i18n.denest, 3: i18n.nest };
+        nestBtn.innerText = labels[window.processMode] || i18n.nest;
         nestBtn.disabled = false;
         nestBtn.classList.add('vibrant');
       }
     }
+
+    let coordAnnounceTimeout = null;
 
     function updateCoordDisplay() {
       const editors = [window.inputEditor, window.outputEditor];
@@ -67,6 +92,20 @@
         else text = ` | Ln ${line}, Col ${col}`;
         fileNameEl.setAttribute('caret-pos', text);
       });
+      clearTimeout(coordAnnounceTimeout);
+      coordAnnounceTimeout = setTimeout(() => {
+        if (mode === 0) return;
+        const editor = window.inputEditor;
+        if (!editor) return;
+        const pos = editor.getCursorPosition();
+        const line = pos.row + 1;
+        const col = pos.column + 1;
+        let text = '';
+        if (mode === 1) text = `Line ${line}`;
+        else if (mode === 2) text = `Column ${col}`;
+        else text = `Line ${line}, Column ${col}`;
+        if (typeof announce === 'function') announce(text);
+      }, 1000);
     }
 
     /* Subscribe to store changes */
@@ -113,7 +152,13 @@
         });
       },
       coordinates: () => updateCoordDisplay(),
-      mode: (value) => { window.processMode = value; updateNestButton(); if (typeof nestCode === 'function') nestCode(); },
+      mode: (value) => {
+        window.processMode = value;
+        updateNestButton();
+        if (typeof nestCode === 'function') nestCode();
+        const modeLabels = ['Minify', 'Beautify', 'Denest', 'Nest'];
+        document.title = `${modeLabels[value] || 'Nest'} mode - Quickly Nest Your CSS`;
+      },
       auto: (value) => {
         window.processAuto = value;
         window.autoProcess = value;
@@ -210,5 +255,15 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     initQuicklySettings(window.__store);
+    const skipLink = document.querySelector('.skip-link');
+    if (skipLink) skipLink.textContent = i18n.skipLink;
+    const settingsToggle = document.getElementById('settings-toggle');
+    if (settingsToggle) settingsToggle.setAttribute('aria-label', i18n.settings);
+    const mainSettings = document.getElementById('mainSettings');
+    if (mainSettings) mainSettings.setAttribute('aria-label', i18n.editorSettings);
+    const nestBtn = document.getElementById('nest-btn');
+    if (nestBtn) nestBtn.setAttribute('aria-label', i18n.convertCSS);
+    const headerControls = document.querySelector('.header-controls');
+    if (headerControls) headerControls.setAttribute('aria-label', i18n.editorControls);
   });
 })();

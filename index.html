@@ -1,5 +1,5 @@
 <!DOCTYPE html>  
-<html lang="en" hreflang="en">  
+<html lang="en" dir="ltr" xml:lang="en" hreflang="en">  
 <head>  
   <meta charset="UTF-8" />  
   <meta name="theme-color" content="#00272b" />  
@@ -201,13 +201,14 @@
   </svg>  
   
   <div id="siteWrapper">  
-    <main>  
+    <main role="main">  
     <!-- <main class="nesting"> -->  
-      <button id="settingsBtn" class="header-btn vibrant" title="Settings">  
+      <div id="a11y-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+      <button id="settingsBtn" class="header-btn vibrant" title="Settings" aria-label="Settings">  
         <i class="ph ph-gear-six"></i>  
       </button>
       <div id="mainWrapper">
-        <aside id="mainSettings" inert>  
+        <aside id="mainSettings" aria-label="Editor settings" inert>  
           <section>  
             <h2>Input</h2>  
             <ul>  
@@ -321,7 +322,7 @@
               </li>  
             </ul>  
           </section>  
-          <section>  
+          <section role="alert">  
             <h2 id="error-table">Errors</h2>  
             <div aria-live="polite">  
               <table id="errors" aria-labelledby="error-table">  
@@ -457,7 +458,7 @@
               </div>  
             </figure>  
           </section>  
-          <article id="editorSide">
+          <article id="editorSide" role="toolbar" aria-label="CSS editor">
             <button id="nestBtn" onclick="this.lastElementChild?.click()" aria-label="Start Nesting">  
               <span class="orb1" aria-hidden="true"></span>  
               <span class="orb2" aria-hidden="true"></span>  

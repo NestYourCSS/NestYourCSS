@@ -1,13 +1,21 @@
 function nestCode(e) {
     if (e && e.currentTarget && e.currentTarget.disabled) return;
 
+    const wrapper = document.getElementById('code-editor-wrapper');
+    if (wrapper) wrapper.setAttribute('aria-busy', 'true');
+
     const annotations = inputEditor.getSession().getAnnotations().filter((a) => a.type == 'error');
     if (annotations.length == 0) {
-        outputEditor.getSession().setValue(convertToNestedCSS(inputEditor.getValue()) || '/* Your output CSS will appear here */');
+        const result = convertToNestedCSS(inputEditor.getValue());
+        outputEditor.getSession().setValue(result || i18n.outputPlaceholder);
+        announce(i18n.conversionComplete);
+        if (wrapper) wrapper.removeAttribute('aria-busy');
         return true;
     } else {
         console.log('Code Errors:', annotations);
-        outputEditor.getSession().setValue('/* Your input CSS contains errors */');
+        outputEditor.getSession().setValue(i18n.cssContainsErrors);
+        announce(i18n.cssContainsErrors);
+        if (wrapper) wrapper.removeAttribute('aria-busy');
         return false;
 
         // Show a list of the errors if any.

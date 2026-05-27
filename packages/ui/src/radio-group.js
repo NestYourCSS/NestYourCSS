@@ -37,16 +37,6 @@ export class NycssRadioGroup extends HTMLElement {
       });
     });
 
-    this.radioLabels.forEach((label, i) => {
-      label.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.radios[i].checked = true;
-        this.value = i;
-        this._updateTabindex(i);
-        this.dispatchEvent(new CustomEvent('change', { detail: i }));
-      });
-    });
-
     this.addEventListener('keydown', (e) => {
       const current = this.value;
       let next = -1;

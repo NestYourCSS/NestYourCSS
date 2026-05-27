@@ -43,7 +43,6 @@ document.body.addEventListener('pointermove', (e) => {
 document.addEventListener('visibilitychange', () => document.body.hidden = document.hidden);
 
 const elements = [
-  '#nestBtn',
   '#mainSettings > nav > a > figure.inner-cursor',
   '#repeatingText span.repeat',
   '#changingText s',
@@ -56,6 +55,14 @@ elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach
 
 scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof updateLogoState !== 'undefined' && updateLogoState())));
 
+function announce(message) {
+    const liveRegion = document.getElementById('a11y-live-region');
+    if (liveRegion) {
+        liveRegion.textContent = '';
+        requestAnimationFrame(() => { liveRegion.textContent = message; });
+    }
+}
+
 window.tabButtonHandler = (e) => {
   let tabButton = e.currentTarget;
   let editor = (tabButton.closest('.editorWrapper')?.id.startsWith("input")) ? inputEditorInstance : outputEditorInstance;
@@ -64,6 +71,7 @@ window.tabButtonHandler = (e) => {
     case "tabCopyAll":
       let copiedText = editor.getValue(); 
       navigator.clipboard.writeText(copiedText);
+      announce(i18n.copiedToClipboard);
       break;
     case "tabInsertCSS":
       window.insertCSSFileInput.click();
@@ -143,12 +151,17 @@ window.setupDragAndDrop = (editor) => {
 
       if (file && (file.type === "text/css" || file.name.endsWith('.css'))) { // css file
           const reader = new FileReader();
-          reader.onload = (event) => inputEditorInstance.setValue(event.target.result);
+          reader.onload = (event) => {
+            inputEditorInstance.setValue(event.target.result);
+            announce(i18n.fileImported + ": " + file.name);
+          };
           reader.readAsText(file);
       }
-      else if (e.dataTransfer.getData('text/plain'));
+      else if (e.dataTransfer.getData('text/plain')) {
+        announce(i18n.textInsertedDragDrop);
+      }
       else {
-          alert("Only .css files or text are allowed!");
+          announce(i18n.onlyCSSFilesAllowed);
       }
   });
 };

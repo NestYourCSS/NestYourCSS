@@ -70,11 +70,15 @@ h1 {
     wrapEditorWithGroup(editor.container, editorTab);
   });
 
-  function createButton(idSuffix, className, isShadowEditor) {
+  function createButton(idSuffix, className, isShadowEditor, accessibleLabel) {
     const button = document.createElement("button");
     button.id = idSuffix;
     button.classList.add(className);
-    if (!isShadowEditor) button.addEventListener("click", tabButtonHandler);
+    if (isShadowEditor) button.setAttribute('aria-hidden', 'true');
+    else {
+      button.setAttribute('aria-label', accessibleLabel);
+      button.addEventListener("click", tabButtonHandler);
+    }
     return button;
   }
 
@@ -90,9 +94,11 @@ h1 {
 
     const tabButtons = document.createElement("div");
     tabButtons.classList.add('tabButtons');
+    tabButtons.setAttribute('role', 'toolbar');
+    tabButtons.setAttribute('aria-label', `${editorName}.css editor controls`);
 
     // Add buttons to the tab
-    tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor));
+    tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, i18n.copyAll));
 
     if (isInputEditor) {
       if (!isShadowEditor) {
@@ -115,12 +121,14 @@ h1 {
         window.insertCSSFileInput = fileInput;
       }
 
-      tabButtons.appendChild(createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor));
+      const insertBtn = createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, i18n.insertCSSFile);
+      insertBtn.setAttribute('aria-controls', 'css-file-input');
+      tabButtons.appendChild(insertBtn);
     } else {
-      tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor));
+      tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, i18n.openRawOutput));
     }
 
-    tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor));
+    tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor, i18n.deleteAll));
 
     // Add file name and buttons to the tab
     editorTab.appendChild(fileName);

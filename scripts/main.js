@@ -1,3 +1,29 @@
+const i18n = {
+    skipLink: 'Skip to content',
+    settings: 'Settings',
+    editorSettings: 'Editor settings',
+    convertCSS: 'Convert CSS',
+    copyAll: 'Copy all',
+    insertCSSFile: 'Insert CSS file',
+    openRawOutput: 'Open raw output',
+    deleteAll: 'Delete all',
+    copiedToClipboard: 'Copied to clipboard',
+    fileImported: 'File imported',
+    textInsertedDragDrop: 'Text inserted from drag and drop',
+    onlyCSSFilesAllowed: 'Only .css files or text are allowed!',
+    conversionComplete: 'Conversion complete',
+    cssContainsErrors: '/* Your input CSS contains errors. See the table in the bottom left. */',
+    outputPlaceholder: '/* Your output CSS will appear here. */',
+    inputPlaceholder: '/* Your input CSS should go here. */',
+    auto: 'Auto',
+    minify: 'Minify',
+    beautify: 'Beautify',
+    denest: 'Denest',
+    nest: 'Nest',
+    increase: 'Increase',
+    decrease: 'Decrease',
+};
+
 /**
  * Creates a debounced function that delays invoking `func` until after `wait`
  * milliseconds have elapsed since the last time the debounced function was

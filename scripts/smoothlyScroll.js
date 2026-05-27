@@ -1,6 +1,21 @@
 function initializeSmoothScrollAndNestingController() {
   window.isNesting = mainElement.classList.contains('nesting');
   window.currentLenis = null;
+
+  window.switchToNestingMode = () => mainElement.classList.add('nesting');
+
+  window.switchToHomepage = () => mainElement.classList.remove('nesting');
+
+  window.lockToNestingMode = () => {
+    window._nestingLocked = true;
+    window.switchToNestingMode();
+    if (nestBtn) nestBtn.style.display = 'none';
+  };
+
+  window.unlockNestingMode = () => {
+    window._nestingLocked = false;
+    if (nestBtn) nestBtn.style.display = '';
+  };
   
   const updateLenisTarget = async () => {
     const target = window.isNesting ? mainSettings : scrollWrapper;
@@ -33,7 +48,7 @@ function initializeSmoothScrollAndNestingController() {
     window.isNesting = isCurrentlyNesting;
   
     // Disable the button immediately to prevent spam-clicking during the transition
-    nestBtn.disabled = true;
+    if (nestBtn) nestBtn.disabled = true;
   
     // Update the 'inert' attribute on the views for accessibility
     [mainSettings, mainElement.nextElementSibling, textSideElem].forEach((elem, i) => {
@@ -54,18 +69,24 @@ function initializeSmoothScrollAndNestingController() {
       await waitElementTransitionEnd(animatingElem, 5000, 'animationend');
     }
   
-    nestBtn.disabled = false;
+    if (nestBtn) nestBtn.disabled = false;
   
     // Update UI state (Editor <-> Homepage)
     document.title = 'Nest Your CSS - ' + (window.isNesting ? 'Editor' : 'Homepage');
-    nestBtn.setAttribute('aria-label', window.isNesting ? "View Homepage" : "Start Nesting");
+    if (nestBtn) nestBtn.setAttribute('aria-label', window.isNesting ? "View Homepage" : "Start Nesting");
     toggleBtn.textContent = (window.isNesting) ? 'Start Nesting' : 'Visit Homepage';
   };
   
   const observer = new MutationObserver(() => {
     const isCurrentlyNesting = mainElement.classList.contains('nesting');
   
-    if (isCurrentlyNesting !== window.isNesting) handleNestingChange(isCurrentlyNesting);
+    if (isCurrentlyNesting !== window.isNesting) {
+      if (window._nestingLocked && !isCurrentlyNesting) {
+        window.switchToNestingMode();
+        return;
+      }
+      handleNestingChange(isCurrentlyNesting);
+    }
     
   });
   
@@ -78,6 +99,13 @@ function initializeSmoothScrollAndNestingController() {
   };
   requestAnimationFrame(raf);
   
+  const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (reducedMotionMedia.matches) lockToNestingMode();
+  reducedMotionMedia.addEventListener('change', (e) => {
+    if (e.matches) lockToNestingMode();
+    else unlockNestingMode();
+  });
+
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
       e.preventDefault();

@@ -10,10 +10,12 @@
   /* --- Default Component CSS Variables --- */
   :root {
     --component-background: #161616;
-    --component-background-selected: linear-gradient(to right, #484848, #222222);
+    --component-background-accent-light: #484848;
+    --component-background-accent-dark: #222222;
+    --component-background-selected: linear-gradient(to right, var(--component-background-accent-light), var(--component-background-accent-dark));
     --component-box-shadow-selected: inset 0 1px oklch(100% none none / 0.25);
     --component-box-shadow-focused: 0 0 1.5em #aeaeae;
-    --component-text: #717171;
+    --component-text-accent: #484848;
     --component-text-hover: #aeaeae;
     --component-gap: 0.5rem;
   }
@@ -146,7 +148,7 @@
   nycss-combobox > output > div:not(:focus):empty::before {
     pointer-events: none;
     content: attr(placeholder);
-    color: #484848;
+    color: var(--component-text-accent);
   }
 
   nycss-combobox > output:hover > div:not(:focus):empty::before {
@@ -215,7 +217,6 @@
     user-select: none;
     position: relative;
     width: fit-content;
-    color: var(--component-text);
     border: none;
     padding: 1rem;
     gap: calc(2 * var(--component-gap));
@@ -263,7 +264,7 @@
   nycss-stepper svg {
     cursor: pointer;
     width: 1ch;
-    fill: #484848;
+    fill: var(--component-text-accent);
   }
 
   /* ======================================================================
@@ -284,8 +285,8 @@
     text-align: center;
     align-content: center;
     border-radius: 1rem;
-    --top-colour: #484848;
-    --bottom-colour: #222222;
+    --top-colour: var(--component-background-accent-light);
+    --bottom-colour: var(--component-background-accent-dark);
     background:
       linear-gradient(
           to bottom,
@@ -295,7 +296,7 @@
         )
         0% 100% / 100% 210% no-repeat,
       var(--component-background);
-    transition: background-position 0.125s ease-out;
+      transition: background-position 0.125s ease-out;
   }
 
   nycss-radio-group > label:has(:checked) {

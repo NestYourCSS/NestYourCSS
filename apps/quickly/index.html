@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr" xml:lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,15 +25,16 @@
   <link href="./styles/main.css" rel="stylesheet">
 </head>
 <body>
-  <main>
+  <div id="a11y-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  <main role="main">
     <div id="code-editor-wrapper">
-      <div class="header-controls">
+      <div class="header-controls" role="toolbar" aria-label="Editor controls">
         <div class="settings-container">
-          <button id="settings-toggle" class="header-btn vibrant" title="Settings">
+          <button id="settings-toggle" class="header-btn vibrant" title="Settings" aria-label="Settings">
             <i class="ph ph-gear-six"></i>
           </button>
 
-          <aside id="mainSettings" hidden>
+          <aside id="mainSettings" aria-label="Editor settings" hidden>
             <section>
               <h2>Editor</h2>
               <ul>
@@ -117,7 +118,7 @@
             </section>
           </aside>
         </div>
-        <button id="nest-btn" class="header-btn">Auto</button>
+        <button id="nest-btn" class="header-btn" aria-label="Convert CSS">Auto</button>
       </div>
       <div id="code-editor">
         <div class="editor" id="inputEditor"></div>

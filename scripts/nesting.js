@@ -71,7 +71,7 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
 };  
     
 function nestCode(onClick = false) {  
-    if (nestBtn.hasAttribute('disabled')) return;  
+    if (nestBtn?.hasAttribute('disabled')) return; 
 
     if (onClick) {
         mainElement.classList.toggle('nesting', !window.isNesting);
@@ -80,13 +80,17 @@ function nestCode(onClick = false) {
     }  
   
     if (typeof outputEditorInstance === 'undefined' || !inputEditorInstance) return;  
+
+    const wrapper = document.getElementById('codeEditor') || document.getElementById('siteWrapper');
+    if (wrapper) wrapper.setAttribute('aria-busy', 'true');
   
     let tableBodyElem = errorTable.tBodies[0];  
 	const annotations = inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
 	if (annotations.length == 0) {  
 		outputEditorInstance.getSession().setValue(convertToNestedCSS(inputEditorInstance.getValue()) || '/* Your output CSS will appear here */');  
-          
+         
         if (tableBodyElem.rows.length) tableBodyElem.innerHTML = '';  
+        if (typeof announce === 'function') announce(i18n.conversionComplete);
 	} else {  
 		outputEditorInstance.getSession().setValue('/* Your input CSS contains errors */');  
 		console.log('Code Errors:', annotations);  
@@ -97,7 +101,9 @@ function nestCode(onClick = false) {
           inputEditorInstance,  
           outputEditorInstance  
         );  
+        if (typeof announce === 'function') announce(i18n.cssContainsErrors);
 	}  
+    if (wrapper) wrapper.removeAttribute('aria-busy');
 };  
   
 function convertToNestedCSS(cssProvided, htmlString) {  
@@ -116,38 +122,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsToggle = document.getElementById('settingsBtn');  
     const mainSettings = document.getElementById('mainSettings');  
     const mainElement = document.querySelector('main');  
-  
+
     if (!settingsToggle || !mainSettings) return;  
-  
+
+    function openSettingsPanel() {
+        mainSettings.classList.add('mobile-open');  
+        mainSettings.removeAttribute('inert');  
+        const focusable = mainSettings.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label');
+        if (focusable.length) focusable[0].focus();
+    }
+
+    function closeSettingsPanel() {
+        mainSettings.classList.remove('mobile-open');  
+        if (mainElement && !mainElement.classList.contains('nesting')) {  
+            mainSettings.setAttribute('inert', '');  
+        }
+        settingsToggle.focus();
+    }
+
     settingsToggle.addEventListener('click', (e) => {  
         e.stopPropagation();  
-        const isOpen = mainSettings.classList.toggle('mobile-open');  
-        if (isOpen) {  
-            mainSettings.removeAttribute('inert');  
-        } else {  
-            if (mainElement && !mainElement.classList.contains('nesting')) {  
-                mainSettings.setAttribute('inert', '');  
-            }  
-        }  
+        if (mainSettings.classList.contains('mobile-open')) {
+            closeSettingsPanel();
+        } else {
+            openSettingsPanel();
+        }
     });  
-  
+
     document.addEventListener('click', (e) => {  
         if (mainSettings.classList.contains('mobile-open') &&   
             !mainSettings.contains(e.target) &&   
             !settingsToggle.contains(e.target)) {  
-            mainSettings.classList.remove('mobile-open');  
-            if (mainElement && !mainElement.classList.contains('nesting')) {  
-                mainSettings.setAttribute('inert', '');  
-            }  
+            closeSettingsPanel();
         }  
     });  
-  
+
     document.addEventListener('keydown', (e) => {  
         if (e.key === 'Escape' && mainSettings.classList.contains('mobile-open')) {  
-            mainSettings.classList.remove('mobile-open');  
-            if (mainElement && !mainElement.classList.contains('nesting')) {  
-                mainSettings.setAttribute('inert', '');  
-            }  
+            closeSettingsPanel();
         }  
     });  
-});  
+});

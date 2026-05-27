@@ -1,3 +1,11 @@
+function announce(message) {
+    const liveRegion = document.getElementById('a11y-live-region');
+    if (liveRegion) {
+        liveRegion.textContent = '';
+        requestAnimationFrame(() => { liveRegion.textContent = message; });
+    }
+}
+
 function tabButtonHandler(e) {
     let tabButton = e.currentTarget;
     let editor = (tabButton.parentElement.parentElement.nextElementSibling?.id.startsWith("input")) ? inputEditor : outputEditor;
@@ -6,6 +14,7 @@ function tabButtonHandler(e) {
       case "tabCopyAll":
         let copiedText = editor.getValue(); 
         navigator.clipboard.writeText(copiedText);
+        announce(i18n.copiedToClipboard);
         break;
       case "tabInsertCSS":
         window.insertCSSFileInput.click();
@@ -76,14 +85,18 @@ function setupDragAndDrop(editor) {
 
       if (file && (file.type === "text/css" || file.name.endsWith('.css'))) { // css file
           const reader = new FileReader();
-          reader.onload = (event) => window.inputEditor.setValue(event.target.result);
+            reader.onload = (event) => {
+            window.inputEditor.setValue(event.target.result);
+            announce(i18n.fileImported + ": " + file.name);
+          };
           reader.readAsText(file);
       }
       else if (text) { // plain text
           const cursorPosition = window.inputEditor.getCursorPosition();
           window.inputEditor.insertText(cursorPosition, text);
+          announce(i18n.textInsertedDragDrop);
       } else {
-          alert("Only .css files or text are allowed!");
+          announce(i18n.onlyCSSFilesAllowed);
       }
   });
 }
