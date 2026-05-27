@@ -114,7 +114,7 @@
   }
 
   /* Dropdown focus shadow */
-  nycss-dropdown:has(:is(input, ul > li):focus) > output {
+  nycss-dropdown:has(:focus) > output {
     z-index: 1;
     box-shadow: var(--component-box-shadow-focused);
   }

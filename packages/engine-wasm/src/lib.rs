@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-/// Parse and nest/un-nest/minify/beautify CSS.
+/// Parse and nest/denest/minify/beautify CSS.
 /// Returns the processed CSS string.
 #[wasm_bindgen]
 pub fn process_css(input: &str, mode: u8, preserve_comments: bool, indent: &str) -> String {

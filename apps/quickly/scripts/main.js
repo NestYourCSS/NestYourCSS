@@ -5,14 +5,12 @@
 const i18n = {
     settings: 'Settings',
     editorSettings: 'Editor settings',
-    convertCSS: 'Convert CSS',
-    editorControls: 'Editor controls',
+    headerControls: 'Editor controls',
     copyAll: 'Copy all',
     insertCSSFile: 'Insert CSS file',
     openRawOutput: 'Open raw output',
     deleteAll: 'Delete all',
     copiedToClipboard: 'Copied to clipboard',
-    browseFiles: 'Browse files',
     fileImported: 'File imported',
     textInsertedDragDrop: 'Text inserted from drag and drop',
     onlyCSSFilesAllowed: 'Only .css files or text are allowed!',
@@ -25,8 +23,7 @@ const i18n = {
     beautify: 'Beautify',
     denest: 'Denest',
     nest: 'Nest',
-    increase: 'Increase',
-    decrease: 'Decrease',
+    editorControls: '{name}.css editor controls',
 };
 
 /**

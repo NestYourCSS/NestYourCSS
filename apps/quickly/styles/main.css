@@ -425,16 +425,21 @@ main {
 
                 > button {
                     font-size: inherit;
-                    height: 2em;
-                    width: 2em;
+                    height: 2rem;
+                    width: 2rem;
+                    padding: 0;
                     border: none;
+                    outline: none;
                     border-radius: 50%;
                     background-color: transparent;
                     background-position: center;
-                    background-size: cover;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    /* I could've just editing the .svg files to make them gray, but this is the lazy approach */
                     filter: invert(0.4431);
                     opacity: var(--opacity-medium);
                     cursor: pointer;
+                    transition: 0.1s;
 
                     &.tabCopyAll {
                         background-image: url('../assets/icon-copy.svg');
@@ -454,6 +459,14 @@ main {
 
                     &:hover {
                         filter: invert(0.8832);
+                    }
+
+                    &:focus {
+                        /* z-index: 1; */
+                        outline: 1px solid var(--shades-medium);
+                        outline-offset: 4px;
+                        box-shadow: 0 0 calc((3 / 4) * 2rem) var(--shades-medium);
+                        background-size: calc(100% - 0.5rem);
                     }
                 }
             }
@@ -485,10 +498,4 @@ main {
 :focus-visible {
     outline: 2px solid var(--sec-colour-medium);
     outline-offset: 2px;
-}
-
-:is(#mainSettings, .header-controls, .editorTab, .tabButtons) :focus-visible {
-    outline: 2px solid var(--sec-colour-medium);
-    outline-offset: 2px;
-    border-radius: 4px;
 }

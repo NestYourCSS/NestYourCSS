@@ -2,7 +2,7 @@ function initializeAceEditors() {
   window.setupEditors = async () => {
   
     await waitForVar('cssSamples');
-    let sample = cssSamples[window.cssSample] ?? cssSamples["unnestedShowcase"];
+    let sample = cssSamples[window.cssSample] ?? cssSamples["denestedShowcase"];
   
     await waitForVar('LanguageProvider');
     const languageProvider = LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");

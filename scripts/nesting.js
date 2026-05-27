@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openSettingsPanel() {
         mainSettings.classList.add('mobile-open');  
-        mainSettings.removeAttribute('inert');  
+        mainSettings.removeAttribute('inert');
         const focusable = mainSettings.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label');
         if (focusable.length) focusable[0].focus();
     }
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeSettingsPanel() {
         mainSettings.classList.remove('mobile-open');  
         if (mainElement && !mainElement.classList.contains('nesting')) {  
-            mainSettings.setAttribute('inert', '');  
+            mainSettings.setAttribute('inert', '');
         }
         settingsToggle.focus();
     }

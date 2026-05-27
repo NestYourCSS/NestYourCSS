@@ -20,7 +20,7 @@
     popover.removeAttribute('hidden');
     closeDropdowns();
     // Focus the first focusable element in the panel
-    const focusable = popover.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label');
+    const focusable = popover.querySelectorAll(':is(button, [href], input, select, textarea, nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label):not([tabindex="-1"])');
     if (focusable.length) focusable[0].focus();
   }
 
@@ -156,8 +156,8 @@
         window.processMode = value;
         updateNestButton();
         if (typeof nestCode === 'function') nestCode();
-        const modeLabels = ['Minify', 'Beautify', 'Denest', 'Nest'];
-        document.title = `${modeLabels[value] || 'Nest'} mode - Quickly Nest Your CSS`;
+        const modeLabels = { 0: i18n.minify, 1: i18n.beautify, 2: i18n.denest, 3: i18n.nest };
+        document.title = `Quickly '${modeLabels[value] || 'Nest'}' Your CSS - Editor`;
       },
       auto: (value) => {
         window.processAuto = value;
@@ -259,9 +259,7 @@
     if (settingsToggle) settingsToggle.setAttribute('aria-label', i18n.settings);
     const mainSettings = document.getElementById('mainSettings');
     if (mainSettings) mainSettings.setAttribute('aria-label', i18n.editorSettings);
-    const nestBtn = document.getElementById('nest-btn');
-    if (nestBtn) nestBtn.setAttribute('aria-label', i18n.convertCSS);
     const headerControls = document.querySelector('.header-controls');
-    if (headerControls) headerControls.setAttribute('aria-label', i18n.editorControls);
+    if (headerControls) headerControls.setAttribute('aria-label', i18n.headerControls);
   });
 })();

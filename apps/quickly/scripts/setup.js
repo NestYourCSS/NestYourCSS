@@ -8,6 +8,24 @@ async function setupEditors() {
       showPrintMargin: false
     });
 
+    editor.commands.addCommand({
+      name: "tabOutForward",
+      bindKey: { win: "Tab", mac: "Tab" },
+      exec: () => false,
+    });
+
+    editor.commands.addCommand({
+      name: "tabOutBack",
+      bindKey: { win: "Shift-Tab", mac: "Shift-Tab" },
+      exec: () => false,
+    });
+
+    editor.commands.addCommand({
+      name: "blurEditor",
+      bindKey: { win: "Esc", mac: "Esc" },
+      exec: (editor) => editor.blur(),
+    });
+
     editor.setValue(value, -1);
     provider.registerEditor(editor);
 
@@ -27,8 +45,8 @@ h1 {
   // sample = Object.values(cssSamples).slice(0, 2).join(''); // Range
   // sample = Object.values(cssSamples).join(''); // All - It would be stupid to do this
 
-  window.inputEditor = initializeEditor("inputEditor", sample || '/* Your input CSS should go here */');
-  window.outputEditor = initializeEditor("outputEditor", '/* Your output CSS will appear here */');
+  window.inputEditor = initializeEditor("inputEditor", sample || i18n.inputPlaceholder);
+  window.outputEditor = initializeEditor("outputEditor", i18n.outputPlaceholder);
 
   let editors = [inputEditor, outputEditor];
 
@@ -95,7 +113,7 @@ h1 {
     const tabButtons = document.createElement("div");
     tabButtons.classList.add('tabButtons');
     tabButtons.setAttribute('role', 'toolbar');
-    tabButtons.setAttribute('aria-label', `${editorName}.css editor controls`);
+    tabButtons.setAttribute('aria-label', i18n.editorControls.replace('{name}', editorName));
 
     // Add buttons to the tab
     tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, i18n.copyAll));

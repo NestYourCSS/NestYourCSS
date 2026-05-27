@@ -1,7 +1,6 @@
 const i18n = {
     settings: 'Settings',
     editorSettings: 'Editor settings',
-    convertCSS: 'Convert CSS',
     copyAll: 'Copy all input code',
     insertCSSFile: 'Insert sample CSS into input',
     openRawOutput: 'Open CSS as Raw',
@@ -17,13 +16,12 @@ const i18n = {
     cssIsValid: '/* CSS is valid! */',
     noErrorsFound: 'No errors found.',
     processing: 'Processing...',
+    mode: 'Mode',
     auto: 'Auto',
     minify: 'Minify',
     beautify: 'Beautify',
     denest: 'Denest',
     nest: 'Nest',
-    increase: 'Increase',
-    decrease: 'Decrease',
     startNesting: 'Start Nesting',
     viewHomepage: 'View Homepage',
     visitHomepage: 'Visit Homepage',
@@ -83,26 +81,21 @@ function applyI18n() {
     document.querySelectorAll('img[alt="Advertisement"]').forEach(img => img.setAttribute('alt', i18n.adAlt));
     document.getElementById('miniEditor')?.setAttribute('aria-label', i18n.codeExampleLabel);
     document.getElementById('samples-label') && (document.getElementById('samples-label').textContent = i18n.samples);
-    document.getElementById('samples')?.setAttribute('label', i18n.samples);
-    const settingsSectionHeadings = { 'Input': 'Input', 'Editor': 'Editor', 'Functionality': 'Functionality' };
-    document.querySelectorAll('#mainSettings section h2').forEach(h2 => {
-        if (settingsSectionHeadings[h2.textContent.trim()]) {
-            const radio = h2.closest('section')?.querySelector('nycss-radio-group');
-            if (radio) radio.setAttribute('aria-label', i18n[radio.id === 'mode' ? 'convertCSS' : radio.id]);
-        }
-    });
     document.getElementById('auto-label') && (document.getElementById('auto-label').textContent = i18n.auto);
-    document.getElementById('mode-group-label') && (document.getElementById('mode-group-label').textContent = i18n.convertCSS);
+    document.getElementById('mode-group-label') && (document.getElementById('mode-group-label').textContent = i18n.mode);
+
     const modeGroup = document.getElementById('mode');
     if (modeGroup) {
-        const labels = modeGroup.querySelectorAll('label');
-        if (labels[0]) labels[0].textContent = i18n.minify;
-        if (labels[1]) labels[1].textContent = i18n.beautify;
-        if (labels[2]) labels[2].textContent = i18n.denest;
-        if (labels[3]) labels[3].textContent = i18n.nest;
+        const modeTexts = { 0: i18n.minify, 1: i18n.beautify, 2: i18n.denest, 3: i18n.nest };
+        modeGroup.querySelectorAll('label').forEach((label, i) => {
+            if (modeTexts[i]) {
+                const input = label.querySelector('input[type="radio"]');
+                label.textContent = '';
+                label.appendChild(document.createTextNode(modeTexts[i]));
+                if (input) label.appendChild(input);
+            }
+        });
     }
-    const autoToggle = document.getElementById('auto');
-    if (autoToggle) autoToggle.setAttribute('label', i18n.auto);
 }
 
 applyI18n();

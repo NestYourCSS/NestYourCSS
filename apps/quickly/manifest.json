@@ -1,7 +1,7 @@
 {
   "name": "Quickly Nest Your CSS",
   "short_name": "QuicklyCSS",
-  "description": "Quickly nest, un-nest, and minify your CSS",
+  "description": "Quickly nest, denest, beautify and minify your CSS",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",

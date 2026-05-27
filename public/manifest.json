@@ -1,7 +1,7 @@
 {
   "name": "Nest Your CSS",
   "short_name": "NestCSS",
-  "description": "Nest, un-nest, and minify your CSS in seconds",
+  "description": "Nest, denest, beautify and minify your CSS in seconds",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#00272b",

@@ -5,7 +5,7 @@ import { registerSW } from '@nycss/pwa';
 
 // Initialize Proxy Store
 const settingsConfig = {
-  samples: { defaultValue: 'unnestedShowcase' },
+  samples: { defaultValue: 'denestedShowcase' },
   externalCss: { defaultValue: '' },
   typefaces: { defaultValue: 'Fira Code' },
   fontsizes: { defaultValue: '1.25rem' },
