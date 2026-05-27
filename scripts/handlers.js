@@ -77,11 +77,11 @@ window.tabButtonHandler = (e) => {
       window.insertCSSFileInput.click();
       break;
     case "tabOpenRaw":
-      // Get the raw text from the editor
+      announce(i18n.openingNewWindow);
+
       let content = editor.getValue();
 
-      // Open a new blank window
-      let rawFileWindow = window.open("", "_blank");
+      let rawFileWindow = window.open("", "_blank", "noopener,noreferrer");
       rawFileWindow.document.write(`
         <html style="color-scheme: dark;">
             <body style="
@@ -120,7 +120,10 @@ window.tabButtonHandler = (e) => {
 
       break;
     case "tabDeleteAll":
-      editor.setValue("");
+      if (confirm(i18n.confirmDeleteAll)) {
+        editor.setValue("");
+        announce(i18n.contentDeleted);
+      }
       break;
   }
 };

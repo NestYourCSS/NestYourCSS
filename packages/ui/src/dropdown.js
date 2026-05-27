@@ -13,7 +13,7 @@ export class NycssDropdown extends HTMLElement {
     const cbId = this.id ? `${this.id}-checkbox` : `${id}-cb`;
     const listId = this.id ? `${this.id}-listbox` : `${id}-listbox`;
     const labelId = this.id ? `${this.id}-label` : '';
-    this.setAttribute('aria-owns', listId);
+    this.setAttribute('aria-controls', listId);
     this.innerHTML = `
       <input type="checkbox" id="${cbId}" class="dropdown-toggle" aria-hidden="true" tabindex="-1">
       <output role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-controls="${listId}"${labelId ? ` aria-labelledby="${labelId}"` : ''} class="dropdown-output">${this.value || this.querySelector('[role="option"]')?.textContent || ''}</output>

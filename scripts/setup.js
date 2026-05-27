@@ -169,6 +169,7 @@ function initializeAceEditors() {
       tabButtons.classList.add('tabButtons');
       tabButtons.setAttribute('role', 'toolbar');
       tabButtons.setAttribute('aria-label', i18n.editorControls.replace('{name}', editorName));
+      tabButtons.setAttribute('aria-orientation', 'horizontal');
 
       tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, i18n.copyAll));
   
@@ -191,7 +192,9 @@ function initializeAceEditors() {
           window.insertCSSFileInput = fileInput;
         }
         
-        tabButtons.appendChild(createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, i18n.insertCSSFile));
+        const insertBtn = createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, i18n.insertCSSFile);
+        insertBtn.setAttribute('aria-controls', 'inputEditor');
+        tabButtons.appendChild(insertBtn);
       } else {
         tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, i18n.openRawOutput));
       }

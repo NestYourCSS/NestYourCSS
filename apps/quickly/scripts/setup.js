@@ -26,6 +26,9 @@ async function setupEditors() {
       exec: (editor) => editor.blur(),
     });
 
+    const textarea = editor.textInput.getElement();
+    textarea.setAttribute("aria-label", editorId === "inputEditor" ? i18n.inputEditorLabel : i18n.outputEditorLabel);
+
     editor.setValue(value, -1);
     provider.registerEditor(editor);
 
@@ -114,6 +117,7 @@ h1 {
     tabButtons.classList.add('tabButtons');
     tabButtons.setAttribute('role', 'toolbar');
     tabButtons.setAttribute('aria-label', i18n.editorControls.replace('{name}', editorName));
+    tabButtons.setAttribute('aria-orientation', 'horizontal');
 
     // Add buttons to the tab
     tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, i18n.copyAll));
@@ -140,7 +144,7 @@ h1 {
       }
 
       const insertBtn = createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, i18n.insertCSSFile);
-      insertBtn.setAttribute('aria-controls', 'css-file-input');
+      insertBtn.setAttribute('aria-controls', 'inputEditor');
       tabButtons.appendChild(insertBtn);
     } else {
       tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, i18n.openRawOutput));

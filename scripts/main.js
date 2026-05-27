@@ -51,6 +51,9 @@ const i18n = {
     editorControls: '{name}.css editor controls',
     adAlt: 'Advertisement',
     samples: 'Samples',
+    openingNewWindow: 'Opening raw output in a new window',
+    confirmDeleteAll: 'Delete all content? This cannot be undone.',
+    contentDeleted: 'Content deleted',
 };
 
 function applyI18n() {
