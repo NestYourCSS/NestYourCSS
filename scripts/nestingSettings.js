@@ -107,7 +107,6 @@
       },
       auto: (value) => {
         window.processAuto = value;
-        window.autoProcess = value;
         const modeLabel = document.querySelector('#mode');
         if (modeLabel) modeLabel.classList.toggle('button', !value);
         if (value && typeof nestCode === 'function') nestCode();

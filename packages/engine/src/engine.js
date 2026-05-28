@@ -749,7 +749,7 @@ export function denestCSS(ast) {
     return newRoot;
 }
 
-export function stringifySelector(groups) {
+function stringifySelector(groups) {
     if (groups._str) return groups._str;
     groups._str = groups.map(g => {
         if (!g._str) g._str = g.parts.join('');
@@ -758,7 +758,7 @@ export function stringifySelector(groups) {
     return groups._str;
 }
 
-export function findNestingRelationship(parentGroups, childGroups) {
+function findNestingRelationship(parentGroups, childGroups) {
     const parentStr = stringifySelector(parentGroups);
     const childStr = stringifySelector(childGroups);
 

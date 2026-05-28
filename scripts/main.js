@@ -263,23 +263,6 @@ window.waitElementTransitionEnd = (element, fallbackDurationMs, event = 'animati
 };
 
 /**
- * Generates a string of 10 cryptographically secure random numbers.
- * 
- * This function creates a Uint8Array of length 10, fills it with cryptographically
- * secure random values using window.crypto.getRandomValues(), and returns them
- * joined as a string.
- * 
- * @function getRandomNumbers
- * @returns {string} A string containing 10 random numbers (0-255) joined together.
- * @throws {Error} If the crypto API is not available in the current environment.
- */
-window.getRandomNumbers = () => {
-  const typedArray = new Uint8Array(10);
-  const randomValues = window.crypto.getRandomValues(typedArray);
-  return randomValues.join('');
-};
-
-/**
  * Checks if the browser's CSS engine supports the `@scope` at-rule.
  *
  * @returns {boolean} `true` if the `@scope` at-rule is supported, otherwise `false`.

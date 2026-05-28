@@ -66,4 +66,3 @@ registerSW();
 
 // Export for use in legacy scripts
 window.__store = store;
-window.store = store;

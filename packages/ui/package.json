@@ -5,10 +5,6 @@
   "type": "module",
   "main": "./src/index.js",
   "exports": {
-    ".": "./src/index.js",
-    "./stepper": "./src/stepper.js",
-    "./dropdown": "./src/dropdown.js",
-    "./checkbox": "./src/checkbox.js",
-    "./radio-group": "./src/radio-group.js"
+    ".": "./src/index.js"
   }
 }

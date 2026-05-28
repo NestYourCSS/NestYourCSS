@@ -48,7 +48,6 @@ window.editorIndentChar = '\t';
 
 // Export store
 window.__store = store;
-window.store = store;
 
 // Register PWA
 registerSW();
