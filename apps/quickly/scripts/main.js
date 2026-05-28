@@ -27,7 +27,7 @@ const i18n = {
     inputEditorLabel: 'The editor to input CSS code that will be minified/nested/denested.',
     outputEditorLabel: 'The editor that outputs the CSS code that will be minified/nested/denested.',
     openingNewWindow: 'Opening raw output in a new window',
-    confirmDeleteAll: 'Delete all content? This cannot be undone.',
+    confirmDeleteAll: 'Delete all content? This can only be undone using CTRL+Z.',
     contentDeleted: 'Content deleted',
 };
 

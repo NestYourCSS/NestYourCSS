@@ -178,7 +178,10 @@
     background: var(--component-background-selected);
     box-shadow: var(--component-box-shadow-selected);
     z-index: 0;
-    transition: 0.25s;
+
+    @media not (prefers-reduced-motion: reduce) {
+      transition: 0.25s;
+    }
   }
 
   nycss-toggle:has(:checked)::before {
@@ -296,7 +299,10 @@
         )
         0% 100% / 100% 210% no-repeat,
       var(--component-background);
+
+    @media not (prefers-reduced-motion: reduce) {
       transition: background-position 0.125s ease-out;
+    }
   }
 
   nycss-radio-group > label:has(:checked) {

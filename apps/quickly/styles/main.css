@@ -97,7 +97,7 @@ html {
     font-size: 1.125rem;
     font-weight: 300;
     border: none;
-    color: var(--shades-lightest);
+    color: var(--shades-lighter);
     box-shadow: inset 0 1px oklch(100% none none / 0.25);
     min-width: 8rem;
 
@@ -105,14 +105,21 @@ html {
     --bottom-colour: var(--shades-em-darker);
 
     background: linear-gradient(to bottom, var(--top-colour), var(--bottom-colour) 45%, transparent 55%) 0% 100% / 100% 210% no-repeat, var(--component-background);
-    transition: background-position 0.125s ease-out, transform 0.2s, filter 0.2s;
+    transition: filter 0.2s;
     background-position: 0% 100%;
+    
 
+    @media not (prefers-reduced-motion: reduce) {
+        transition: background-position 0.125s ease-out, translate 0.2s, filter 0.2s;
+    }
 }
 
 .header-btn:hover {
     filter: brightness(1.2);
-    transform: translateY(-2px);
+
+    @media not (prefers-reduced-motion: reduce) {
+        translate: 0 -2px;
+    }
 }
 
 .header-btn:disabled {
@@ -122,7 +129,7 @@ html {
 
 .header-btn:disabled:hover {
     filter: none;
-    transform: none;
+    translate: 0;
 }
 
 .header-btn.vibrant {
@@ -439,7 +446,10 @@ main {
                     filter: invert(0.4431);
                     opacity: var(--opacity-medium);
                     cursor: pointer;
-                    transition: 0.1s;
+                    
+                    @media not (prefers-reduced-motion: reduce) {
+                        transition: 0.1s;
+                    }
 
                     &.tabCopyAll {
                         background-image: url('../assets/icon-copy.svg');

@@ -52,7 +52,7 @@ const i18n = {
     adAlt: 'Advertisement',
     samples: 'Samples',
     openingNewWindow: 'Opening raw output in a new window',
-    confirmDeleteAll: 'Delete all content? This cannot be undone.',
+    confirmDeleteAll: 'Delete all content? This can only be undone using CTRL+Z.',
     contentDeleted: 'Content deleted',
 };
 
