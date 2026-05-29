@@ -103,7 +103,7 @@
       },
       mode: (value) => {
         window.processMode = value;
-        if (typeof nestCode === 'function') nestCode();
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
       auto: (value) => {
         window.processAuto = value;
@@ -150,6 +150,20 @@
         store[el.id] = e.detail;
       });
     });
+
+    // Mode radio: clicking already-selected label triggers nest when Auto is Off
+    const modeRadio = document.getElementById('mode');
+    if (modeRadio) {
+      modeRadio.addEventListener('click', (e) => {
+        const label = e.target.closest('label');
+        if (!label) return;
+        const labels = modeRadio.querySelectorAll(':scope > label');
+        const idx = Array.from(labels).indexOf(label);
+        if (idx >= 0 && idx === modeRadio.value && !window.processAuto && typeof nestCode === 'function') {
+          nestCode();
+        }
+      });
+    }
 
     /* Apply initial state to components */
     window.appIsInitializing = true;

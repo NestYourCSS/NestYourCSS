@@ -155,7 +155,7 @@
       mode: (value) => {
         window.processMode = value;
         updateNestButton();
-        if (typeof nestCode === 'function') nestCode();
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
         const modeLabels = { 0: i18n.minify, 1: i18n.beautify, 2: i18n.denest, 3: i18n.nest };
         document.title = `Quickly '${modeLabels[value] || 'Nest'}' Your CSS - Editor`;
       },
