@@ -333,9 +333,12 @@
     gap: var(--padding);
     padding-bottom: calc((3 / 4) * var(--padding));
     overflow: hidden auto;
-    transition:
-      margin-right 2s,
-      min-width 2s;
+    
+    @media not (prefers-reduced-motion: reduce) {
+      transition:
+        margin-right 2s,
+        min-width 2s;
+    }
 
     > section {
       border-radius: 3rem;
@@ -581,6 +584,12 @@
       background: none;
       border-radius: 999px;
 
+      @media (prefers-reduced-motion: reduce) {
+        &:not([aria-disabled="true"]):hover > figure {
+          background: rgb(from var(--shades-white) r g b / 0.5);
+        }
+      }
+
       &:nth-of-type(1) > figure {
         clip-path: url(#iconGithub);
       }
@@ -641,7 +650,10 @@
           width: 75cqw;
           filter: blur(1rem);
           background-color: var(--shades-white);
-          animation: blink 3s infinite alternate-reverse;
+          
+          @media not (prefers-reduced-motion: reduce) {
+            animation: blink 3s infinite alternate-reverse;
+          }
         }
 
         &:focus {
@@ -715,10 +727,13 @@
     justify-content: space-between;
     container-type: inline-size;
     contain: paint;
-    transition:
-      width 2s,
-      opacity 2s,
-      padding 2s;
+    
+    @media not (prefers-reduced-motion: reduce) {
+      transition:
+        width 2s,
+        opacity 2s,
+        padding 2s;
+    }
 
     > header {
       margin: 2rem 2rem 0 4rem;
@@ -746,7 +761,10 @@
       line-height: 125%;
       font-weight: 900;
       font-size: 6em;
-      transition: opacity 3s 1.5s;
+      
+      @media not (prefers-reduced-motion: reduce) {
+        transition: opacity 3s 1.5s;
+      }
 
       &:hover {
         color: var(--shades-white);
@@ -833,9 +851,12 @@
 
       /* Initial state of icon fills and button background */
       --button-bg: transparent;
-      transition:
-        opacity 3s 1s,
-        --button-bg var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+                    
+      @media not (prefers-reduced-motion: reduce) {
+        transition:
+          opacity 3s 1s,
+          --button-bg var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+      }
 
       > svg {
         height: 3em;
@@ -870,19 +891,23 @@
         background-clip: text;
 
         /* Transitions for HOVER-OUT */
-        transition:
-          font-size var(--anim-duration-text-hide) var(--delay-text-hide-font),
-          opacity var(--anim-duration-text-opacity-hide)
-            var(--delay-text-hide-opacity),
-          color var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+        @media not (prefers-reduced-motion: reduce) {
+          transition:
+            font-size var(--anim-duration-text-hide) var(--delay-text-hide-font),
+            opacity var(--anim-duration-text-opacity-hide) var(--delay-text-hide-opacity),
+            color var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+        }
       }
 
       &:not([aria-disabled="true"]) {
         &:hover {
           /* Hover state of icon fills and button background */
           --button-bg: var(--secondary-colour);
-          transition: --button-bg var(--anim-duration-bg-in)
-            var(--delay-icon-in-bg);
+
+          @media not (prefers-reduced-motion: reduce) {
+            transition:
+              --button-bg var(--anim-duration-bg-in) var(--delay-icon-in-bg);
+          }
 
           > svg {
             /* Transitions for HOVER-IN */
@@ -899,12 +924,12 @@
             opacity: 1;
 
             /* Transitions for HOVER-IN */
-            transition:
-              font-size var(--anim-duration-text-show)
-                var(--delay-text-show-font),
-              opacity var(--anim-duration-text-opacity-show)
-                var(--delay-text-show-opacity),
-              color var(--anim-duration-icon-in) var(--delay-icon-in-bg);
+            @media not (prefers-reduced-motion: reduce) {
+              transition:
+                font-size var(--anim-duration-text-show) var(--delay-text-show-font),
+                opacity var(--anim-duration-text-opacity-show) var(--delay-text-show-opacity),
+                color var(--anim-duration-icon-in) var(--delay-icon-in-bg);
+            }
           }
         }
 
@@ -952,7 +977,10 @@
       font-size: 1.25rem;
       height: 2rem;
       align-content: center;
-      transition: opacity 3s;
+
+      @media not (prefers-reduced-motion: reduce) {
+        transition: opacity 3s;
+      }
     }
 
     > div {
@@ -966,15 +994,21 @@
         rgb(from var(--shades-darker) r g b / var(--opacity-low));
       padding: 1rem;
       gap: 1rem;
-      animation: slideInLeft 0.5s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-      transition:
-        0.25s,
-        opacity 3s 1s;
+
+      @media not (prefers-reduced-motion: reduce) {
+        animation: slideInLeft 0.5s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        transition:
+          0.25s,
+          opacity 3s 1s;
+      }
 
       > picture {
         width: 17.637rem;
         aspect-ratio: 1 / 1;
-        transition: filter 0.25s;
+
+        @media not (prefers-reduced-motion: reduce) {
+          transition: filter 0.25s;
+        }
 
         > * {
           cursor: pointer;
@@ -1103,9 +1137,12 @@
               position: absolute;
               overflow: hidden;
               height: 100%;
-              transition:
-                translate 2s,
-                opacity 2s;
+              
+              @media not (prefers-reduced-motion: reduce) {
+                transition:
+                  translate 2s,
+                  opacity 2s;
+              }
             }
 
             &,
@@ -1116,10 +1153,12 @@
         }
 
         &#outputEditorWrapper {
-          transition:
+          @media not (prefers-reduced-motion: reduce) {
+            transition:
             opacity 1s,
             display 1s;
-          transition-behavior: allow-discrete;
+            transition-behavior: allow-discrete;
+          }
         }
       }
     }
@@ -1132,12 +1171,7 @@
       width: auto;
       aspect-ratio: var(--editor-width) / 7;
 
-      &:has(button:active) {
-        --onClickValue1: 0.75;
-        --opacity-medium: var(--onClickValue2, unset);
-        animation: onClick 1s;
-      }
-
+      &:has(button:active),
       &:has(#inputEditor.drag-hover) {
         --opacity-medium: 0.75;
       }
@@ -1194,7 +1228,10 @@
           filter: invert(0.4431);
           opacity: var(--opacity-medium);
           cursor: pointer;
-          transition: 0.1s;
+                    
+          @media not (prefers-reduced-motion: reduce) {
+              transition: 0.1s;
+          }
 
           &.tabCopyAll {
             background-image: url("../assets/images/icon-copy.svg");
@@ -1248,12 +1285,15 @@
     outline: none !important;
     padding: 0;
     --nestBtn-shadow-direction: 1;
-    animation: bounceInTop 1.5s 0.5s both;
-    transition:
-      opacity 1s,
-      font-size 1s,
-      translate 1s,
-      --nestBtn-shadow-direction 1s;
+
+    @media not (prefers-reduced-motion: reduce) {
+      animation: bounceInTop 1.5s 0.5s both;
+      transition:
+        opacity 1s,
+        font-size 1s,
+        translate 1s,
+        --nestBtn-shadow-direction 1s;
+    }
 
     &:disabled {
       cursor: not-allowed;
@@ -1283,9 +1323,12 @@
       text-align: center;
       align-content: center;
       transform-origin: bottom right;
-      transition:
-        scale 0.5s,
-        background-color 1s;
+
+      @media not (prefers-reduced-motion: reduce) {
+        transition:
+          scale 0.5s,
+          background-color 1s;
+      }
 
       /* Visuals */
       background-color: var(--pri-colour-lighter);
@@ -1308,11 +1351,15 @@
       opacity: 0;
       z-index: -1;
       border-radius: inherit;
-      transition:
-        inset 0.5s,
-        opacity 2s,
-        background-color 2s;
-      animation: shadowRotate 3s infinite both;
+      animation: shadowRotate 3s infinite both paused;
+      
+      @media not (prefers-reduced-motion: reduce) {
+        transition:
+          inset 0.5s,
+          opacity 2s,
+          background-color 2s;
+        animation-play-state: running;
+      }
 
       /* Show spans on hover of the main div */
       :is(#nestBtn:not(:disabled):has(> div:hover) > &) {
@@ -1363,10 +1410,20 @@
     gap: var(--padding);
 
     > #editorSide {
+      width: calc(var(--single-editor-width));
+
       animation: moveRight 2s cubic-bezier(1, 0, 0.5, 1) both;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation-delay: -2s;
+      }
 
       > #codeEditor > .editorWrapper {
         transition: 1s 0.5s;
+        
+        @media (prefers-reduced-motion: reduce) {
+          transition: none;
+        }
 
         /* &#inputEditorWrapper { */
         &:first-child {
@@ -1407,7 +1464,10 @@
 @scope (#siteWrapper:has(> main.nesting)) {
   & > main {
     height: 100dvh;
-    transition: height 1s;
+    
+    @media not (prefers-reduced-motion: reduce) {
+      transition: height 1s;
+    }
 
     & + article,
     & + article section {
@@ -1468,17 +1528,22 @@
           aspect-ratio: var(--total-width) / 7;
           animation: moveLeft 2s cubic-bezier(1, 0, 0.5, 1) both;
 
+          @media (prefers-reduced-motion: reduce) {
+            animation-delay: -2s;
+          }
+
           #editorGap {
             height: 100%;
             aspect-ratio: var(--gutter-width) / 6.625;
           }
 
-          .editorWrapper#inputEditorWrapper
-            > #shadowEditorsWrapper
-            > .shadowEditorWrapper {
+          .editorWrapper#inputEditorWrapper > #shadowEditorsWrapper > .shadowEditorWrapper {
             translate: 0 !important;
             opacity: 0 !important;
-            transition: 2s;
+            
+            @media not (prefers-reduced-motion: reduce) {
+              transition: 2s;
+            }
           }
         }
       }
@@ -1540,8 +1605,10 @@
           z-index: -1;
           position: absolute;
           color: rgb(from var(--shades-white) r g b / 0.5);
-          animation: repeatText 2s linear infinite;
-          animation-composition: add;
+          
+          @media not (prefers-reduced-motion: reduce) {
+            animation: repeatText 2s linear infinite;
+          }
         }
 
         &[hidden]::before {
@@ -1578,21 +1645,23 @@
           translate: 0 -1lh;
         }
 
-        @supports (animation-range: normal) {
-          animation: swapText linear 1ms;
-          animation-timeline: view();
-          animation-range-start: cover -0.5lh;
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            animation: swapText linear 1ms;
+            animation-timeline: view();
+            animation-range-start: cover -0.5lh;
 
-          &:nth-child(1) {
-            animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
-          }
+            &:nth-child(1) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
+            }
 
-          &:nth-child(2) {
-            animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
-          }
+            &:nth-child(2) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
+            }
 
-          &:nth-child(3) {
-            animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+            &:nth-child(3) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+            }
           }
         }
 
@@ -1638,23 +1707,25 @@
         overflow: hidden;
         position: relative;
 
-        @supports (animation-range: normal) {
-          padding-top: 1lh;
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            padding-top: 1lh;
 
-          &:first-child {
-            text-shadow: 0 0.5lh;
-            animation: showText linear forwards 1ms;
-            animation-timeline: view();
-            animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
-            animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
-          }
+            &:first-child {
+              text-shadow: 0 0.5lh;
+              animation: showText linear forwards 1ms;
+              animation-timeline: view();
+              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            }
 
-          &:last-child {
-            text-shadow: 0 -2lh;
-            animation: showText linear forwards 1ms;
-            animation-timeline: view();
-            animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
-            animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            &:last-child {
+              text-shadow: 0 -2lh;
+              animation: showText linear forwards 1ms;
+              animation-timeline: view();
+              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            }
           }
         }
       }
@@ -1671,11 +1742,13 @@
       width: 56ch;
       text-align: right;
 
-      @supports (animation-range: normal) {
-        animation: slideDown linear both 1ms;
-        animation-timeline: view();
-        animation-range-start: cover -20lh;
-        animation-range-end: contain 5lh;
+      @media not (prefers-reduced-motion: reduce) {
+        @supports (animation-range: normal) {
+          animation: slideDown linear both 1ms;
+          animation-timeline: view();
+          animation-range-start: cover -20lh;
+          animation-range-end: contain 5lh;
+        }
       }
 
       s {
@@ -1707,6 +1780,7 @@
             var(--shades-white) 25%
           );
           top: 50%;
+          
           animation: strikethrough 2.5s infinite var(--animation-delay);
           animation-timing-function: linear(
             0 0%,
@@ -1732,7 +1806,11 @@
             0.99 74.4%,
             1 86.4%,
             1 100%
-          );
+          ); /* I have no idea how this happened */
+
+          @media (prefers-reduced-motion: reduce) {
+            animation: none;
+          }
         }
 
         + b {
@@ -1785,20 +1863,26 @@
           }
         }
 
-        @supports (animation-range: normal) {
-          animation: slideIn ease-out forwards 1ms;
-          animation-timeline: view();
-          animation-range-start: cover -0.5lh;
-          animation-range-end: cover calc(2lh + 2.5lh);
+        animation: slideIn 1s linear paused;
+        animation-delay: -0.5s;
+        animation-timeline: unset;
 
-          &:first-child {
-            animation-range-start: cover 0lh;
-            animation-range-end: cover calc(2.5lh + 2.5lh);
-          }
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            animation: slideIn ease-out forwards 1ms;
+            animation-timeline: view();
+            animation-range-start: cover -0.5lh;
+            animation-range-end: cover calc(2lh + 2.5lh);
 
-          &:last-child {
-            animation-range-start: cover -1.5lh;
-            animation-range-end: cover calc(1.5lh + 2.5lh);
+            &:first-child {
+              animation-range-start: cover 0lh;
+              animation-range-end: cover calc(2.5lh + 2.5lh);
+            }
+
+            &:last-child {
+              animation-range-start: cover -1.5lh;
+              animation-range-end: cover calc(1.5lh + 2.5lh);
+            }
           }
         }
       }
@@ -1815,20 +1899,21 @@
       font-size: 2em;
       line-height: 1.5em;
       width: 50ch;
+      translate: 0 -1lh;
+        
+      @media not (prefers-reduced-motion: reduce) {
+        @supports (animation-range: normal) {
+          animation:
+            boostUp linear both 1ms,
+            slideUp linear both 1ms;
 
-      @supports (animation-range: normal) {
-        animation:
-          boostUp linear both 1ms,
-          slideUp linear both 1ms;
-        animation-range:
-          cover 16em,
-          cover;
-        animation-timeline: view(), view();
-        animation-composition: add;
-      }
-
-      @supports not (animation-range: normal) {
-        translate: -3lh;
+          animation-range:
+            cover 16em,
+            cover;
+            
+          animation-timeline: view(), view();
+          animation-composition: add;
+        }
       }
 
       u {
@@ -1836,11 +1921,9 @@
 
         b {
           font-size: 1.25em;
-          /* line-height: inherit; */
           transition: color 0.5s;
 
           &:hover {
-            /* line-height: inherit; */
             color: var(--pri-colour-lightest);
           }
 
@@ -1889,7 +1972,10 @@
         position: absolute;
         content: attr(data-text);
         inset: -0.25rem;
-        animation: 10s linear both infinite 5s;
+        
+        @media not (prefers-reduced-motion: reduce) {
+          animation: 10s linear both infinite 5s;
+        }
       }
 
       &::before {
@@ -2015,6 +2101,19 @@
           }
         }
       }
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+        transition: none;
+
+        div :is(> div, span) {
+          animation: none;
+        }
+
+        > .visual-presentation > pre > code > div:first-child::before {
+          transition: none;
+        }
+      }
     }
   }
 }
@@ -2028,7 +2127,9 @@
       touch-action: none;
 
       &:has(> :not(#backToStart):hover) {
-        cursor: none;
+        @media not (prefers-reduced-motion: reduce) {
+          cursor: none;
+        }
 
         > #nycssCursor {
           scale: 0.25;
@@ -2047,9 +2148,7 @@
       pointer-events: none;
       position: absolute;
       z-index: 999;
-      background-color: rgb(
-        from var(--pri-colour-lightest) r g b / var(--opacity-low)
-      );
+      background-color: rgb(from var(--pri-colour-lightest) r g b / var(--opacity-low));
       border-radius: 50%;
       aspect-ratio: 1 / 1;
       font-size: 10em;
@@ -2060,6 +2159,10 @@
       transition:
         opacity 1s 0.1s,
         scale 0.5s;
+
+      @media (prefers-reduced-motion: reduce) {
+        display: none;
+      }
 
       :is(:has(.hover-animation):has(> &):hover &) {
         will-change: transform;
@@ -2074,7 +2177,8 @@
       position: absolute;
       top: 4lh;
       right: 8ch;
-      color: var(--shades-white);
+      user-select: none;
+      color: transparent;
       font-family: "Poppins", "Calibri", sans-serif;
       font-weight: 300;
       font-size: 1.75rem;
@@ -2085,8 +2189,16 @@
       column-count: 2;
       gap: 6ch;
       word-spacing: 0.3ch;
-      color: transparent;
-      user-select: none;
+      
+      @media (prefers-reduced-motion: reduce) {
+        color: var(--shades-white);
+        user-select: unset;
+
+        > a:hover {
+          text-decoration: underline;
+        }
+      }
+
       @supports (animation-range: normal) {
         animation: unblur ease-out both 1ms;
         animation-timeline: view();
@@ -2096,12 +2208,15 @@
       &::before,
       &::after {
         color: var(--shades-white);
-        content: attr(data-text);
         position: absolute;
         inset: 0;
         column-count: inherit;
         gap: inherit;
-        animation: widenGap 3s ease-in-out infinite alternate backwards;
+        
+        @media not (prefers-reduced-motion: reduce) {
+          content: attr(data-text);
+          animation: widenGap 3s ease-in-out infinite alternate backwards;
+        }
       }
 
       &::before {
@@ -2136,16 +2251,26 @@
       font-weight: 600;
       font-size: 3em;
       scale: 1;
-      @supports (animation-range: normal) {
-        animation: moveDown linear both 1ms;
-        animation-timeline: view();
-        animation-range-start: cover -2lh;
-        animation-range-end: cover 2lh;
+
+      @media not (prefers-reduced-motion: reduce) {
+        @supports (animation-range: normal) {
+          animation: moveDown linear both 1ms;
+          animation-timeline: view();
+          animation-range-start: cover -2lh;
+          animation-range-end: cover 2lh;
+        }
       }
 
       > span {
         display: inline-block;
-        transition: 1s;
+        
+        @media (prefers-reduced-motion: reduce) {
+          transition: 0s 1s;
+        }
+        
+        @media not (prefers-reduced-motion: reduce) {
+          transition: 1s 0s;
+        }
 
         &:hover {
           scale: 1 2;
@@ -2171,15 +2296,19 @@
         font-size: 1em;
         font-weight: 900;
         font-family: "Poppins", "Calibri", sans-serif;
-        @supports (animation-range: normal) {
-          animation: moveDown linear both 1ms;
-          animation-timeline: view();
-          animation-range-start: cover -2lh;
-          animation-range-end: cover 2lh;
+        
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            animation: moveDown linear both 1ms;
+            animation-timeline: view();
+            animation-range-start: cover -2lh;
+            animation-range-end: cover 2lh;
+          }
+
+          transition:
+            scale 1s,
+            text-shadow 1s;
         }
-        transition:
-          scale 1s,
-          text-shadow 1s;
 
         &:hover {
           scale: 1.1;
@@ -2198,15 +2327,20 @@
         letter-spacing: -0.05em;
         font-family: "Orelo Expanded";
         color: rgb(from var(--shades-white) r g b / var(--opacity-medium));
-        @supports (animation-range: normal) {
-          animation: fadeUp linear both 1ms;
-          animation-timeline: view();
-          animation-range-start: cover;
-          animation-range-end: cover calc(1lh + 1.98em);
-        }
-        @supports not (animation-range: normal) {
-          translate: -0.96ch -0.31em;
-          opacity: 1;
+       
+        translate: -0.96ch -0.31em;
+        opacity: 1;
+
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0; 
+            opacity: 0;   
+            
+            animation: fadeUp linear both 1ms;
+            animation-timeline: view();
+            animation-range-start: cover;
+            animation-range-end: cover calc(1lh + 1.98em);
+          }
         }
       }
 
@@ -2237,6 +2371,19 @@
         aspect-ratio: 1 / 1;
       }
 
+      img#nycssLogo:not([hidden]) {
+        --shadow-color: #1474b833;
+        --shadow-distance: 1.5em;
+        --shadow-blur: 0.25em;
+        filter: drop-shadow(0 calc(-1 * var(--shadow-distance)) var(--shadow-blur) var(--shadow-color));
+        
+        :hover > & {
+          --shadow-color: #26a2d933;
+          --shadow-distance: 1.5em;
+          --shadow-blur: 0.5em;
+        }
+      }
+
       > img#nycssNest {
         color: transparent;
         filter: drop-shadow(0 -0.5em) drop-shadow(0.7em 0.3em)
@@ -2261,6 +2408,7 @@
           drop-shadow(0 calc(-1 * var(--shadow-distance)) 0 var(--shadow-color));
         --shadow-color: #1474b833; /* Taken directly from the CSS Logo */
         --shadow-distance: 0;
+
         transition: 1s;
 
         &.main-animation {
@@ -2292,7 +2440,7 @@
         }
       }
 
-      &:has(img.hover-animation) {
+      &:has([hidden] + .hover-animation) {
         clip-path: inset(19.3% 1.3% 1.3% 7.3%);
 
         &:hover #nycssBadge.hover-animation {

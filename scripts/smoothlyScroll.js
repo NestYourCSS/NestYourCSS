@@ -23,10 +23,9 @@ function initializeSmoothScrollAndNestingController() {
     if (window.currentLenis) window.currentLenis.destroy();
   
     await waitForVar('Lenis');
-    const newLenis = new Lenis({
-      wrapper: target,
-      autoResize: true
-    });
+    const lenisOpts = { wrapper: target, autoResize: true };
+    if (window.prefersReducedMotion) lenisOpts.lerp = 1;
+    const newLenis = new Lenis(lenisOpts);
 
     if (window.currentLenis == null && newLenis.dimensions.wrapper == siteWrapper) {
       // 3. Use the 'scroll' event to check the position
@@ -54,8 +53,6 @@ function initializeSmoothScrollAndNestingController() {
     [mainSettings, mainElement.nextElementSibling, textSideElem].forEach((elem, i) => {
       elem.toggleAttribute('inert', i ? window.isNesting : !window.isNesting);
     });
-    
-    
     
     // Update the Lenis scroller target (whole to page => nesting settings section)
     updateLenisTarget();
@@ -98,13 +95,6 @@ function initializeSmoothScrollAndNestingController() {
     requestAnimationFrame(raf)
   };
   requestAnimationFrame(raf);
-  
-  const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (reducedMotionMedia.matches) lockToNestingMode();
-  reducedMotionMedia.addEventListener('change', (e) => {
-    if (e.matches) lockToNestingMode();
-    else unlockNestingMode();
-  });
 
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -116,14 +106,22 @@ function initializeSmoothScrollAndNestingController() {
       if (targetSelector == '#') targetElement = scrollWrapper.firstElementChild;
       else targetElement = document.getElementById(targetSelector.slice(1));
       
-      if (window.currentLenis) window.currentLenis.scrollTo(targetElement, {
-        duration: 1.5,
-        lock: true
-      });
-      else scrollWrapper.scrollTo({
-        top: targetElement.offsetTop,
-        behavior: 'smooth'
-      });
+      if (window.prefersReducedMotion) {
+        if (window.currentLenis) window.currentLenis.scrollTo(targetElement, { immediate: true, force: true });
+        else scrollWrapper.scrollTo({ top: targetElement.offsetTop });
+      } else if (window.currentLenis) {
+        window.currentLenis.scrollTo(targetElement, { duration: 1.5, lock: true });
+      } else {
+        scrollWrapper.scrollTo({ top: targetElement.offsetTop, behavior: 'smooth' });
+      }
     });
+  });
+
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => {
+    if (window.currentLenis) {
+      window.currentLenis.destroy();
+      window.currentLenis = null;
+    }
+    updateLenisTarget();
   });
 };

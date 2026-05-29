@@ -12,7 +12,16 @@ function initializeAceEditors() {
   
   
     if (!(inputEditorInstance && outputEditorInstance)) return;
-  
+
+    const editorMql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateEditorAnimatedScroll = () => {
+      const shouldAnimate = !window.prefersReducedMotion;
+      inputEditorInstance.setAnimatedScroll(shouldAnimate);
+      outputEditorInstance.setAnimatedScroll(shouldAnimate);
+    };
+    editorMql.addEventListener('change', updateEditorAnimatedScroll);
+    updateEditorAnimatedScroll();
+
     // Auto Nest
     let codeChanged = false;
     let isProcessing = false;
@@ -85,7 +94,7 @@ function initializeAceEditors() {
       textarea.setAttribute("aria-label", labelDescription);
     
       editor.setValue(value, -1);
-      editor.setAnimatedScroll(true);
+      editor.setAnimatedScroll(!window.prefersReducedMotion);
     
       let tabIndexSet = false;
       let lastGutterWidth = null;

@@ -167,7 +167,10 @@
       <style>
         symbol > :is(.icon-path-one, .icon-path-two) {
             cursor: pointer;
-            transition: var(--icon-paths-fill-transition);
+            
+            @media not (prefers-reduced-motion: reduce) {
+              transition: var(--icon-paths-fill-transition);
+            }
     
             &.icon-path-one { fill: var(--icon-path-one-fill); }
             &.icon-path-two { fill: var(--icon-path-two-fill); }
@@ -548,12 +551,12 @@
           <p><a href="#" tabindex="-1">Click anywhere to...</a></p>  
         </hgroup>  
   
-        <p id="splittingText" data-text="Nesting in CSS allows you to define styles for child elements within the context of their parent element's style rule. This creates a hierarchy that reflects your HTML structure document, making your CSS code more intuitive and easier to manage.">  
-          This powerful hierarchy makes your code more intuitive, <a href="#improvedCodeReadability">easier to read</a>, and ultimately, <a href="#easierMaintenance">easier to manage</a>.  
-        </p>  
+        <p id="splittingText" data-text="CSS Nesting allows you to style elements within the context of an ancestor's rule. If you want your CSS code to be easier to read, this will create a hierarchy that reflects your HTML structure document that also makes your code easier to manage.">
+          CSS Nesting allows you to style elements within the context of an ancestor's rule. If you want your CSS code to be <a href="#improvedCodeReadability">easier to read</a>, this will create a hierarchy that reflects your HTML structure document that also makes your code <a href="#easierMaintenance">easier to manage</a>.
+        </p>
         <a id="nycssLogoGroup" href="#" tabindex="-1" aria-label="Go to top of page">  
-          <img id="nycssLogo" loading="lazy" class="optimize" hidden alt="The official logo for NestYourCSS..." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/">  
-          <img id="nycssBadge" loading="lazy" class="optimize main-animation" alt="The official CSS badge..." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/">  
+          <img id="nycssLogo" loading="lazy" class="optimize" hidden alt="The official logo for NestYourCSS." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/">  
+          <img id="nycssBadge" loading="lazy" class="optimize main-animation" alt="The official CSS badge." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/">  
           <img id="nycssNest" loading="lazy" class="optimize" alt="A bird's nest..." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/256x/-/format/auto/-/quality/smart/">  
         </a>  
       </section>  

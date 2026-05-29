@@ -41,8 +41,8 @@ const i18n = {
     reportBugLabel: 'Report a Bug (opens in new tab)',
     feedbackLabel: 'Share Your Mind (opens in new tab)',
     quicklyLabel: 'Nest Quicker (opens in current tab)',
-    logoAlt: 'The official logo for NestYourCSS...',
-    cssBadgeAlt: 'The official CSS badge...',
+    logoAlt: 'The official logo for NestYourCSS.',
+    cssBadgeAlt: 'The official CSS badge.',
     cursorAlt: 'An animated cursor showing three curved \'NEST YOUR CSS\' on the edge of a translucent circle, spinning endlessly, and constantly follows the user\'s cursor',
     nestAlt: 'A bird\'s nest...',
     inputEditorLabel: 'The editor to input CSS code that will be minified/nested/denested.',
@@ -102,6 +102,28 @@ function applyI18n() {
 }
 
 applyI18n();
+
+window.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotionMql = window.matchMedia('(prefers-reduced-motion: reduce)');
+reducedMotionMql.addEventListener('change', (e) => { window.prefersReducedMotion = e.matches; });
+
+const cssLogo = document.getElementById('nycssLogo');
+const cssNest = document.getElementById('nycssNest');
+
+function updateLogoVisibility() {
+  cssBadge?.toggleAttribute('hidden', window.prefersReducedMotion);
+  cssNest?.toggleAttribute('hidden', window.prefersReducedMotion);
+  cssLogo?.toggleAttribute('hidden', !window.prefersReducedMotion);
+  cursor?.toggleAttribute('hidden', window.prefersReducedMotion);
+
+  if (cursor) {
+    cursor.style.opacity = window.prefersReducedMotion ? '0' : '';
+    cursor.style.pointerEvents = window.prefersReducedMotion ? 'none' : '';
+  }
+}
+
+updateLogoVisibility();
+reducedMotionMql.addEventListener('change', updateLogoVisibility);
 
 /**
  * Creates a debounced function that delays invoking `func` until after `wait`

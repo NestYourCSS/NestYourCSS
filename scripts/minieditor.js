@@ -38,9 +38,11 @@ function initializeMiniEditor() {
     
     /* Horizontal */
   
-    let horizontalPos = cursorX / document.body.clientWidth;
-    let padding = nycssCodeExample.parentElement.offsetLeft / miniEditor.offsetWidth;
-    let horizontalRePos = ((1 - (padding * 2)) * horizontalPos) + padding;
-    nycssCodeExample.parentElement.style.setProperty('--intensityPos', roundNumber(horizontalRePos * 100) + '%');
+    if (!window.prefersReducedMotion) {
+      let horizontalPos = cursorX / document.body.clientWidth;
+      let padding = nycssCodeExample.parentElement.offsetLeft / miniEditor.offsetWidth;
+      let horizontalRePos = ((1 - (padding * 2)) * horizontalPos) + padding;
+      nycssCodeExample.parentElement.style.setProperty('--intensityPos', roundNumber(horizontalRePos * 100) + '%');
+    }
   };
 };

@@ -2,8 +2,14 @@
 
 @keyframes scaleDown {
 	1%, 99% { pointer-events: none; }
-	0% { scale: 1; filter: grayscale(0); }
-	50%, 100% { scale: calc(3 / 4); filter: grayscale(1); }
+	0% {		
+		@media (prefers-reduced-motion: reduce) { scale: 1 }
+		filter: grayscale(0);
+	}
+	50%, 100% {		
+		@media (prefers-reduced-motion: reduce) { scale: calc(3 / 4) }
+		filter: grayscale(1);
+	}
 }
 
 /* ((96vh {firstSectionHeight} + ((100vh {sectionHeight} + 50vh {gap})  * 4 {otherSectionsCount})) / 696 {totalHeight}) */

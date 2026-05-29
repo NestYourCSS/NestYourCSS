@@ -8,15 +8,24 @@ var(--shades-black)
 document.body.addEventListener('pointermove', (e) => {
   if (typeof splashTextElem === 'undefined' || splashTextElem === null || !mainElement) return;
 
+  const prefersReducedMotion = window.prefersReducedMotion;
+
   window.cursorX = e.clientX;
   window.cursorY = e.clientY;
   
   requestAnimationFrame(() => {
-    const horizValue = roundNumber((e.clientX / document.body.clientWidth) * 100) + '%';
-    if (window.isNesting || scrollWrapper.scrollTop < mainElement.offsetHeight)
-      mainContent.style.background = mainContentBackgroundString(horizValue);
+    // 1. Handle the background motion
+    if (prefersReducedMotion) {
+      // Set a static "safe" value (e.g., 50%) so it doesn't move
+      mainContent.style.background = mainContentBackgroundString("50%");
+    } else {
+      const horizValue = roundNumber((e.clientX / document.body.clientWidth) * 100) + '%';
+      if (window.isNesting || scrollWrapper.scrollTop < mainElement.offsetHeight)
+        mainContent.style.background = mainContentBackgroundString(horizValue);
+    }
 
-    if (window.isNesting) {
+    // 2. Handle nested nav buttons (Safe-ish, but good to check)
+    if (window.isNesting && !prefersReducedMotion) {
       // Offset is needed since containing box has been changed from root to mainSettings (or some other element)
       const [ offsetX, offsetY ] = [(mainSettings.scrollLeft - mainSettings.lastElementChild.clientHeight / 2), (mainSettings.scrollTop - (mainSettings.lastElementChild.clientHeight / 2))];
 
@@ -50,7 +59,13 @@ const elements = [
   '#nycssCursor',
   '#splittingText'
 ];
-const intersectionObserver = new IntersectionObserver((entries) => entries.forEach(entry => entry.target.hidden = !entry.isIntersecting), { threshold: 0.01 });
+const intersectionObserver = new IntersectionObserver((entries) => {
+  const reduce = window.prefersReducedMotion;
+  entries.forEach(entry => {
+    if (entry.target.id === 'nycssCursor' && reduce) return;
+    entry.target.hidden = !entry.isIntersecting;
+  });
+}, { threshold: 0.01 });
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
 scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof updateLogoState !== 'undefined' && updateLogoState())));
