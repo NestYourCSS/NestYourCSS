@@ -519,27 +519,29 @@ function beautifySelector(groups, indent) {
 
 function beautifyValue(valueTokens) {
     if (!valueTokens || valueTokens.length === 0) return '';
+    const COMMA_PLACEHOLDER = '\x00COMMA\x00';
     
     const processedTokens = valueTokens.map(token => {
         const parenIndex = token.indexOf('(');
         if (parenIndex !== -1 && token.endsWith(')')) {
             const functionName = token.substring(0, parenIndex).toLowerCase().trim();
             const prefix = token.substring(0, parenIndex + 1);
-            const content = token.substring(parenIndex + 1, token.length - 1);
+            let content = token.substring(parenIndex + 1, token.length - 1);
             const suffix = ')';
             
             if (functionName === 'calc' || (functionName === '' && token.startsWith('(('))) {
                 return prefix + beautifyMathContent(content) + suffix;
             }
             if (functionName === 'url') {
-                return prefix + content.trim() + suffix;
+                content = content.trim().replace(/,/g, COMMA_PLACEHOLDER);
+                return prefix + content + suffix;
             }
             return prefix + beautifyValue(parseValue(content)) + suffix;
         }
         return token;
     });
 
-    return processedTokens.join(' ').replace(/\s*,\s*/g, ', ');
+    return processedTokens.join(' ').replace(/\s*,\s*/g, ', ').replace(new RegExp(COMMA_PLACEHOLDER, 'g'), ',');
 }
 
 export function beautifyCSS(ast, initialIndent = '') {
@@ -868,19 +870,22 @@ function findSingleGroupNestingRelationship(parentGroup, childGroup) {
     }
 
     if (childParts.length > parentParts.length) {
-        let isReverseMatch = true;
-        for (let i = 0; i < parentParts.length; i++) {
-            if (childParts[childParts.length - parentParts.length + i] !== parentParts[i]) {
-                isReverseMatch = false;
-                break;
+        const hasAmpersandRef = childParts.some(p => typeof p === 'string' && p.startsWith('&'));
+        if (!hasAmpersandRef) {
+            let isReverseMatch = true;
+            for (let i = 0; i < parentParts.length; i++) {
+                if (childParts[childParts.length - parentParts.length + i] !== parentParts[i]) {
+                    isReverseMatch = false;
+                    break;
+                }
             }
-        }
 
-        if (isReverseMatch) {
-            const prevPart = childParts[childParts.length - parentParts.length - 1];
-            if (prevPart === ' ' || combinators.includes(prevPart)) {
-                const newParts = [...childParts.slice(0, childParts.length - parentParts.length), '&'];
-                return { type: 'REVERSE_NEST', newSelector: [{ parts: newParts, newlinesBefore: 0 }] };
+            if (isReverseMatch) {
+                const prevPart = childParts[childParts.length - parentParts.length - 1];
+                if (prevPart === ' ' || combinators.includes(prevPart)) {
+                    const newParts = [...childParts.slice(0, childParts.length - parentParts.length), '&'];
+                    return { type: 'REVERSE_NEST', newSelector: [{ parts: newParts, newlinesBefore: 0 }] };
+                }
             }
         }
     }
