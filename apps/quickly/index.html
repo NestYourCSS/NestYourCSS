@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" dir="ltr" xml:lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#00272b" />
+  <meta name="description" content="Quickly nest, denest, beautify and minify your CSS with our fast online tool.">
+  <meta name="author" content="Tim Chinye">
+  <link rel="canonical" href="https://quickly.nestyourcss.com/">
+  <link rel="icon" type="image/png" href="./assets/logo.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <title>A Quick CSS Formatting Tool | Nest, Denest, Beautify & Minify Stylesheets</title>  
+
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <script src="./lib/ace.min.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <link href="./styles/editor.css" rel="stylesheet">
+  <link href="./styles/main.css" rel="stylesheet">
+</head>
+<body>
+  <div id="a11y-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  <main role="main">
+    <div id="code-editor-wrapper">
+      <div class="header-controls" role="toolbar" aria-label="Editor controls" aria-orientation="horizontal">
+        <div class="settings-container">
+          <button id="settings-toggle" class="header-btn vibrant" title="Settings" aria-label="Settings">
+            <i class="ph ph-gear-six"></i>
+          </button>
+
+          <aside id="mainSettings" aria-label="Editor settings" hidden>
+            <section>
+              <h2>Editor</h2>
+              <ul>
+                <li>
+                  <span id="font-label">Font</span>
+                  <div>
+                    <nycss-dropdown id="typefaces" label="Font">
+                      <span role="option">DejaVu Mono</span>
+                      <span role="option">Fira Code</span>
+                      <span role="option">iA Writer Mono</span>
+                      <span role="option">Jetbrains Mono</span>
+                      <span role="option">PT Mono</span>
+                    </nycss-dropdown>
+                    <nycss-dropdown id="fontsizes" label="Font Size">
+                      <span role="option">0.5rem</span>
+                      <span role="option">0.75rem</span>
+                      <span role="option">1rem</span>
+                      <span role="option">1.25rem</span>
+                      <span role="option">1.5rem</span>
+                      <span role="option">1.75rem</span>
+                      <span role="option">2rem</span>
+                      <span role="option">2.25rem</span>
+                      <span role="option">2.5rem</span>
+                    </nycss-dropdown>
+                  </div>
+                </li>
+                <li>
+                  <span id="indentation-type-label">Indentation</span>
+                  <div>
+                    <nycss-toggle id="indentationType" label="Indentation" on-text="Hard" off-text="Soft"></nycss-toggle>
+
+                    <nycss-stepper id="indentationSize" label="Size:" min="1" max="16"></nycss-stepper>
+                  </div>
+                </li>
+                <li>
+                  <span id="word-wrap-label">Word Wrap</span>
+                  <div>
+                    <nycss-toggle id="wordWrap" label="Word Wrap" off-text="Off" on-text="On"></nycss-toggle>
+                  </div>
+                </li>
+                <li>
+                  <span id="coordinates-group-label">Coordinates</span>
+                  <div>
+                    <nycss-radio-group id="coordinates" label="Coordinates">
+                      <label>None</label>
+                      <label>Line</label>
+                      <label>Col</label>
+                      <label>Both</label>
+                    </nycss-radio-group>
+                  </div>
+                </li>
+              </ul>
+            </section>
+            <section>
+              <h2>Functionality</h2>
+              <ul>
+                <li>
+                  <span id="preserveComments-label">Comments?</span>
+                  <div>
+                    <nycss-toggle id="preserveComments" label="Comments?" off-text="Yes" on-text="No"></nycss-toggle>
+                  </div>
+                </li>
+                <li>
+                  <span id="mode-group-label">Mode</span>
+                  <div>
+                    <nycss-radio-group id="mode" label="Mode">
+                      <label>Minify</label>
+                      <label>Beautify</label>
+                      <label>Denest</label>
+                      <label>Nest</label>
+                    </nycss-radio-group>
+                  </div>
+                </li>
+                <li>
+                  <span id="auto-label">Auto</span>
+                  <div>
+                    <nycss-toggle id="auto" label="Auto" on-text="On" off-text="Off"></nycss-toggle>
+                  </div>
+                </li>
+              </ul>
+            </section>
+          </aside>
+        </div>
+        <button id="nest-btn" class="header-btn" aria-label="Convert CSS">Auto</button>
+      </div>
+      <div id="code-editor">
+        <div class="editor" id="inputEditor"></div>
+        <div class="editor" id="outputEditor"></div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+
+  <script src="./scripts/main.js" defer></script>
+  <script src="./scripts/setup.js" defer></script>
+  <script src="./scripts/sample.js" defer></script>
+  <script src="./scripts/nesting.js" defer></script>
+  <script src="./scripts/handlers.js" defer></script>
+  <script src="./scripts/debugging.js" defer></script>
+  <script src="./scripts/settings.js" defer></script>
+
+  <script src="./lib/mode-css.js" defer></script>
+  <script src="./lib/ace-linters.min.js" defer></script>
+  <script src="./lib/ext-searchbox.min.js" defer></script>
+</body>
+</html>

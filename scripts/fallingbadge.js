@@ -4,6 +4,7 @@ function initializeFallingBadgeManager() {
 
   // Event listener for scroll events
   window.updateLogoState = () => {
+    if (window.prefersReducedMotion) return;
     if (scrollTimer) clearTimeout(scrollTimer);
 
     const { scrollTop, scrollHeight, clientHeight } = scrollWrapper;
@@ -23,5 +24,5 @@ function initializeFallingBadgeManager() {
       }, 1000);
     }
   };
-  updateLogoState();
+  window.updateLogoState();
 };

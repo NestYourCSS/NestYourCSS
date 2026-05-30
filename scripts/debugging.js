@@ -61,7 +61,7 @@ function initializeDebuggingTools() {
             finalOutputHasSyntaxErrors: false,
             changeFromLastIteration: false
         };
-        const editorSession = inputEditorInstance.getSession();
+        const editorSession = window.inputEditorInstance.getSession();
 
         if (!mute) console.log(`[${sampleKey}] Starting ${iterations} nesting iterations.`);
 
@@ -140,7 +140,7 @@ function initializeDebuggingTools() {
     async function processAndShowSampleByName(sampleKey, iterations = 5, mute = false) {
         if (!cssSamples.hasOwnProperty(sampleKey)) {
             if (!mute) console.error(`Sample key "${sampleKey}" not found in cssSamples.`);
-            outputEditorInstance.getSession().setValue(`/* Sample key "${sampleKey}" not found. */`);
+            window.outputEditorInstance.getSession().setValue(`/* Sample key "${sampleKey}" not found. */`);
             return;
         }
 
@@ -149,7 +149,7 @@ function initializeDebuggingTools() {
 
         if (typeof initialCss !== 'string') {
             if (!mute) console.error(`[${sampleKey}] The sample CSS is not a string. Skipping.`);
-            outputEditorInstance.getSession().setValue(`/* [${sampleKey}] Sample CSS is not valid (not a string). */`);
+            window.outputEditorInstance.getSession().setValue(`/* [${sampleKey}] Sample CSS is not valid (not a string). */`);
             return;
         }
         
@@ -164,7 +164,7 @@ function initializeDebuggingTools() {
         
         const { name, finalCss, issues } = result;
 
-        outputEditorInstance.getSession().setValue(finalCss || `/* [${sampleKey}] Final output is empty or undefined after ${iterations} iterations. */`);
+        window.outputEditorInstance.getSession().setValue(finalCss || `/* [${sampleKey}] Final output is empty or undefined after ${iterations} iterations. */`);
         
         let issuesFound = Object.values(issues).some(flag => flag === true);
 
@@ -190,7 +190,7 @@ function initializeDebuggingTools() {
         const keys = Object.keys(cssSamples);
         if (sampleIndex < 0 || sampleIndex >= keys.length) {
             if (!mute) console.error(`Sample index ${sampleIndex} is out of bounds. Valid range: 0 to ${keys.length - 1}.`);
-            outputEditorInstance.getSession().setValue(`/* Sample index ${sampleIndex} is out of bounds. */`);
+            window.outputEditorInstance.getSession().setValue(`/* Sample index ${sampleIndex} is out of bounds. */`);
             return;
         }
         const sampleKey = keys[sampleIndex];
@@ -308,12 +308,12 @@ function initializeDebuggingTools() {
             if (samplesToReview.find(s => s.key === lastProcessedKey)) {
                 prefix = `/* POTENTIAL ISSUES DETECTED for ${lastProcessedKey} (last processed). Check console. */\n`;
             }
-            outputEditorInstance.getSession().setValue(prefix + (lastOutput || `/* [${lastProcessedKey}] Final output is empty/undefined. (Last processed in batch) */`));
+            window.outputEditorInstance.getSession().setValue(prefix + (lastOutput || `/* [${lastProcessedKey}] Final output is empty/undefined. (Last processed in batch) */`));
             if (!mute) console.log(`Output editor updated with the result of the last processed sample: ${lastProcessedKey}`);
         } else if (Object.keys(cssSamples).length > 0) {
-            outputEditorInstance.getSession().setValue("/* All samples processed. Check console for details. The last processed sample might have had issues or was empty. */");
+            window.outputEditorInstance.getSession().setValue("/* All samples processed. Check console for details. The last processed sample might have had issues or was empty. */");
         } else {
-            outputEditorInstance.getSession().setValue("/* No samples found in cssSamples or all processing failed. Check console. */");
+            window.outputEditorInstance.getSession().setValue("/* No samples found in cssSamples or all processing failed. Check console. */");
         }
 
         console.log("Detailed results for all samples:", allResults);
@@ -325,8 +325,6 @@ function initializeDebuggingTools() {
     /*
     *
     * HOW TO USE:
-    *
-    * Make sure your cssSamples, inputEditorInstance, outputEditorInstance, and convertToNestedCSS are defined.
     *
     * To process a specific sample by its key (e.g; 'denestedShowcase') for 5 iterations:
     * Debugger.processAndShowSampleByName('denestedShowcase', 5);

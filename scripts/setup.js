@@ -1,40 +1,38 @@
 function initializeAceEditors() {
   window.setupEditors = async () => {
-    if (codeEditorElem) codeEditorElem.classList.add('loading');
   
     await waitForVar('cssSamples');
-    let sample = cssSamples[window.cssSample] ?? cssSamples["unnestedShowcase"];
+    let sample = cssSamples[window.cssSample] ?? cssSamples["denestedShowcase"];
   
     await waitForVar('LanguageProvider');
     const languageProvider = LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
   
-    inputEditorInstance = initEditor("inputEditor", "The editor to input CSS code that will be minified/nested/denested.", sample || '/* Your input CSS should go here */');
-    outputEditorInstance = initEditor("outputEditor", "The editor that outputs the CSS code that will be minified/nested/denested.", '/* Your output CSS will appear here */');
-  
-    if (codeEditorElem && inputEditorInstance) {
-      inputEditorInstance.renderer.once('afterRender', () => {
-        // Wait for next paint cycle
-        setTimeout(() => {
-          codeEditorElem.classList.remove('loading');
-        }, 0);
-      });
-    }
-  
-    if (!(inputEditorInstance && outputEditorInstance)) return;
-  
+    window.inputEditorInstance = initEditor("inputEditor", window.i18n.inputEditorLabel, sample || window.i18n.inputPlaceholder);
+    window.outputEditorInstance = initEditor("outputEditor", window.i18n.outputEditorLabel, window.i18n.outputPlaceholder);
+    if (!(window.inputEditorInstance && window.outputEditorInstance)) return;
+
+    const editorMql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateEditorAnimatedScroll = () => {
+      const shouldAnimate = !window.prefersReducedMotion;
+      window.inputEditorInstance.setAnimatedScroll(shouldAnimate);
+      window.outputEditorInstance.setAnimatedScroll(shouldAnimate);
+    };
+    editorMql.addEventListener('change', updateEditorAnimatedScroll);
+    updateEditorAnimatedScroll();
+
     // Auto Nest
     let codeChanged = false;
     let isProcessing = false;
   
-    inputEditorInstance.getSession().on('change', () => ((typeof window.appIsInitializing !== 'undefined' && !window.appIsInitializing) && (window.processAuto ?? true)) && (codeChanged = true));
-  
-    inputEditorInstance.getSession().on('changeAnnotation', () => {
+    window.inputEditorInstance.getSession().on('change', () => ((!window.appIsInitializing) && (window.processAuto ?? true)) && (codeChanged = true));
+
+    window.inputEditorInstance.getSession().on('changeAnnotation', () => {
       if ((!window.appIsInitializing) && (window.processAuto ?? true) && !isProcessing) {
         isProcessing = true;
   
         setTimeout(() => {
           if (codeChanged) {
-            nestCode();
+            window.nestCode();
             codeChanged = false;
           }
   
@@ -94,7 +92,7 @@ function initializeAceEditors() {
       textarea.setAttribute("aria-label", labelDescription);
     
       editor.setValue(value, -1);
-      editor.setAnimatedScroll(true);
+      editor.setAnimatedScroll(!window.prefersReducedMotion);
     
       let tabIndexSet = false;
       let lastGutterWidth = null;
@@ -139,7 +137,7 @@ function initializeAceEditors() {
           this.getElement().style.top = y + "px";
       };
   
-      editor.session.selection.on('changeCursor', () => updateCoordinateDisplay(editor));
+      editor.session.selection.on('changeCursor', () => window.updateCoordinateDisplay(editor));
     
       languageProvider.registerEditor(editor);
       return editor;
@@ -147,7 +145,7 @@ function initializeAceEditors() {
   
     // (The rest of your function remains unchanged)
     // ...
-    let inputEditorElem = inputEditorInstance.container;
+    let inputEditorElem = window.inputEditorInstance.container;
     let outputEditorElem = inputEditorElem.parentElement.lastElementChild;
   
     const shadowCount = 3;
@@ -159,7 +157,7 @@ function initializeAceEditors() {
       if (isShadowEditor) button.setAttribute('aria-hidden', 'true');
       else {
         button.setAttribute('aria-label', accessibleLabel);
-        button.addEventListener("click", tabButtonHandler);
+        button.addEventListener("click", window.tabButtonHandler);
       }
       return button;
     }
@@ -176,8 +174,11 @@ function initializeAceEditors() {
   
       const tabButtons = document.createElement("div");
       tabButtons.classList.add('tabButtons');
-  
-      tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, 'Copy all input code'));
+      tabButtons.setAttribute('role', 'toolbar');
+      tabButtons.setAttribute('aria-label', window.i18n.editorControls.replace('{name}', editorName));
+      tabButtons.setAttribute('aria-orientation', 'horizontal');
+
+      tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, window.i18n.copyAll));
   
       if (isInputEditor) {
         if (!isShadowEditor) {
@@ -188,22 +189,24 @@ function initializeAceEditors() {
   
           fileInput.addEventListener("change", (event) => {
             if (file = event.target.files[0]) {
-              fileReader.onload = (e) => inputEditorInstance.setValue(e.target.result);
+              fileReader.onload = (e) => window.inputEditorInstance.setValue(e.target.result);
               fileReader.readAsText(file);
             };
           });
   
-          setupDragAndDrop(editor);
+          window.setupDragAndDrop(editor);
           
           window.insertCSSFileInput = fileInput;
         }
         
-        tabButtons.appendChild(createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, 'Insert sample CSS into input'));
+        const insertBtn = createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, window.i18n.insertCSSFile);
+        insertBtn.setAttribute('aria-controls', 'inputEditor');
+        tabButtons.appendChild(insertBtn);
       } else {
-        tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, 'Open CSS as Raw'));
+        tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, window.i18n.openRawOutput));
       }
-  
-      tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor, 'Delete all input code'));
+
+      tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor, window.i18n.deleteAll));
   
       editorTab.appendChild(fileName);
       editorTab.appendChild(tabButtons);
@@ -234,11 +237,10 @@ function initializeAceEditors() {
       editorGroup.appendChild(editor);
       wrapperElement.appendChild(editorGroup);
     }
-  
     [inputEditorElem, outputEditorElem].forEach((editor) => {
       const editorTab = createEditorTab(editor, editor === inputEditorElem, false);
       wrapEditorWithGroup(editor, editorTab);
-      updateCoordinateDisplay(ace.edit(editor));
+      window.updateCoordinateDisplay(ace.edit(editor));
     });
   
     const shadowWrapperElement = document.createElement("div");
@@ -361,7 +363,7 @@ function initializeAceEditors() {
     });
   };
   
-  setupEditors();
+  window.setupEditors();
   
   /**
    * Splits the text content of elements into individual <span>s for animation.
@@ -384,31 +386,31 @@ function initializeAceEditors() {
   };
   
   toggleBtn.addEventListener('click', () => {
-    if (typeof nestCode === 'undefined') return;
-  
-    nestCode(true);
+    if (typeof window.nestCode === 'undefined') return;
+
+    window.nestCode(true);
   });
   
   window.updateCoordinateDisplay = (editor) => {
     let { row, column } = editor.getCursorPosition();
   
     let cursorText = "";
-    switch (window.coordDisplayMode ??= 3) {
-      case 0:
-        cursorText = ` | Ln ${++row}, Col ${column}`;
-        break;
-      case 1:
-        cursorText = ` | Ln ${++row}`;
-        break;
-      case 2:
-        cursorText = ` | Col ${column}`;
-        break;
-      case 3:
-      default:
-        cursorText = "";
+    if (window.coordDisplayMode == null) window.coordDisplayMode = 3;
+    if (window.coordDisplayMode === 0) {
+      cursorText = "";
+    } else if (window.coordDisplayMode === 1) {
+      cursorText = ` | Ln ${++row}`;
+    } else if (window.coordDisplayMode === 2) {
+      cursorText = ` | Col ${column}`;
+    } else {
+      cursorText = ` | Ln ${++row}, Col ${column}`;
     }
   
-    editor.container.previousElementSibling.firstElementChild.setAttribute('cursor', cursorText);
+    const fileNameEl = editor.container.previousElementSibling.firstElementChild;
+    fileNameEl.setAttribute('caret-pos', cursorText);
+    
+    const baseName = fileNameEl.textContent;
+    fileNameEl.setAttribute('aria-label', baseName + cursorText);
   };
   
   /**
@@ -437,7 +439,7 @@ function initializeAceEditors() {
     // Step 2: The element must be visible.
     // Assumes a robust `isElementVisible` function is available that checks for
     // `display: none`, `visibility: hidden`, and disconnected elements.
-    if (!isElementVisible(el)) {
+    if (!window.isElementVisible(el)) {
       return false;
     }
   
@@ -506,14 +508,14 @@ function initializeAceEditors() {
     while (node) {
       // Search inside shadow roots recursively
       if (node.shadowRoot) {
-        focusableCandidates.push(...getAllFocusableElements(node.shadowRoot));
+        focusableCandidates.push(...window.getAllFocusableElements(node.shadowRoot));
       }
       focusableCandidates.push(node);
       node = walker.nextNode();
     }
   
     // Filter the candidates using our robust checker
-    const focusableElements = focusableCandidates.filter(isElementFocusable);
+    const focusableElements = focusableCandidates.filter(window.isElementFocusable);
     
     // Sort the elements to respect `tabindex`
     return focusableElements.sort((a, b) => {
@@ -539,7 +541,7 @@ function initializeAceEditors() {
    * Moves focus to the previous focusable element on the page.
    */
   window.focusPreviousElement = () => {
-    const allFocusable = getAllFocusableElements();
+    const allFocusable = window.getAllFocusableElements();
     if (allFocusable.length === 0) return;
   
     const currentElement = document.activeElement.shadowRoot 
@@ -557,7 +559,7 @@ function initializeAceEditors() {
    * Moves focus to the next focusable element on the page.
    */
   window.focusNextElement = () => {
-    const allFocusable = getAllFocusableElements();
+    const allFocusable = window.getAllFocusableElements();
     if (allFocusable.length === 0) return;
   
     const currentElement = document.activeElement.shadowRoot 

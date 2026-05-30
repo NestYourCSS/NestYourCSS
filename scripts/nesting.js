@@ -13,12 +13,12 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     
     if (annotations.length === 0) {  
       // --- POSITIVE FEEDBACK: Announce that errors are gone ---  
-      outputEditorInstance.getSession().setValue('/* CSS is valid! */');  
-        
+      outputEditorInstance.getSession().setValue(window.i18n.cssIsValid);  
+     
       // Create a single, reassuring row for screen reader users.  
       const successRow = tableBodyElem.insertRow();  
       const successCell = successRow.insertCell();  
-      successCell.textContent = "No errors found.";  
+      successCell.textContent = window.i18n.noErrorsFound;  
       successCell.colSpan = 3; // Span across all columns.  
         
       // No need to scroll into view if there are no errors.  
@@ -26,7 +26,7 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     }  
     
     // --- NEGATIVE FEEDBACK: Announce errors exist and populate the table ---  
-    outputEditorInstance.getSession().setValue('/* Your input CSS contains errors. See table below. */');  
+    outputEditorInstance.getSession().setValue(window.i18n.cssContainsErrors);  
     
     // 2. Loop through annotations and create an ACCESSIBLE row for each.  
     annotations.forEach(({ column, row, text }) => {  
@@ -71,34 +71,40 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
 };  
     
 function nestCode(onClick = false) {  
-    if (nestBtn.hasAttribute('disabled')) return;  
-  
-    mainElement.classList.toggle('nesting', !(onClick && window.isNesting));  
-  
-    if (onClick) {  
+    if (nestBtn?.hasAttribute('disabled')) return; 
+
+    if (onClick) {
+        mainElement.classList.toggle('nesting', !window.isNesting);
         if (window.isNesting) return;  
-        else scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
+        scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
     }  
   
-    if (typeof outputEditorInstance === 'undefined' || !inputEditorInstance) return;  
+    if (typeof window.outputEditorInstance === 'undefined' || !window.inputEditorInstance) return;  
+
+    if (typeof window.announce === 'function') window.announce(window.i18n.processing);
+    const wrapper = document.getElementById('codeEditor') || document.getElementById('siteWrapper');
+    if (wrapper) wrapper.setAttribute('aria-busy', 'true');
   
     let tableBodyElem = errorTable.tBodies[0];  
-	const annotations = inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
+	const annotations = window.inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
 	if (annotations.length == 0) {  
-		outputEditorInstance.getSession().setValue(convertToNestedCSS(inputEditorInstance.getValue()) || '/* Your output CSS will appear here */');  
-          
+		window.outputEditorInstance.getSession().setValue(convertToNestedCSS(window.inputEditorInstance.getValue()) || window.i18n.outputPlaceholder);  
+        
         if (tableBodyElem.rows.length) tableBodyElem.innerHTML = '';  
+        if (typeof window.announce === 'function') window.announce(window.i18n.conversionComplete);
 	} else {  
-		outputEditorInstance.getSession().setValue('/* Your input CSS contains errors */');  
+		window.outputEditorInstance.getSession().setValue(window.i18n.cssContainsErrors);  
 		console.log('Code Errors:', annotations);  
 		  
         updateAccessibleErrorTable(  
           annotations,  
           tableBodyElem,  
-          inputEditorInstance,  
-          outputEditorInstance  
+          window.inputEditorInstance,  
+          window.outputEditorInstance  
         );  
+        if (typeof window.announce === 'function') window.announce(window.i18n.cssContainsErrors);
 	}  
+    if (wrapper) wrapper.removeAttribute('aria-busy');
 };  
   
 function convertToNestedCSS(cssProvided, htmlString) {  
@@ -117,38 +123,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsToggle = document.getElementById('settingsBtn');  
     const mainSettings = document.getElementById('mainSettings');  
     const mainElement = document.querySelector('main');  
-  
+
     if (!settingsToggle || !mainSettings) return;  
-  
+
+    function openSettingsPanel() {
+        mainSettings.classList.add('mobile-open');  
+        mainSettings.removeAttribute('inert');
+        const focusable = mainSettings.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label');
+        if (focusable.length) focusable[0].focus();
+    }
+
+    function closeSettingsPanel() {
+        mainSettings.classList.remove('mobile-open');  
+        if (mainElement && !mainElement.classList.contains('nesting')) {  
+            mainSettings.setAttribute('inert', '');
+        }
+        settingsToggle.focus();
+    }
+
     settingsToggle.addEventListener('click', (e) => {  
         e.stopPropagation();  
-        const isOpen = mainSettings.classList.toggle('mobile-open');  
-        if (isOpen) {  
-            mainSettings.removeAttribute('inert');  
-        } else {  
-            if (mainElement && !mainElement.classList.contains('nesting')) {  
-                mainSettings.setAttribute('inert', '');  
-            }  
-        }  
+        if (mainSettings.classList.contains('mobile-open')) {
+            closeSettingsPanel();
+        } else {
+            openSettingsPanel();
+        }
     });  
-  
+
     document.addEventListener('click', (e) => {  
         if (mainSettings.classList.contains('mobile-open') &&   
             !mainSettings.contains(e.target) &&   
             !settingsToggle.contains(e.target)) {  
-            mainSettings.classList.remove('mobile-open');  
-            if (mainElement && !mainElement.classList.contains('nesting')) {  
-                mainSettings.setAttribute('inert', '');  
-            }  
+            closeSettingsPanel();
         }  
     });  
-  
+
     document.addEventListener('keydown', (e) => {  
         if (e.key === 'Escape' && mainSettings.classList.contains('mobile-open')) {  
-            mainSettings.classList.remove('mobile-open');  
-            if (mainElement && !mainElement.classList.contains('nesting')) {  
-                mainSettings.setAttribute('inert', '');  
-            }  
+            closeSettingsPanel();
         }  
     });  
-});  
+});
+

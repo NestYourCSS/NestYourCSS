@@ -1,3 +1,132 @@
+const i18n = {
+    settings: 'Settings',
+    editorSettings: 'Editor settings',
+    copyAll: 'Copy all input code',
+    insertCSSFile: 'Insert sample CSS into input',
+    openRawOutput: 'Open CSS as Raw',
+    deleteAll: 'Delete all input code',
+    copiedToClipboard: 'Copied to clipboard',
+    fileImported: 'File imported',
+    textInsertedDragDrop: 'Text inserted from drag and drop',
+    onlyCSSFilesAllowed: 'Only .css files or text are allowed!',
+    conversionComplete: 'Conversion complete',
+    cssContainsErrors: '/* Your input CSS contains errors. See table below. */',
+    outputPlaceholder: '/* Your output CSS will appear here. */',
+    inputPlaceholder: '/* Your input CSS should go here. */',
+    cssIsValid: '/* CSS is valid! */',
+    noErrorsFound: 'No errors found.',
+    processing: 'Processing...',
+    mode: 'Mode',
+    auto: 'Auto',
+    minify: 'Minify',
+    beautify: 'Beautify',
+    denest: 'Denest',
+    nest: 'Nest',
+    startNesting: 'Start Nesting',
+    viewHomepage: 'View Homepage',
+    visitHomepage: 'Visit Homepage',
+    backToStart: 'Back to start of page',
+    goToTop: 'Go to top of page',
+    pageTitleEditor: 'Nest Your CSS - Editor',
+    pageTitleHomepage: 'Nest Your CSS - Homepage',
+    contribute: 'Contribute',
+    nestingHistory: 'Nesting History',
+    userSettings: 'User Settings',
+    reportBug: 'Report a Bug',
+    shareYourMind: 'Share Your Mind',
+    nestQuicker: 'Nest Quicker',
+    githubLabel: 'View on GitHub (opens in new tab)',
+    historyLabel: 'View Nesting History (opens in new tab)',
+    userSettingsLabel: 'User Settings (opens in new tab)',
+    reportBugLabel: 'Report a Bug (opens in new tab)',
+    feedbackLabel: 'Share Your Mind (opens in new tab)',
+    quicklyLabel: 'Nest Quicker (opens in current tab)',
+    logoAlt: 'The official logo for NestYourCSS.',
+    cssBadgeAlt: 'The official CSS badge.',
+    cursorAlt: 'An animated cursor showing three curved \'NEST YOUR CSS\' on the edge of a translucent circle, spinning endlessly, and constantly follows the user\'s cursor',
+    nestAlt: 'A bird\'s nest...',
+    inputEditorLabel: 'The editor to input CSS code that will be minified/nested/denested.',
+    outputEditorLabel: 'The editor that outputs the CSS code that will be minified/nested/denested.',
+    codeExampleLabel: 'Code example explaining CSS nesting',
+    editorControls: '{name}.css editor controls',
+    adAlt: 'Advertisement',
+    samples: 'Samples',
+    openingNewWindow: 'Opening raw output in a new window',
+    confirmDeleteAll: 'Delete all content? This can only be undone using CTRL+Z.',
+    contentDeleted: 'Content deleted',
+};
+
+window.i18n = i18n;
+
+function applyI18n() {
+    document.getElementById('settingsBtn')?.setAttribute('title', i18n.settings);
+    document.getElementById('settingsBtn')?.setAttribute('aria-label', i18n.settings);
+    document.getElementById('mainSettings')?.setAttribute('aria-label', i18n.editorSettings);
+    document.getElementById('nestingToggleBtn') && (document.getElementById('nestingToggleBtn').textContent = i18n.startNesting);
+    document.getElementById('nestBtn')?.setAttribute('aria-label', i18n.startNesting);
+    document.getElementById('backToStart')?.setAttribute('aria-label', i18n.backToStart);
+    document.getElementById('nycssLogoGroup')?.setAttribute('aria-label', i18n.goToTop);
+
+    const navIds = ['githubHomeBtn', 'historyHomeBtn', 'userSettingsHomeBtn', 'reportBugHomeBtn', 'feedbackHomeBtn', 'quicklyHomeBtn'];
+    const navTextKeys = ['contribute', 'nestingHistory', 'userSettings', 'reportBug', 'shareYourMind', 'nestQuicker'];
+    const navLabelKeys = ['githubLabel', 'historyLabel', 'userSettingsLabel', 'reportBugLabel', 'feedbackLabel', 'quicklyLabel'];
+    navIds.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) {
+            const span = el.querySelector('span');
+            if (span) span.textContent = i18n[navTextKeys[i]];
+            el.setAttribute('aria-label', i18n[navLabelKeys[i]]);
+        }
+    });
+
+    document.getElementById('nycssLogo')?.setAttribute('alt', i18n.logoAlt);
+    document.getElementById('nycssBadge')?.setAttribute('alt', i18n.cssBadgeAlt);
+    document.getElementById('nycssCursor')?.setAttribute('alt', i18n.cursorAlt);
+    document.getElementById('nycssNest')?.setAttribute('alt', i18n.nestAlt);
+    document.querySelectorAll('img[alt="Advertisement"]').forEach(img => img.setAttribute('alt', i18n.adAlt));
+    document.getElementById('miniEditor')?.setAttribute('aria-label', i18n.codeExampleLabel);
+    document.getElementById('samples-label') && (document.getElementById('samples-label').textContent = i18n.samples);
+    document.getElementById('auto-label') && (document.getElementById('auto-label').textContent = i18n.auto);
+    document.getElementById('mode-group-label') && (document.getElementById('mode-group-label').textContent = i18n.mode);
+
+    const modeGroup = document.getElementById('mode');
+    if (modeGroup) {
+        const modeTexts = { 0: i18n.minify, 1: i18n.beautify, 2: i18n.denest, 3: i18n.nest };
+        modeGroup.querySelectorAll('label').forEach((label, i) => {
+            if (modeTexts[i]) {
+                const input = label.querySelector('input[type="radio"]');
+                label.textContent = '';
+                label.appendChild(document.createTextNode(modeTexts[i]));
+                if (input) label.appendChild(input);
+            }
+        });
+    }
+}
+
+applyI18n();
+
+window.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotionMql = window.matchMedia('(prefers-reduced-motion: reduce)');
+reducedMotionMql.addEventListener('change', (e) => { window.prefersReducedMotion = e.matches; });
+
+const cssLogo = document.getElementById('nycssLogo');
+const cssNest = document.getElementById('nycssNest');
+
+function updateLogoVisibility() {
+  cssBadge?.toggleAttribute('hidden', window.prefersReducedMotion);
+  cssNest?.toggleAttribute('hidden', window.prefersReducedMotion);
+  cssLogo?.toggleAttribute('hidden', !window.prefersReducedMotion);
+  cursor?.toggleAttribute('hidden', window.prefersReducedMotion);
+
+  if (cursor) {
+    cursor.style.opacity = window.prefersReducedMotion ? '0' : '';
+    cursor.style.pointerEvents = window.prefersReducedMotion ? 'none' : '';
+  }
+}
+
+updateLogoVisibility();
+reducedMotionMql.addEventListener('change', updateLogoVisibility);
+
 /**
  * Creates a debounced function that delays invoking `func` until after `wait`
  * milliseconds have elapsed since the last time the debounced function was
@@ -155,23 +284,6 @@ window.waitElementTransitionEnd = (element, fallbackDurationMs, event = 'animati
 
     failsafeTimeoutId = setTimeout(finalize, fallbackDurationMs + 50);
   });
-};
-
-/**
- * Generates a string of 10 cryptographically secure random numbers.
- * 
- * This function creates a Uint8Array of length 10, fills it with cryptographically
- * secure random values using window.crypto.getRandomValues(), and returns them
- * joined as a string.
- * 
- * @function getRandomNumbers
- * @returns {string} A string containing 10 random numbers (0-255) joined together.
- * @throws {Error} If the crypto API is not available in the current environment.
- */
-window.getRandomNumbers = () => {
-  const typedArray = new Uint8Array(10);
-  const randomValues = window.crypto.getRandomValues(typedArray);
-  return randomValues.join('');
 };
 
 /**

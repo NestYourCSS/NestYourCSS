@@ -12,7 +12,7 @@
  * Selector with an #iD - #.*\s\{  
  */
 
-@layer base, framework;
+@layer ui-base, base, framework;
 
 /* --- Global and Root Element Styles --- */
 
@@ -125,6 +125,17 @@
     }
   }
 
+  /* Observed elements must keep layout so IntersectionObserver can re-detect them */
+  body,
+  #mainSettings > nav > a > figure.inner-cursor,
+  #repeatingText span.repeat,
+  #changingText s,
+  #groupedText,
+  #nycssCursor,
+  #splittingText { &[hidden] {
+    display: revert !important;
+  }}
+
   html {
     background-color: color-mix(in srgb, #000 50%, var(--sec-colour-darkest));
     /* scroll-behavior: smooth; */
@@ -133,6 +144,12 @@
 
     ::-webkit-scrollbar {
       width: 0;
+    }
+    
+    @media (forced-colors: active) {
+      ::-webkit-scrollbar {
+        width: auto;
+      }
     }
   }
 
@@ -255,13 +272,6 @@
         display: flex;
         justify-content: flex-end;
       }
-      --padding: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      height: 96dvh;
-      width: 100%;
-      padding: var(--padding);
     }
 
     /* --- Article Section Styles --- */
@@ -323,9 +333,12 @@
     gap: var(--padding);
     padding-bottom: calc((3 / 4) * var(--padding));
     overflow: hidden auto;
-    transition:
-      margin-right 2s,
-      min-width 2s;
+    
+    @media not (prefers-reduced-motion: reduce) {
+      transition:
+        margin-right 2s,
+        min-width 2s;
+    }
 
     > section {
       border-radius: 3rem;
@@ -409,12 +422,6 @@
         color: var(--component-text);
         font-size: 1rem;
 
-        /* Generic Components */
-
-        > label {
-          flex: 1;
-        }
-
         > #externalCss {
           max-width: 100%;
         }
@@ -432,314 +439,19 @@
           gap: var(--component-gap);
         }
 
-        /* Specific Components */
-
-        > .dropdown,
-        > .combobox {
-          user-select: none;
-          display: inline-flex;
-          flex-direction: column;
-          width: auto;
-          margin: 0;
-          text-align: left;
-          box-sizing: content-box;
-          position: relative;
-
-          > input {
-            appearance: none;
-            position: absolute;
-            margin: 0;
-          }
-
-          &:focus-within > input:checked {
-            + output {
-              border-radius: 1rem 1rem 0 0;
-            }
-
-            ~ ul {
-              position: absolute;
-              z-index: 999;
-              top: 100%;
-              width: 100%;
-              display: flex;
-              margin: 0;
-              margin-top: 0.25rem;
-              padding: 1em;
-              gap: 0.5em;
-              flex-direction: column;
-              background: var(--component-background);
-              border-bottom-left-radius: 1rem;
-              border-bottom-right-radius: 1rem;
-              box-shadow: 0px 10px 10px 2.5px
-                rgb(from var(--shades-black) r g b / 0.5);
-
-              > li {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                outline: none !important;
-
-                &:hover {
-                  color: var(--component-text-hover);
-                  cursor: pointer;
-                }
-
-                &:focus {
-                  color: var(--component-text-hover);
-                }
-
-                &:disabled {
-                  color: rgb(from var(--component-text) r g b / 0.5);
-                  cursor: not-allowed;
-
-                  &:hover {
-                    color: inherit;
-                  }
-                }
-              }
-            }
-          }
-
-          > output {
-            outline: none !important;
-            cursor: pointer;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: clip;
-            background:
-              url("data:image/svg+xml,%3Csvg fill='%23484848' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11.178 19.569a.998.998 0 0 0 1.644 0l9-13A.999.999 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13z'%3E%3C/path%3E%3C/svg%3E")
-                right 1rem top 50% / 1ch no-repeat,
-              var(--component-background);
-            border-radius: 1rem;
-            padding: 1rem;
-            padding-right: calc(1rem + 2ch);
-
-            &:hover {
-              color: var(--component-text-hover);
-            }
-          }
-
-          /* Component Specific */
-
-          &.dropdown:has(:is(input, ul > li):focus) > output {
-            z-index: 1;
-            box-shadow: var(--component-box-shadow-focused);
-          }
-
-          &.combobox {
-            &:has(:is(input, output > div, ul > li):focus) > output {
-              z-index: 1;
-              box-shadow: var(--component-box-shadow-focused);
-            }
-
-            > output {
-              &&:hover > div:empty::before {
-                color: var(--shades-darker);
-              }
-
-              > div {
-                cursor: auto;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                outline: none !important;
-
-                &:focus {
-                  overflow-x: scroll;
-                  scrollbar-width: none;
-                  text-overflow: clip;
-                }
-
-                &:not(:focus):empty {
-                  align-content: center;
-                  font-size: 75%;
-                  padding: 0.25em 0;
-
-                  &::before {
-                    pointer-events: none;
-                    content: attr(placeholder);
-                    color: var(--shades-m-darker);
-                  }
-                }
-              }
-            }
-          }
+        > label,
+        > nycss-dropdown,
+        > nycss-combobox,
+        > nycss-toggle,
+        > nycss-stepper,
+        > nycss-radio-group {
+          flex: 1;
         }
 
-        > .number {
-          user-select: none;
-          position: relative;
-          width: fit-content;
-          color: var(--component-text);
-          border: none;
-          padding: 1rem;
-          gap: calc(2 * var(--component-gap));
-          background: var(--component-background);
-          border-radius: 1rem;
-
-          &:hover {
-            color: var(--component-text-hover);
-          }
-
-          &:has(input:focus, input:active) {
-            z-index: 1;
-            box-shadow: var(--component-box-shadow-focused);
-          }
-
-          > output > input {
-            cursor: auto;
-            display: inline-block;
-            margin-right: 1ch;
-            outline: none !important;
-
-            ~ div {
-              position: absolute;
-              width: 1ch;
-              top: 50%;
-              right: 1rem;
-              translate: 0 -50%;
-              display: flex;
-              flex-direction: column;
-              gap: 0.25em;
-
-              > svg {
-                cursor: pointer;
-              }
-            }
-
-            &[type="text"] {
-              appearance: none;
-              background: inherit;
-              border: inherit;
-              color: inherit;
-              font: inherit;
-              overflow: visible !important;
-              overflow-wrap: break-word;
-              text-align: inherit;
-              -webkit-user-modify: read-write;
-            }
-          }
-        }
-
-        > .checkbox {
-          outline: none !important;
-          user-select: none;
-          position: relative;
-          display: flex;
-          border-radius: 1rem;
-          background: var(--component-background);
-
-          &::before {
-            position: absolute;
-            content: "";
-            height: 100%;
-            left: 0%;
-            width: 50%;
-            border-radius: inherit;
-            background: var(--component-background-selected);
-            box-shadow: var(--component-box-shadow-selected);
-            z-index: 0;
-            transition: 0.25s;
-          }
-
-          &:has(:checked)::before {
-            left: 50%;
-          }
-
-          &:has(input:focus, input:active) {
-            z-index: 1;
-            box-shadow: var(--component-box-shadow-focused);
-          }
-
-          > input {
-            appearance: none;
-            position: absolute;
-            margin: 0;
-          }
-
-          > span {
-            position: relative;
-            cursor: pointer;
-            flex: 1;
-            padding: 1rem 2.5ch;
-            text-align: center;
-            align-content: center;
-
-            &:hover {
-              color: var(--component-text-hover);
-            }
-          }
-        }
-
-        > .radio-group {
-          user-select: none;
-          display: flex;
-          gap: var(--component-gap);
-
+        > nycss-radio-group.button {
           > label {
-            outline: none !important;
-            flex: 1;
-            cursor: pointer;
-            padding: 1rem 1.75ch;
-            text-align: center;
-            align-content: center;
-            border-radius: 1rem;
-            --top-colour: var(--shades-m-darker);
-            --bottom-colour: var(--shades-em-darker);
-            background:
-              linear-gradient(
-                  to bottom,
-                  var(--top-colour),
-                  var(--bottom-colour) 45%,
-                  var(--component-background) 55%
-                )
-                0% 100% / 100% 210% no-repeat,
-              var(--component-background);
-            transition: background-position 0.125s ease-out;
-
-            &:has(:disabled) {
-              &,
-              &:hover {
-                --shades-true-darkest: color-mix(
-                  in srgb,
-                  var(--shades-black),
-                  var(--shades-darkest)
-                );
-                background: linear-gradient(
-                  to bottom,
-                  var(--shades-black),
-                  var(--shades-true-darkest)
-                );
-                box-shadow: inset 0 calc(-1rem / 16) var(--shades-darkest);
-                color: var(--shades-m-darker);
-                cursor: not-allowed;
-              }
-            }
-
-            &:has(:checked) {
-              box-shadow: var(--component-box-shadow-selected);
-              background-position: 0% 0%;
-            }
-
-            &:hover {
-              color: var(--component-text-hover);
-            }
-
-            &:has(> input:focus) {
-              z-index: 1;
-              box-shadow: var(--component-box-shadow-focused);
-            }
-
-            > input {
-              appearance: none;
-              position: absolute;
-              margin: 0;
-            }
-          }
-
-          &.button {
-            > label {
-              --top-colour: var(--sec-colour-m-darker);
-              --bottom-colour: var(--pri-colour-darkest);
-            }
+            --top-colour: var(--sec-colour-m-darker);
+            --bottom-colour: var(--pri-colour-darkest);
           }
         }
       }
@@ -872,6 +584,12 @@
       background: none;
       border-radius: 999px;
 
+      @media (prefers-reduced-motion: reduce) {
+        &:not([aria-disabled="true"]):hover > figure {
+          background: rgb(from var(--shades-white) r g b / 0.5);
+        }
+      }
+
       &:nth-of-type(1) > figure {
         clip-path: url(#iconGithub);
       }
@@ -912,7 +630,7 @@
           }
         }
 
-        &.hidden.inner-cursor::after {
+        &[hidden].inner-cursor::after {
           animation-play-state: paused;
         }
       }
@@ -932,7 +650,10 @@
           width: 75cqw;
           filter: blur(1rem);
           background-color: var(--shades-white);
-          animation: blink 3s infinite alternate-reverse;
+          
+          @media not (prefers-reduced-motion: reduce) {
+            animation: blink 3s infinite alternate-reverse;
+          }
         }
 
         &:focus {
@@ -1006,10 +727,13 @@
     justify-content: space-between;
     container-type: inline-size;
     contain: paint;
-    transition:
-      width 2s,
-      opacity 2s,
-      padding 2s;
+    
+    @media not (prefers-reduced-motion: reduce) {
+      transition:
+        width 2s,
+        opacity 2s,
+        padding 2s;
+    }
 
     > header {
       margin: 2rem 2rem 0 4rem;
@@ -1037,7 +761,10 @@
       line-height: 125%;
       font-weight: 900;
       font-size: 6em;
-      transition: opacity 3s 1.5s;
+      
+      @media not (prefers-reduced-motion: reduce) {
+        transition: opacity 3s 1.5s;
+      }
 
       &:hover {
         color: var(--shades-white);
@@ -1124,9 +851,12 @@
 
       /* Initial state of icon fills and button background */
       --button-bg: transparent;
-      transition:
-        opacity 3s 1s,
-        --button-bg var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+                    
+      @media not (prefers-reduced-motion: reduce) {
+        transition:
+          opacity 3s 1s,
+          --button-bg var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+      }
 
       > svg {
         height: 3em;
@@ -1161,19 +891,23 @@
         background-clip: text;
 
         /* Transitions for HOVER-OUT */
-        transition:
-          font-size var(--anim-duration-text-hide) var(--delay-text-hide-font),
-          opacity var(--anim-duration-text-opacity-hide)
-            var(--delay-text-hide-opacity),
-          color var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+        @media not (prefers-reduced-motion: reduce) {
+          transition:
+            font-size var(--anim-duration-text-hide) var(--delay-text-hide-font),
+            opacity var(--anim-duration-text-opacity-hide) var(--delay-text-hide-opacity),
+            color var(--anim-duration-bg-out) var(--delay-icon-out-bg);
+        }
       }
 
       &:not([aria-disabled="true"]) {
         &:hover {
           /* Hover state of icon fills and button background */
           --button-bg: var(--secondary-colour);
-          transition: --button-bg var(--anim-duration-bg-in)
-            var(--delay-icon-in-bg);
+
+          @media not (prefers-reduced-motion: reduce) {
+            transition:
+              --button-bg var(--anim-duration-bg-in) var(--delay-icon-in-bg);
+          }
 
           > svg {
             /* Transitions for HOVER-IN */
@@ -1190,12 +924,12 @@
             opacity: 1;
 
             /* Transitions for HOVER-IN */
-            transition:
-              font-size var(--anim-duration-text-show)
-                var(--delay-text-show-font),
-              opacity var(--anim-duration-text-opacity-show)
-                var(--delay-text-show-opacity),
-              color var(--anim-duration-icon-in) var(--delay-icon-in-bg);
+            @media not (prefers-reduced-motion: reduce) {
+              transition:
+                font-size var(--anim-duration-text-show) var(--delay-text-show-font),
+                opacity var(--anim-duration-text-opacity-show) var(--delay-text-show-opacity),
+                color var(--anim-duration-icon-in) var(--delay-icon-in-bg);
+            }
           }
         }
 
@@ -1231,7 +965,7 @@
     margin-right: 2rem;
     height: 100%;
     width: min(50vw, calc(100% - 6rem)); /* margin-left + right */
-    container: ads-container / size;
+    container-type: inline-size; /* ads-container */
 
     > figcaption {
       text-overflow: ellipsis;
@@ -1243,7 +977,10 @@
       font-size: 1.25rem;
       height: 2rem;
       align-content: center;
-      transition: opacity 3s;
+
+      @media not (prefers-reduced-motion: reduce) {
+        transition: opacity 3s;
+      }
     }
 
     > div {
@@ -1257,15 +994,21 @@
         rgb(from var(--shades-darker) r g b / var(--opacity-low));
       padding: 1rem;
       gap: 1rem;
-      animation: slideInLeft 0.5s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-      transition:
-        0.25s,
-        opacity 3s 1s;
+
+      @media not (prefers-reduced-motion: reduce) {
+        animation: slideInLeft 0.5s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        transition:
+          0.25s,
+          opacity 3s 1s;
+      }
 
       > picture {
         width: 17.637rem;
         aspect-ratio: 1 / 1;
-        transition: filter 0.25s;
+
+        @media not (prefers-reduced-motion: reduce) {
+          transition: filter 0.25s;
+        }
 
         > * {
           cursor: pointer;
@@ -1345,11 +1088,6 @@
       );
       transition: opacity 0.5s ease-out;
 
-      &.loading {
-        visibility: hidden;
-        opacity: 0;
-      }
-
       /* moveLeft Animation Variables */
       & {
         --screen-width: (100lvw);
@@ -1377,13 +1115,7 @@
 @scope (#codeEditor) {
   & {
     .editorWrapper {
-      &:not(.shadowEditorWrapper):is(
-          #inputEditorWrapper,
-          #outputEditorWrapper
-        ):is(#inputEditorWrapper, #outputEditorWrapper):is(
-          #inputEditorWrapper,
-          #outputEditorWrapper
-        ) {
+      &:not(.shadowEditorWrapper):is(#inputEditorWrapper, #outputEditorWrapper) {
         width: calc(
           (var(--code-editor-height) - var(--vertical-padding)) *
             (var(--editor-width) / 7)
@@ -1405,9 +1137,12 @@
               position: absolute;
               overflow: hidden;
               height: 100%;
-              transition:
-                translate 2s,
-                opacity 2s;
+              
+              @media not (prefers-reduced-motion: reduce) {
+                transition:
+                  translate 2s,
+                  opacity 2s;
+              }
             }
 
             &,
@@ -1418,10 +1153,12 @@
         }
 
         &#outputEditorWrapper {
-          transition:
+          @media not (prefers-reduced-motion: reduce) {
+            transition:
             opacity 1s,
             display 1s;
-          transition-behavior: allow-discrete;
+            transition-behavior: allow-discrete;
+          }
         }
       }
     }
@@ -1434,12 +1171,7 @@
       width: auto;
       aspect-ratio: var(--editor-width) / 7;
 
-      &:has(button:active) {
-        --onClickValue1: 0.75;
-        --opacity-medium: var(--onClickValue2, unset);
-        animation: onClick 1s;
-      }
-
+      &:has(button:active),
       &:has(#inputEditor.drag-hover) {
         --opacity-medium: 0.75;
       }
@@ -1469,9 +1201,9 @@
         font-size: 1rem;
         align-content: center;
 
-        &[cursor]::after {
+        &[caret-pos]::after {
           font-size: 0.75em;
-          content: attr(cursor);
+          content: attr(caret-pos);
           color: var(--shades-m-darker);
         }
       }
@@ -1486,7 +1218,7 @@
           width: 2rem;
           padding: 0;
           border: none;
-          outline: none !important;
+          outline: none;
           border-radius: 50%;
           background-color: transparent;
           background-position: center;
@@ -1496,7 +1228,10 @@
           filter: invert(0.4431);
           opacity: var(--opacity-medium);
           cursor: pointer;
-          transition: 0.1s;
+                    
+          @media not (prefers-reduced-motion: reduce) {
+              transition: 0.1s;
+          }
 
           &.tabCopyAll {
             background-image: url("../assets/images/icon-copy.svg");
@@ -1517,7 +1252,8 @@
 
           &:focus {
             z-index: 1;
-            outline: 1px solid var(--shades-medium) !important;
+            outline: 1px solid var(--shades-medium);
+            outline-offset: 4px;
             box-shadow: 0 0 calc((3 / 4) * var(--padding)) var(--shades-medium);
             background-size: calc(100% - 8px);
           }
@@ -1549,12 +1285,15 @@
     outline: none !important;
     padding: 0;
     --nestBtn-shadow-direction: 1;
-    animation: bounceInTop 1.5s 0.5s both;
-    transition:
-      opacity 1s,
-      font-size 1s,
-      translate 1s,
-      --nestBtn-shadow-direction 1s;
+
+    @media not (prefers-reduced-motion: reduce) {
+      animation: bounceInTop 1.5s 0.5s both;
+      transition:
+        opacity 1s,
+        font-size 1s,
+        translate 1s,
+        --nestBtn-shadow-direction 1s;
+    }
 
     &:disabled {
       cursor: not-allowed;
@@ -1584,9 +1323,12 @@
       text-align: center;
       align-content: center;
       transform-origin: bottom right;
-      transition:
-        scale 0.5s,
-        background-color 1s;
+
+      @media not (prefers-reduced-motion: reduce) {
+        transition:
+          scale 0.5s,
+          background-color 1s;
+      }
 
       /* Visuals */
       background-color: var(--pri-colour-lighter);
@@ -1609,12 +1351,15 @@
       opacity: 0;
       z-index: -1;
       border-radius: inherit;
-      transition:
-        inset 0.5s,
-        opacity 2s,
-        background-color 2s;
-      animation: shadowRotate 3s infinite both;
-      /* --nestBtn-shadow-direction: -1; */
+      animation: shadowRotate 3s infinite both paused;
+      
+      @media not (prefers-reduced-motion: reduce) {
+        transition:
+          inset 0.5s,
+          opacity 2s,
+          background-color 2s;
+        animation-play-state: running;
+      }
 
       /* Show spans on hover of the main div */
       :is(#nestBtn:not(:disabled):has(> div:hover) > &) {
@@ -1652,7 +1397,7 @@
     }
 
     /* Pause animations when hidden or main content is not hovered */
-    &.hidden > span {
+    &[hidden] > span {
       animation-play-state: paused;
     }
   }
@@ -1665,10 +1410,20 @@
     gap: var(--padding);
 
     > #editorSide {
+      width: calc(var(--single-editor-width));
+
       animation: moveRight 2s cubic-bezier(1, 0, 0.5, 1) both;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation-delay: -2s;
+      }
 
       > #codeEditor > .editorWrapper {
         transition: 1s 0.5s;
+        
+        @media (prefers-reduced-motion: reduce) {
+          transition: none;
+        }
 
         /* &#inputEditorWrapper { */
         &:first-child {
@@ -1709,7 +1464,10 @@
 @scope (#siteWrapper:has(> main.nesting)) {
   & > main {
     height: 100dvh;
-    transition: height 1s;
+    
+    @media not (prefers-reduced-motion: reduce) {
+      transition: height 1s;
+    }
 
     & + article,
     & + article section {
@@ -1723,10 +1481,10 @@
         opacity 1s,
         top 1s;
       pointer-events: none;
-
-      &article {
-        top: 0dvh;
-      }
+    }
+    
+    & + article {
+      top: 0dvh;
     }
 
     #mainSettings {
@@ -1770,17 +1528,22 @@
           aspect-ratio: var(--total-width) / 7;
           animation: moveLeft 2s cubic-bezier(1, 0, 0.5, 1) both;
 
+          @media (prefers-reduced-motion: reduce) {
+            animation-delay: -2s;
+          }
+
           #editorGap {
             height: 100%;
             aspect-ratio: var(--gutter-width) / 6.625;
           }
 
-          .editorWrapper#inputEditorWrapper
-            > #shadowEditorsWrapper
-            > .shadowEditorWrapper {
+          .editorWrapper#inputEditorWrapper > #shadowEditorsWrapper > .shadowEditorWrapper {
             translate: 0 !important;
             opacity: 0 !important;
-            transition: 2s;
+            
+            @media not (prefers-reduced-motion: reduce) {
+              transition: 2s;
+            }
           }
         }
       }
@@ -1842,11 +1605,13 @@
           z-index: -1;
           position: absolute;
           color: rgb(from var(--shades-white) r g b / 0.5);
-          animation: repeatText 2s linear infinite;
-          animation-composition: add;
+          
+          @media not (prefers-reduced-motion: reduce) {
+            animation: repeatText 2s linear infinite;
+          }
         }
 
-        &.hidden::before {
+        &[hidden]::before {
           animation-play-state: paused;
         }
       }
@@ -1880,21 +1645,23 @@
           translate: 0 -1lh;
         }
 
-        @supports (animation-range: normal) {
-          animation: swapText linear 1ms;
-          animation-timeline: view();
-          animation-range-start: cover -0.5lh;
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            animation: swapText linear 1ms;
+            animation-timeline: view();
+            animation-range-start: cover -0.5lh;
 
-          &:nth-child(1) {
-            animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
-          }
+            &:nth-child(1) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
+            }
 
-          &:nth-child(2) {
-            animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
-          }
+            &:nth-child(2) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
+            }
 
-          &:nth-child(3) {
-            animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+            &:nth-child(3) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+            }
           }
         }
 
@@ -1940,23 +1707,25 @@
         overflow: hidden;
         position: relative;
 
-        @supports (animation-range: normal) {
-          padding-top: 1lh;
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            padding-top: 1lh;
 
-          &:first-child {
-            text-shadow: 0 0.5lh;
-            animation: showText linear forwards 1ms;
-            animation-timeline: view();
-            animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
-            animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
-          }
+            &:first-child {
+              text-shadow: 0 0.5lh;
+              animation: showText linear forwards 1ms;
+              animation-timeline: view();
+              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            }
 
-          &:last-child {
-            text-shadow: 0 -2lh;
-            animation: showText linear forwards 1ms;
-            animation-timeline: view();
-            animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
-            animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            &:last-child {
+              text-shadow: 0 -2lh;
+              animation: showText linear forwards 1ms;
+              animation-timeline: view();
+              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            }
           }
         }
       }
@@ -1973,11 +1742,13 @@
       width: 56ch;
       text-align: right;
 
-      @supports (animation-range: normal) {
-        animation: slideDown linear both 1ms;
-        animation-timeline: view();
-        animation-range-start: cover -20lh;
-        animation-range-end: contain 5lh;
+      @media not (prefers-reduced-motion: reduce) {
+        @supports (animation-range: normal) {
+          animation: slideDown linear both 1ms;
+          animation-timeline: view();
+          animation-range-start: cover -20lh;
+          animation-range-end: contain 5lh;
+        }
       }
 
       s {
@@ -2009,6 +1780,7 @@
             var(--shades-white) 25%
           );
           top: 50%;
+          
           animation: strikethrough 2.5s infinite var(--animation-delay);
           animation-timing-function: linear(
             0 0%,
@@ -2034,7 +1806,11 @@
             0.99 74.4%,
             1 86.4%,
             1 100%
-          );
+          ); /* I have no idea how this happened */
+
+          @media (prefers-reduced-motion: reduce) {
+            animation: none;
+          }
         }
 
         + b {
@@ -2045,7 +1821,7 @@
           ); /* oklch(0.75 0.13 150) */
         }
 
-        &.hidden::before {
+        &[hidden]::before {
           animation-play-state: paused;
         }
       }
@@ -2087,20 +1863,26 @@
           }
         }
 
-        @supports (animation-range: normal) {
-          animation: slideIn ease-out forwards 1ms;
-          animation-timeline: view();
-          animation-range-start: cover -0.5lh;
-          animation-range-end: cover calc(2lh + 2.5lh);
+        animation: slideIn 1s linear paused;
+        animation-delay: -0.5s;
+        animation-timeline: unset;
 
-          &:first-child {
-            animation-range-start: cover 0lh;
-            animation-range-end: cover calc(2.5lh + 2.5lh);
-          }
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            animation: slideIn ease-out forwards 1ms;
+            animation-timeline: view();
+            animation-range-start: cover -0.5lh;
+            animation-range-end: cover calc(2lh + 2.5lh);
 
-          &:last-child {
-            animation-range-start: cover -1.5lh;
-            animation-range-end: cover calc(1.5lh + 2.5lh);
+            &:first-child {
+              animation-range-start: cover 0lh;
+              animation-range-end: cover calc(2.5lh + 2.5lh);
+            }
+
+            &:last-child {
+              animation-range-start: cover -1.5lh;
+              animation-range-end: cover calc(1.5lh + 2.5lh);
+            }
           }
         }
       }
@@ -2117,20 +1899,21 @@
       font-size: 2em;
       line-height: 1.5em;
       width: 50ch;
+      translate: 0 -1lh;
+        
+      @media not (prefers-reduced-motion: reduce) {
+        @supports (animation-range: normal) {
+          animation:
+            boostUp linear both 1ms,
+            slideUp linear both 1ms;
 
-      @supports (animation-range: normal) {
-        animation:
-          boostUp linear both 1ms,
-          slideUp linear both 1ms;
-        animation-range:
-          cover 16em,
-          cover;
-        animation-timeline: view(), view();
-        animation-composition: add;
-      }
-
-      @supports not (animation-range: normal) {
-        translate: -3lh;
+          animation-range:
+            cover 16em,
+            cover;
+            
+          animation-timeline: view(), view();
+          animation-composition: add;
+        }
       }
 
       u {
@@ -2138,11 +1921,9 @@
 
         b {
           font-size: 1.25em;
-          /* line-height: inherit; */
           transition: color 0.5s;
 
           &:hover {
-            /* line-height: inherit; */
             color: var(--pri-colour-lightest);
           }
 
@@ -2191,7 +1972,10 @@
         position: absolute;
         content: attr(data-text);
         inset: -0.25rem;
-        animation: 10s linear both infinite 5s;
+        
+        @media not (prefers-reduced-motion: reduce) {
+          animation: 10s linear both infinite 5s;
+        }
       }
 
       &::before {
@@ -2204,7 +1988,7 @@
         animation-name: changeCard, changeCardAfter;
       }
 
-      :is(body.hidden &) {
+      :is(body[hidden] &) {
         &::before,
         &::after {
           animation-play-state: paused;
@@ -2317,6 +2101,19 @@
           }
         }
       }
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+        transition: none;
+
+        div :is(> div, span) {
+          animation: none;
+        }
+
+        > .visual-presentation > pre > code > div:first-child::before {
+          transition: none;
+        }
+      }
     }
   }
 }
@@ -2330,7 +2127,9 @@
       touch-action: none;
 
       &:has(> :not(#backToStart):hover) {
-        cursor: none;
+        @media not (prefers-reduced-motion: reduce) {
+          cursor: none;
+        }
 
         > #nycssCursor {
           scale: 0.25;
@@ -2349,9 +2148,7 @@
       pointer-events: none;
       position: absolute;
       z-index: 999;
-      background-color: rgb(
-        from var(--pri-colour-lightest) r g b / var(--opacity-low)
-      );
+      background-color: rgb(from var(--pri-colour-lightest) r g b / var(--opacity-low));
       border-radius: 50%;
       aspect-ratio: 1 / 1;
       font-size: 10em;
@@ -2363,11 +2160,15 @@
         opacity 1s 0.1s,
         scale 0.5s;
 
+      @media (prefers-reduced-motion: reduce) {
+        display: none;
+      }
+
       :is(:has(.hover-animation):has(> &):hover &) {
         will-change: transform;
       }
 
-      &.hidden {
+      &[hidden] {
         animation-play-state: paused;
       }
     }
@@ -2376,7 +2177,8 @@
       position: absolute;
       top: 4lh;
       right: 8ch;
-      color: var(--shades-white);
+      user-select: none;
+      color: transparent;
       font-family: "Poppins", "Calibri", sans-serif;
       font-weight: 300;
       font-size: 1.75rem;
@@ -2387,8 +2189,16 @@
       column-count: 2;
       gap: 6ch;
       word-spacing: 0.3ch;
-      color: transparent;
-      user-select: none;
+      
+      @media (prefers-reduced-motion: reduce) {
+        color: var(--shades-white);
+        user-select: unset;
+
+        > a:hover {
+          text-decoration: underline;
+        }
+      }
+
       @supports (animation-range: normal) {
         animation: unblur ease-out both 1ms;
         animation-timeline: view();
@@ -2398,12 +2208,15 @@
       &::before,
       &::after {
         color: var(--shades-white);
-        content: attr(data-text);
         position: absolute;
         inset: 0;
         column-count: inherit;
         gap: inherit;
-        animation: widenGap 3s ease-in-out infinite alternate backwards;
+        
+        @media not (prefers-reduced-motion: reduce) {
+          content: attr(data-text);
+          animation: widenGap 3s ease-in-out infinite alternate backwards;
+        }
       }
 
       &::before {
@@ -2416,7 +2229,7 @@
         transform-origin: right;
       }
 
-      &.hidden {
+      &[hidden] {
         &::before,
         &::after {
           animation-play-state: paused;
@@ -2438,16 +2251,26 @@
       font-weight: 600;
       font-size: 3em;
       scale: 1;
-      @supports (animation-range: normal) {
-        animation: moveDown linear both 1ms;
-        animation-timeline: view();
-        animation-range-start: cover -2lh;
-        animation-range-end: cover 2lh;
+
+      @media not (prefers-reduced-motion: reduce) {
+        @supports (animation-range: normal) {
+          animation: moveDown linear both 1ms;
+          animation-timeline: view();
+          animation-range-start: cover -2lh;
+          animation-range-end: cover 2lh;
+        }
       }
 
       > span {
         display: inline-block;
-        transition: 1s;
+        
+        @media (prefers-reduced-motion: reduce) {
+          transition: 0s 1s;
+        }
+        
+        @media not (prefers-reduced-motion: reduce) {
+          transition: 1s 0s;
+        }
 
         &:hover {
           scale: 1 2;
@@ -2473,15 +2296,19 @@
         font-size: 1em;
         font-weight: 900;
         font-family: "Poppins", "Calibri", sans-serif;
-        @supports (animation-range: normal) {
-          animation: moveDown linear both 1ms;
-          animation-timeline: view();
-          animation-range-start: cover -2lh;
-          animation-range-end: cover 2lh;
+        
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            animation: moveDown linear both 1ms;
+            animation-timeline: view();
+            animation-range-start: cover -2lh;
+            animation-range-end: cover 2lh;
+          }
+
+          transition:
+            scale 1s,
+            text-shadow 1s;
         }
-        transition:
-          scale 1s,
-          text-shadow 1s;
 
         &:hover {
           scale: 1.1;
@@ -2500,15 +2327,20 @@
         letter-spacing: -0.05em;
         font-family: "Orelo Expanded";
         color: rgb(from var(--shades-white) r g b / var(--opacity-medium));
-        @supports (animation-range: normal) {
-          animation: fadeUp linear both 1ms;
-          animation-timeline: view();
-          animation-range-start: cover;
-          animation-range-end: cover calc(1lh + 1.98em);
-        }
-        @supports not (animation-range: normal) {
-          translate: -0.96ch -0.31em;
-          opacity: 1;
+       
+        translate: -0.96ch -0.31em;
+        opacity: 1;
+
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0; 
+            opacity: 0;   
+            
+            animation: fadeUp linear both 1ms;
+            animation-timeline: view();
+            animation-range-start: cover;
+            animation-range-end: cover calc(1lh + 1.98em);
+          }
         }
       }
 
@@ -2539,6 +2371,19 @@
         aspect-ratio: 1 / 1;
       }
 
+      img#nycssLogo:not([hidden]) {
+        --shadow-color: #1474b833;
+        --shadow-distance: 1.5em;
+        --shadow-blur: 0.25em;
+        filter: drop-shadow(0 calc(-1 * var(--shadow-distance)) var(--shadow-blur) var(--shadow-color));
+        
+        :hover > & {
+          --shadow-color: #26a2d933;
+          --shadow-distance: 1.5em;
+          --shadow-blur: 0.5em;
+        }
+      }
+
       > img#nycssNest {
         color: transparent;
         filter: drop-shadow(0 -0.5em) drop-shadow(0.7em 0.3em)
@@ -2563,6 +2408,7 @@
           drop-shadow(0 calc(-1 * var(--shadow-distance)) 0 var(--shadow-color));
         --shadow-color: #1474b833; /* Taken directly from the CSS Logo */
         --shadow-distance: 0;
+
         transition: 1s;
 
         &.main-animation {
@@ -2578,7 +2424,7 @@
             scroll(nearest), auto; /* convert to view() if possible */
           animation-composition: add;
 
-          &.hidden {
+          &[hidden] {
             animation-play-state: paused;
           }
         }
@@ -2588,13 +2434,13 @@
           --shadow-color: #1474b833; /* Taken directly from the CSS Logo */
           --shadow-distance: 1.5em;
 
-          &.hidden {
+          &[hidden] {
             animation-play-state: paused;
           }
         }
       }
 
-      &:has(img.hover-animation) {
+      &:has([hidden] + .hover-animation) {
         clip-path: inset(19.3% 1.3% 1.3% 7.3%);
 
         &:hover #nycssBadge.hover-animation {
@@ -2657,6 +2503,8 @@
         padding: 0;
         background: rgb(from var(--shades-black) r g b / 0.5);
         margin-right: 0;
+        outline: 2px solid var(--sec-colour-medium);
+        outline-offset: 2px;
         min-width: 0;
 
         > section {
@@ -2889,5 +2737,31 @@
         }
       }
     }
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-contrast: more) {
+  html {
+    background-color: #000 !important;
+    color: #fff !important;
+  }
+  a { color: #88ccff !important; }
+  button:not([disabled]),
+  input,
+  select,
+  textarea {
+    border: 1px solid #fff !important;
   }
 }

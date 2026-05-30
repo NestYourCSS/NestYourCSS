@@ -1,6 +1,6 @@
 window.cssSamples = {
-/* Showcase - Unnested */
-'unnestedShowcase': `
+/* Showcase - Denested */
+'denestedShowcase': `
 /* Statement at-rules */
 @import url("stylesheet.css") screen and (max-width: 400px);
 
@@ -278,7 +278,7 @@ h2.bold {
 /* This is a comment */
 `,
 /* Extracted from: https://developer.chrome.com/docs/css-ui/css-nesting */
-'unnestedCodeSnippet': `
+'denestedCodeSnippet': `
 .nesting {
   color: hotpink;
 }
@@ -396,8 +396,8 @@ h1 {
     src: url('myfont.woff2') format('woff2');
 }
 `,
-/* Unnested navbar */
-'unnestedNavbar': `
+/* Denested navbar */
+'denestedNavbar': `
 nav {
     display: inline-flex;
     width: clamp(384px, 100%, 1600px);

@@ -1,0 +1,511 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=JetBrains+Mono:wght@300..700&family=PT+Mono&family=Source+Code+Pro:wght@300..700&family=Poppins:wght@300..700&display=swap');
+@layer ui-base;
+
+:root {
+    --rem: clamp(0px, 1.5vh, 24px);
+    --header-top: 2rem;
+    --margin-gap: 1rem;
+
+    --pri-colour-darkest: #051823;
+    --pri-colour-em-darker: #092533;
+    --pri-colour-m-darker: #1c4d67;
+    --pri-colour-darker: #307aa0;
+    --pri-colour-medium: #00d2ff;
+    --pri-colour-lighter: #80e8ff;
+    --pri-colour-lightest: #bde4fc;
+
+    --sec-colour-darkest: #00272b;
+    --sec-colour-m-darker: #015259;
+    --sec-colour-darker: #02818b;
+    --sec-colour-medium: #00f2ff;
+    --sec-colour-lighter: #8adee7;
+    --sec-colour-lightest: #b6e9ee;
+
+    --red-colour-darkest: #33191b;
+    --red-colour-m-darker: #67383c;
+    --red-colour-darker: #a15a60;
+    --red-colour-medium: #ff4d4d;
+    --red-colour-lighter: #ffb8bc;
+    --red-colour-lightest: #ffd1d3;
+
+    --shades-darkest: #000000;
+    --shades-em-darker: #222222;
+    --shades-m-darker: #484848;
+    --shades-darker: #717171;
+    --shades-medium: #aeaeae;
+    --shades-lighter: #cecece;
+    --shades-em-lighter: #dedede;
+    --shades-lightest: #ffffff;
+    --shades-black: #000000;
+
+    --opacity-none: 0;
+    --opacity-low: 0.25;
+    --opacity-medium: 0.5;
+    --opacity-high: 0.75;
+
+    --component-text: color-mix(in srgb, var(--shades-darker), var(--shades-medium));
+    --component-text-hover: var(--shades-medium);
+    --component-background: rgb(from var(--shades-darkest) r g b / 0.25);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    margin: 0;
+    height: 100%;
+    min-height: 100vh;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.header-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    align-self: flex-end;
+    position: relative;
+
+    @media (width < 1024px) {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.header-btn {
+    cursor: pointer;
+    padding: 1rem 1.75ch;
+    text-align: center;
+    align-content: center;
+    border-radius: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 300;
+    border: none;
+    color: var(--shades-lighter);
+    box-shadow: inset 0 1px oklch(100% none none / 0.25);
+    min-width: 8rem;
+
+    --top-colour: var(--shades-m-darker);
+    --bottom-colour: var(--shades-em-darker);
+
+    background: linear-gradient(to bottom, var(--top-colour), var(--bottom-colour) 45%, transparent 55%) 0% 100% / 100% 210% no-repeat, var(--component-background);
+    transition: filter 0.2s;
+    background-position: 0% 100%;
+    
+
+    @media not (prefers-reduced-motion: reduce) {
+        transition: background-position 0.125s ease-out, translate 0.2s, filter 0.2s;
+    }
+}
+
+.header-btn:hover {
+    filter: brightness(1.2);
+
+    @media not (prefers-reduced-motion: reduce) {
+        translate: 0 -2px;
+    }
+}
+
+.header-btn:disabled {
+    color: var(--component-text);
+    cursor: not-allowed;
+}
+
+.header-btn:disabled:hover {
+    filter: none;
+    translate: 0;
+}
+
+.header-btn.vibrant {
+    --top-colour: var(--sec-colour-m-darker);
+    --bottom-colour: var(--pri-colour-darkest);
+    background-position: 0% 0%;
+}
+
+.settings-container {
+    position: relative;
+    display: flex;
+
+    @media (width < 1024px) {
+        position: static;
+    }
+}
+
+#mainSettings {
+    position: absolute;
+    z-index: 1001;
+    top: calc(100% + var(--header-top)); /* dynamic gap below the buttons */
+    right: 0;
+    width: max-content;
+    max-height: calc(100vh - 9rem);
+    overflow: hidden auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+    box-sizing: content-box;
+    background: rgb(from #000 r g b / 0.25);
+    border-radius: 4rem;
+    scrollbar-width: none; /* Hide scrollbar */
+    -ms-overflow-style: none; /* IE and Edge */
+
+    @media (width < 1024px) {
+        left: 0;
+        right: 0;
+        width: 100%;
+        top: calc(100% + var(--margin-gap));
+        bottom: calc(100% + var(--header-top) + var(--margin-gap) - 100vh);
+        max-height: none;
+        box-sizing: border-box;
+        border-radius: 2rem;
+        padding: 0;
+        background: none;
+    }
+}
+
+#mainSettings::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+#mainSettings {
+    font-family: 'Poppins', sans-serif;
+}
+
+#mainSettings > section {
+    border-radius: 2rem;
+    padding: 2rem;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    gap: 2rem;
+    box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.05) inset;
+
+    @media (width < 1024px) {
+        padding: 1.25rem;
+        gap: 1.25rem;
+        background: rgb(from var(--pri-colour-darkest) r g b / 0.5);
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        backdrop-filter: blur(25px) saturate(100%) brightness(1.5);
+        z-index: -1;
+    }
+}
+
+#mainSettings > section > h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: normal;
+    color: var(--shades-medium);
+}
+
+#mainSettings > section > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    --component-gap: 0.5rem;
+    --component-background-selected: linear-gradient(to right, var(--shades-m-darker), var(--shades-em-darker));
+    --component-box-shadow: inset 0 1px oklch(100% none none / 0.25), inset 0 -1px rgb(from var(--shades-m-darker) r g b / 0.5);
+    --component-box-shadow-selected: inset 0 1px oklch(100% none none / 0.25), inset 0 -1px rgb(from var(--shades-m-darker) r g b / 0.5);
+    --component-box-shadow-focused: 0 0 1.5em var(--shades-medium);
+    gap: var(--component-gap);
+}
+
+#mainSettings > section > ul > li {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    align-items: center;
+
+    @media (width < 1024px) {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+#mainSettings > section > ul > li > span {
+    cursor: auto;
+    grid-column: span 3;
+    font-size: 1.125rem;
+    font-weight: 300;
+    color: var(--component-text);
+
+    @media (width < 1024px) {
+        font-size: 1rem;
+    }
+}
+
+#mainSettings > section > ul > li > div {
+    grid-column: span 7;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--component-gap);
+    color: var(--component-text);
+    font-size: 1rem;
+
+    @media (width < 1024px) {
+        width: 100%;
+    }
+}
+
+#mainSettings > section > ul > li > div > :is(.dropdown, .combobox, .toggle, .radio-group) {
+    flex: 1;
+}
+
+/* Dropdown list - quickly-specific visuals */
+#mainSettings .dropdown > ul {
+    background: rgb(from color-mix(in srgb, var(--shades-darkest), var(--pri-colour-darkest) 75%) r g b / 0.75);
+    backdrop-filter: blur(25px);
+}
+
+/* Stepper - quickly uses inline arrows */
+#mainSettings .number {
+    display: flex;
+    gap: 1rem;
+}
+
+#mainSettings .number > output {
+    display: flex;
+    align-items: center;
+}
+
+#mainSettings .number > output > input {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    width: 2ch;
+    text-align: center;
+    outline: none;
+}
+
+#mainSettings .number > output > input::-webkit-outer-spin-button,
+#mainSettings .number > output > input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0;
+}
+
+#mainSettings .number > output > input[type=number] {
+  -moz-appearance: textfield !important;
+}
+
+#mainSettings .number > output > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#mainSettings .number > output > div > svg {
+    cursor: pointer;
+    width: 1ch;
+    fill: #484848;
+}
+
+/* Override UA's absolute stepper arrows */
+#mainSettings .number > output > input ~ div {
+    position: static;
+    translate: none;
+}
+
+/* Toggle - quickly uses full-coverage invisible input */
+#mainSettings .toggle {
+    overflow: hidden;
+}
+
+#mainSettings .toggle > input {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+    opacity: 0;
+}
+
+body {
+    font-size: clamp(8px, 1.5vh, 24px);
+    margin: 0;
+    height: 100dvh;
+    overflow: hidden;
+    background: url('../assets/nycss-bg-pattern.png') 0 0.1dvh / 5dvh repeat,
+    linear-gradient(45deg, black, var(--pri-colour-em-darker)),
+    #0C2430;
+}
+
+main {
+    height: 100%;
+}
+
+#code-editor-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: var(--header-top) 2rem 2rem 2rem;
+    gap: 2.625rem;
+    position: relative;
+
+    @media (width < 1024px) {
+        padding-left: var(--margin-gap);
+        padding-right: var(--margin-gap);
+        gap: 1.625rem;
+    }
+
+    > #code-editor {
+        flex: 1;
+        max-width: 100%;
+        aspect-ratio: var(--total-width) / 7;
+        --gutter-width: 0.5;
+        --editor-width: 5;
+        --total-width: calc(var(--gutter-width) + (2 * var(--editor-width)));
+        display: flex;
+        gap: calc((var(--gutter-width) / var(--total-width)) * 100%);
+
+        @media (width < 1024px) {
+            display: grid;
+        }
+
+        .editorGroup {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+
+            &:has(button:active),
+            &:has(#inputEditor.drag-hover) {
+                --opacity-medium: 0.75;
+            }
+        }
+
+        .editorTab {
+            --background-colour: rgb(from var(--shades-darkest) r g b / 0.25);
+            --window-text-colour: rgb(from var(--shades-darker) r g b / var(--opacity-medium));
+            line-height: 100%;
+            color: rgb(from var(--shades-medium) r g b / 50%);
+            font-size: 1rem;
+            font-family: "Fira Code", monospace;
+            border: 0.25rch solid var(--window-text-colour);
+            border-radius: 1rem 1rem 0 0;
+            border-bottom: none;
+            background-color: var(--background-colour);
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem !important;
+
+            > .fileName {
+                font-size: 1em;
+                align-content: center;
+                &[caret-pos]::after {
+
+                    content: attr(caret-pos);
+                    font-size: 0.75em;
+                    opacity: 0.6;
+                }
+            }
+
+            > .tabButtons {
+                font-size: 0.75em;
+                display: flex;
+                gap: 1em;
+
+                > button {
+                    font-size: inherit;
+                    height: 2rem;
+                    width: 2rem;
+                    padding: 0;
+                    border: none;
+                    outline: none;
+                    border-radius: 50%;
+                    background-color: transparent;
+                    background-position: center;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    /* I could've just editing the .svg files to make them gray, but this is the lazy approach */
+                    filter: invert(0.4431);
+                    opacity: var(--opacity-medium);
+                    cursor: pointer;
+                    
+                    @media not (prefers-reduced-motion: reduce) {
+                        transition: 0.1s;
+                    }
+
+                    &.tabCopyAll {
+                        background-image: url('../assets/icon-copy.svg');
+                    }
+
+                    &.tabOpenRaw {
+                        background-image: url('../assets/icon-open-external.svg');
+                    }
+
+                    &.tabInsertCSS {
+                        background-image: url('../assets/icon-add-file.svg');
+                    }
+
+                    &.tabDeleteAll {
+                        background-image: url('../assets/icon-erase.svg');
+                    }
+
+                    &:hover {
+                        filter: invert(0.8832);
+                    }
+
+                    &:focus {
+                        /* z-index: 1; */
+                        outline: 1px solid var(--shades-medium);
+                        outline-offset: 4px;
+                        box-shadow: 0 0 calc((3 / 4) * 2rem) var(--shades-medium);
+                        background-size: calc(100% - 0.5rem);
+                    }
+                }
+            }
+        }
+
+        .editor {
+            flex: 1;
+        }
+    }
+}
+
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    z-index: 10000;
+    padding: 1rem 2rem;
+    background: var(--sec-colour-darkest);
+    color: var(--shades-lightest);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    text-decoration: none;
+
+    &:focus {
+        top: 0;
+    }
+}
+
+:focus-visible {
+    outline: 2px solid var(--sec-colour-medium);
+    outline-offset: 2px;
+}

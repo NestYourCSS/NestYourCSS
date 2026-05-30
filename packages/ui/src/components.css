@@ -1,0 +1,347 @@
+/* ==========================================================================
+   @nycss/ui - Component User Agent Stylesheet
+   Default, standalone styles for NYCSS web components.
+   Uses tag selectors - for foundational/default styling.
+   Override with classes or IDs in application stylesheets.
+   ========================================================================== */
+
+@layer ui-base {
+
+  /* --- Default Component CSS Variables --- */
+  :root {
+    --component-background: #161616;
+    --component-background-accent-light: #484848;
+    --component-background-accent-dark: #222222;
+    --component-background-selected: linear-gradient(to right, var(--component-background-accent-light), var(--component-background-accent-dark));
+    --component-box-shadow-selected: inset 0 1px oklch(100% none none / 0.25);
+    --component-box-shadow-focused: 0 0 1.5em #aeaeae;
+    --component-text-accent: #484848;
+    --component-text-hover: #aeaeae;
+    --component-gap: 0.5rem;
+  }
+
+  /* ======================================================================
+     DROPDOWN & COMBOBOX - Shared Base Styles
+     ====================================================================== */
+
+  nycss-dropdown,
+  nycss-combobox {
+    user-select: none;
+    display: inline-flex;
+    flex-direction: column;
+    width: auto;
+    margin: 0;
+    text-align: left;
+    box-sizing: content-box;
+    position: relative;
+  }
+
+  nycss-dropdown > input[type="checkbox"],
+  nycss-combobox > input[type="checkbox"] {
+    appearance: none;
+    position: absolute;
+    margin: 0;
+  }
+
+  nycss-dropdown > output,
+  nycss-combobox > output {
+    outline: none !important;
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: clip;
+    background:
+      url("data:image/svg+xml,%3Csvg fill='%23484848' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11.178 19.569a.998.998 0 0 0 1.644 0l9-13A.999.999 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13z'%3E%3C/path%3E%3C/svg%3E")
+      right 1rem top 50% / 1ch no-repeat,
+      var(--component-background);
+    border-radius: 1rem;
+    padding: 1rem;
+    padding-right: calc(1rem + 2ch);
+  }
+
+  nycss-dropdown > output:hover,
+  nycss-combobox > output:hover {
+    color: var(--component-text-hover);
+  }
+
+  nycss-dropdown > input:checked + output,
+  nycss-combobox > input:checked + output {
+    border-radius: 1rem 1rem 0 0;
+  }
+
+  nycss-dropdown > ul,
+  nycss-combobox > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nycss-dropdown > input:checked ~ ul,
+  nycss-combobox > input:checked ~ ul {
+    position: absolute;
+    z-index: 999;
+    top: 100%;
+    width: 100%;
+    display: flex;
+    margin: 0;
+    margin-top: 0.25rem;
+    padding: 1em;
+    gap: 0.5em;
+    flex-direction: column;
+    background: var(--component-background);
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    box-shadow: 0px 10px 10px 2.5px
+      rgb(from #000 r g b / 0.5);
+  }
+
+  nycss-dropdown > ul > li,
+  nycss-combobox > ul > li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    outline: none !important;
+  }
+
+  nycss-dropdown > ul > li:hover,
+  nycss-combobox > ul > li:hover {
+    color: var(--component-text-hover);
+    cursor: pointer;
+  }
+
+  nycss-dropdown > ul > li:focus,
+  nycss-combobox > ul > li:focus {
+    color: var(--component-text-hover);
+  }
+
+  /* Dropdown focus shadow */
+  nycss-dropdown:has(:focus) > output {
+    z-index: 1;
+    box-shadow: var(--component-box-shadow-focused);
+  }
+
+  /* --- Combobox-specific --- */
+
+  nycss-combobox:has(:is(input, output > div, ul > li):focus) > output {
+    z-index: 1;
+    box-shadow: var(--component-box-shadow-focused);
+  }
+
+  nycss-combobox > output > div {
+    cursor: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    outline: none !important;
+  }
+
+  nycss-combobox > output > div:focus {
+    overflow-x: scroll;
+    scrollbar-width: none;
+    text-overflow: clip;
+  }
+
+  nycss-combobox > output > div:not(:focus):empty {
+    align-content: center;
+    font-size: 75%;
+    padding: 0.25em 0;
+  }
+
+  nycss-combobox > output > div:not(:focus):empty::before {
+    pointer-events: none;
+    content: attr(placeholder);
+    color: var(--component-text-accent);
+  }
+
+  nycss-combobox > output:hover > div:not(:focus):empty::before {
+    color: var(--component-text-hover);
+  }
+
+  /* ======================================================================
+     TOGGLE / SWITCH
+     ====================================================================== */
+
+  nycss-toggle {
+    outline: none !important;
+    user-select: none;
+    position: relative;
+    display: flex;
+    border-radius: 1rem;
+    background: var(--component-background);
+  }
+
+  nycss-toggle::before {
+    position: absolute;
+    content: "";
+    height: 100%;
+    left: 0%;
+    width: 50%;
+    border-radius: inherit;
+    background: var(--component-background-selected);
+    box-shadow: var(--component-box-shadow-selected);
+    z-index: 0;
+
+    @media not (prefers-reduced-motion: reduce) {
+      transition: 0.25s;
+    }
+  }
+
+  nycss-toggle:has(:checked)::before {
+    left: 50%;
+  }
+
+  nycss-toggle:has(input:focus, input:active) {
+    z-index: 1;
+    box-shadow: var(--component-box-shadow-focused);
+  }
+
+  nycss-toggle > input {
+    appearance: none;
+    position: absolute;
+    margin: 0;
+  }
+
+  nycss-toggle > span {
+    position: relative;
+    cursor: pointer;
+    flex: 1;
+    padding: 1rem 2.5ch;
+    text-align: center;
+    align-content: center;
+  }
+
+  nycss-toggle > span:hover {
+    color: var(--component-text-hover);
+  }
+
+  /* ======================================================================
+     STEPPER / NUMBER
+     ====================================================================== */
+
+  nycss-stepper {
+    user-select: none;
+    position: relative;
+    width: fit-content;
+    border: none;
+    padding: 1rem;
+    gap: calc(2 * var(--component-gap));
+    background: var(--component-background);
+    border-radius: 1rem;
+  }
+
+  nycss-stepper:hover {
+    color: var(--component-text-hover);
+  }
+
+  nycss-stepper:has(input:focus, input:active) {
+    z-index: 1;
+    box-shadow: var(--component-box-shadow-focused);
+  }
+
+  nycss-stepper > output > input {
+    cursor: auto;
+    display: inline-block;
+    outline: none !important;
+  }
+
+  nycss-stepper > output > input[type="text"] {
+    appearance: none;
+    background: inherit;
+    border: inherit;
+    color: inherit;
+    font: inherit;
+    overflow: visible !important;
+    overflow-wrap: break-word;
+    text-align: inherit;
+  }
+
+  nycss-stepper > output > input ~ div {
+    position: absolute;
+    width: 1ch;
+    top: 50%;
+    right: 1rem;
+    translate: 0 -50%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+  }
+
+  nycss-stepper svg {
+    cursor: pointer;
+    width: 1ch;
+    fill: var(--component-text-accent);
+  }
+
+  /* ======================================================================
+     RADIO GROUP
+     ====================================================================== */
+
+  nycss-radio-group {
+    user-select: none;
+    display: flex;
+    gap: var(--component-gap);
+  }
+
+  nycss-radio-group > label {
+    outline: none !important;
+    flex: 1;
+    cursor: pointer;
+    padding: 1rem;
+    text-align: center;
+    align-content: center;
+    border-radius: 1rem;
+    --top-colour: var(--component-background-accent-light);
+    --bottom-colour: var(--component-background-accent-dark);
+    background:
+      linear-gradient(
+          to bottom,
+          var(--top-colour),
+          var(--bottom-colour) 45%,
+          transparent 55%
+        )
+        0% 100% / 100% 210% no-repeat,
+      var(--component-background);
+
+    @media not (prefers-reduced-motion: reduce) {
+      transition: background-position 0.125s ease-out;
+    }
+  }
+
+  nycss-radio-group > label:has(:checked) {
+    box-shadow: var(--component-box-shadow-selected);
+    background-position: 0% 0%;
+  }
+
+  nycss-radio-group > label:hover {
+    color: var(--component-text-hover);
+  }
+
+  nycss-radio-group > label:has(> input:focus) {
+    z-index: 1;
+    box-shadow: var(--component-box-shadow-focused);
+  }
+
+  nycss-radio-group > label > input {
+    appearance: none;
+    position: absolute;
+    margin: 0;
+  }
+
+  nycss-radio-group > label:has(:disabled) {
+    &,
+    &:hover {
+      --shades-true-darkest: color-mix(
+        in srgb,
+        #000,
+        var(--component-background)
+      );
+      background: linear-gradient(
+        to bottom,
+        #000,
+        var(--shades-true-darkest)
+      );
+      box-shadow: inset 0 calc(-1rem / 16) var(--component-background);
+      color: var(--component-text, #717171);
+      cursor: not-allowed;
+    }
+  }
+
+}

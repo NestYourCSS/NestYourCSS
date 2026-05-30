@@ -1,30 +1,28 @@
 <!DOCTYPE html>  
-<html lang="en" hreflang="en">  
+<html lang="en" dir="ltr" xml:lang="en" hreflang="en">  
 <head>  
   <meta charset="UTF-8" />  
   <meta name="theme-color" content="#00272b" />  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
   <meta name="google-adsense-account" content="ca-pub-9088468190661086">  
-  <meta name="description" content="Nest, un-nest, and minify your CSS in seconds with our free tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.">  
+  <meta name="description" content="Nest, denest, beautify and minify your CSS in seconds with our free tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.">  
   <meta name="author" content="Tim Chinye">  
   <link rel="canonical" href="https://nestyourcss.com/">  
   <meta property="og:title" content="Nest Your CSS">  
-  <meta property="og:description" content="Nest, un-nest, and minify your CSS in seconds with our free tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.">  
+  <meta property="og:description" content="Nest, denest, beautify and minify your CSS in seconds with our free tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.">  
   <meta property="og:image" content="https://nestyourcss.com/assets/images/nycss-logo.png">  
   <meta property="og:url" content="https://nestyourcss.com/">  
   <meta name="twitter:card" content="summary_large_image">  
   <meta name="twitter:title" content="Nest Your CSS">  
-  <meta name="twitter:description" content="Nest, un-nest, and minify your CSS in seconds with our free tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.">  
+  <meta name="twitter:description" content="Nest, denest, beautify and minify your CSS in seconds with our free tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.">  
   <meta name="twitter:image" content="https://nestyourcss.com/assets/images/nycss-logo.png">  
   
   <link rel="icon" type="image/png" href="./assets/images/nycss-logo.png" />  
-  <title>CSS Formatting Tool | Nest, Un-nest & Minify Stylesheets</title>  
+  <link rel="manifest" href="./manifest.json" />
+  <title>A CSS Formatting Tool | Nest, Denest, Beautify & Minify Stylesheets</title>  
     
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-543TRXJR');</script>  
-  <script>  
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };  
-  </script>  
-  <script defer src="/_vercel/insights/script.js"></script>  
+  
   <script type="application/ld+json">  
     {  
       "@context": "https://schema.org",  
@@ -32,9 +30,9 @@
         {  
           "@type": "WebApplication",  
           "name": "Nest Your CSS",  
-          "headline": "CSS Formatting Tool | Nest, Un-nest & Minify Stylesheets",  
+          "headline": "CSS Formatting Tool | Nest, Denest, Beautify & Minify Stylesheets",  
           "url": "https://nestyourcss.com/",  
-          "description": "Nest, un-nest, and minify your CSS in seconds with our free online tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.",  
+          "description": "Nest, denest, beautify and minify your CSS in seconds with our free online tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.",  
           "inLanguage": "en",  
           "applicationCategory": "DeveloperApplication",  
           "operatingSystem": "Browser-based",  
@@ -131,8 +129,7 @@
   <!--  
     Application Styles - To be bundled & minified  
   -->  
-  <!-- build:css styles/app.min.css -->  
-  <link href="./styles/ads-container.css" rel="stylesheet">  
+  <!-- build:css styles/app.min.css -->    
   <link href="./styles/properties.css" rel="stylesheet">  
   <link href="./styles/keyframes.css" rel="stylesheet">  
   <link href="./styles/fonts.css" rel="stylesheet">  
@@ -169,7 +166,10 @@
       <style>
         symbol > :is(.icon-path-one, .icon-path-two) {
             cursor: pointer;
-            transition: var(--icon-paths-fill-transition);
+            
+            @media not (prefers-reduced-motion: reduce) {
+              transition: var(--icon-paths-fill-transition);
+            }
     
             &.icon-path-one { fill: var(--icon-path-one-fill); }
             &.icon-path-two { fill: var(--icon-path-two-fill); }
@@ -203,33 +203,30 @@
   </svg>  
   
   <div id="siteWrapper">  
-    <main>  
+    <main role="main">  
     <!-- <main class="nesting"> -->  
-      <button id="settingsBtn" class="header-btn vibrant" title="Settings">  
+      <div id="a11y-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+      <button id="settingsBtn" class="header-btn vibrant" title="Settings" aria-label="Settings">  
         <i class="ph ph-gear-six"></i>  
       </button>
       <div id="mainWrapper">
-        <aside id="mainSettings" inert>  
+        <aside id="mainSettings" aria-label="Editor settings" inert>  
           <section>  
             <h2>Input</h2>  
             <ul>  
               <li>  
                 <span id="samples-label">Samples</span>  
                 <div>  
-                  <label id="samples" class="dropdown" for="samples-checkbox" role="presentation">  
-                    <input type="checkbox" id="samples-checkbox" />  
-                    <output role="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="samples-listbox" aria-labelledby="samples-label" aria-activedescendant="samples-option-1">Unnested Showcase</output>  
-                    <ul hidden id="samples-listbox" role="listbox" aria-labelledby="samples-label">  
-                      <li id="samples-option-7" role="option" tabindex="-1" value="unnestedCodeSnippet">Unnested Code Snippet</li>  
-                      <li id="samples-option-6" role="option" tabindex="-1" value="nestedCodeSnippet">Nested Code Snippet</li>  
-                      <li id="samples-option-1" role="option" tabindex="-1" value="unnestedShowcase" aria-selected="true">Unnested Showcase</li>  
-                      <li id="samples-option-2" role="option" tabindex="-1" value="nestedShowcase">Nested Showcase</li>  
-                      <li id="samples-option-3" role="option" tabindex="-1" value="complexSelectorGroups">Complex selector group</li>  
-                      <li id="samples-option-4" role="option" tabindex="-1" value="escapedCharacters">Escaped characters</li>  
-                      <li id="samples-option-5" role="option" tabindex="-1" value="unnestedNavbar">Unnested navbar</li>  
-                      <li id="samples-option-8" role="option" tabindex="-1" value="amazonHomepage">Amazon Homepage</li>  
-                    </ul>  
-                  </label>  
+                  <nycss-dropdown id="samples" label="Samples">  
+                    <span role="option" value="denestedCodeSnippet">Denested Code Snippet</span>  
+                    <span role="option" value="nestedCodeSnippet">Nested Code Snippet</span>  
+                    <span role="option" value="denestedShowcase">Denested Showcase</span>  
+                    <span role="option" value="nestedShowcase">Nested Showcase</span>  
+                    <span role="option" value="complexSelectorGroups">Complex selector group</span>  
+                    <span role="option" value="escapedCharacters">Escaped characters</span>  
+                    <span role="option" value="denestedNavbar">Denested navbar</span>  
+                    <span role="option" value="amazonHomepage">Amazon Homepage</span>  
+                  </nycss-dropdown>  
                 </div>  
               </li>  
               <li>  
@@ -238,18 +235,11 @@
                   <p>(press enter to inject & save)</p>  
                 </span>  
                 <div>  
-                  <label id="externalCss" class="combobox" for="external-css-checkbox" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="external-css-listbox">  
-                    <input type="checkbox" id="external-css-checkbox" />  
-                    <output>  
-                      <div role="textbox" contenteditable="true" placeholder="https://api.codetabs.com/v1/proxy/?quest=https://.../styles.css" aria-labelledby="external-css-label" aria-autocomplete="list" aria-controls="external-css-listbox" id="external-css-input" aria-activedescendant="" tabindex="-1"></div>  
-                    </output>  
-                    <ul hidden id="external-css-listbox" role="listbox" aria-labelledby="external-css-label">  
-                      <!-- Pre-populated/recent items will be managed by JS -->  
-                      <li id="external-css-option-1" role="option" tabindex="-1">/styles/main.css</li>  
-                      <li id="external-css-option-2" role="option" tabindex="-1">/styles/keyframes.css</li>  
-                      <li id="external-css-option-3" role="option" tabindex="-1">/styles/editor.css</li>  
-                    </ul>  
-                  </label>  
+                  <nycss-combobox id="externalCss" label="External CSS" placeholder="https://api.codetabs.com/v1/proxy/?quest=https://.../styles.css">  
+                    <span role="option">/styles/main.css</span>  
+                    <span role="option">/styles/keyframes.css</span>  
+                    <span role="option">/styles/editor.css</span>  
+                  </nycss-combobox>  
                 </div>  
               </li>  
             </ul>  
@@ -260,74 +250,48 @@
               <li>  
                 <span id="font-label">Font</span>  
                 <div>  
-                  <label id="typefaces" class="dropdown" for="typefaces-checkbox" role="presentation">  
-                    <input type="checkbox" id="typefaces-checkbox" />  
-                    <output role="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="typefaces-listbox" aria-labelledby="font-label" aria-activedescendant="typefaces-option-2">Fira Code</output>  
-                    <ul hidden id="typefaces-listbox" role="listbox" aria-labelledby="font-label">  
-                      <li id="typefaces-option-1" role="option" tabindex="-1">DejaVu Mono</li>  
-                      <li id="typefaces-option-2" role="option" tabindex="-1" aria-selected="true">Fira Code</li>  
-                      <li id="typefaces-option-3" role="option" tabindex="-1">iA Writer Mono</li>  
-                      <li id="typefaces-option-4" role="option" tabindex="-1">Jetbrains Mono</li>  
-                      <li id="typefaces-option-5" role="option" tabindex="-1">PT Mono</li>  
-                    </ul>  
-                  </label>  
-                  <label id="fontsizes" class="dropdown" for="fontsizes-checkbox" role="presentation">  
-                    <input type="checkbox" id="fontsizes-checkbox" />  
-                    <output role="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="fontsizes-listbox" aria-label="Font Size" aria-activedescendant="fontsizes-option-4">1.25rem</output>  
-                    <ul hidden id="fontsizes-listbox" role="listbox" aria-label="Font Size">  
-                      <li id="fontsizes-option-1" role="option" tabindex="-1">0.5rem</li>  
-                      <li id="fontsizes-option-2" role="option" tabindex="-1">0.75rem</li>  
-                      <li id="fontsizes-option-3" role="option" tabindex="-1">1rem</li>  
-                      <li id="fontsizes-option-4" role="option" tabindex="-1" aria-selected="true">1.25rem</li>  
-                      <li id="fontsizes-option-5" role="option" tabindex="-1">1.5rem</li>  
-                      <li id="fontsizes-option-6" role="option" tabindex="-1">1.75rem</li>  
-                      <li id="fontsizes-option-7" role="option" tabindex="-1">2rem</li>  
-                      <li id="fontsizes-option-8" role="option" tabindex="-1">2.25rem</li>  
-                      <li id="fontsizes-option-9" role="option" tabindex="-1">2.5rem</li>  
-                    </ul>  
-                  </label>  
+                  <nycss-dropdown id="typefaces" label="Font">  
+                    <span role="option">DejaVu Mono</span>  
+                    <span role="option">Fira Code</span>  
+                    <span role="option">iA Writer Mono</span>  
+                    <span role="option">Jetbrains Mono</span>  
+                    <span role="option">PT Mono</span>  
+                  </nycss-dropdown>  
+                  <nycss-dropdown id="fontsizes" label="Font Size">  
+                    <span role="option">0.5rem</span>  
+                    <span role="option">0.75rem</span>  
+                    <span role="option">1rem</span>  
+                    <span role="option">1.25rem</span>  
+                    <span role="option">1.5rem</span>  
+                    <span role="option">1.75rem</span>  
+                    <span role="option">2rem</span>  
+                    <span role="option">2.25rem</span>  
+                    <span role="option">2.5rem</span>  
+                  </nycss-dropdown>  
                 </div>  
               </li>  
               <li>  
                 <span id="indentation-type-label">Indentation</span>  
                 <div>  
-                  <label id="indentationType" class="checkbox" for="indentation-type-checkbox">  
-                    <input type="checkbox" id="indentation-type-checkbox" checked role="switch" aria-labelledby="indentation-type-label" />  
-                    <span aria-hidden="true">Soft</span>  
-                    <span aria-hidden="true">Hard</span>  
-                  </label>  
-    
-                  <label id="indentationSize" class="number" for="indentation-size-input">  
-                    <span id="indentation-size-label">Size:</span>  
-                    <output>  
-                      <input type="text" inputmode="numeric" aria-labelledby="indentation-size-label" id="indentation-size-input" value="4">  
-                      <div>  
-                        <svg role="button" aria-label="Increase indentation size" fill="#484848" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 19h18a1.002 1.002 0 0 0 .823-1.569l-9-13c-.373-.539-1.271-.539-1.645 0l-9 13A.999.999 0 0 0 3 19z"></path></svg>  
-                        <svg role="button" aria-label="Decrease indentation size" fill="#484848" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.178 19.569a.998.998 0 0 0 1.644 0l9-13A.999.999 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13z"></path></svg>  
-                      </div>  
-                    </output>  
-                  </label>  
+                  <nycss-toggle id="indentationType" label="Indentation" on-text="Hard" off-text="Soft"></nycss-toggle>  
+                  <nycss-stepper id="indentationSize" label="Size:" min="1" max="16"></nycss-stepper>  
                 </div>  
               </li>  
               <li>  
                 <span id="word-wrap-label">Word Wrap</span>  
                 <div>  
-                  <label id="wordWrap" class="checkbox" for="word-wrap-checkbox">  
-                    <input type="checkbox" role="switch" aria-labelledby="word-wrap-label" id="word-wrap-checkbox" />  
-                    <span aria-hidden="true">Off</span>  
-                    <span aria-hidden="true">On</span>  
-                  </label>  
+                  <nycss-toggle id="wordWrap" label="Word Wrap" on-text="On" off-text="Off"></nycss-toggle>  
                 </div>  
               </li>  
               <li>  
                 <span id="coordinates-group-label">Coordinates</span>  
                 <div>  
-                  <label id="coordinates" class="radio-group" role="radiogroup" aria-labelledby="coordinates-group-label">  
-                    <label>None<input type="radio" name="coordinates" role="radio" id="coordinates-none" /></label>  
-                    <label>Line<input type="radio" name="coordinates" role="radio" id="coordinates-line" /></label>  
-                    <label>Col<input type="radio" name="coordinates" role="radio" id="coordinates-col" checked /></label>  
-                    <label>Both<input type="radio" name="coordinates" role="radio" id="coordinates-both" /></label>  
-                  </label>  
+                  <nycss-radio-group id="coordinates" label="Coordinates">  
+                    <label>None</label>  
+                    <label>Line</label>  
+                    <label>Col</label>  
+                    <label>Both</label>  
+                  </nycss-radio-group>  
                 </div>  
               </li>  
             </ul>  
@@ -338,37 +302,29 @@
               <li>  
                 <span id="preserveComments-label">Comments?</span>  
                 <div>  
-                  <label id="preserveComments" class="checkbox" for="preserveComments-checkbox">  
-                    <input type="checkbox" role="switch" aria-labelledby="preserveComments-label" id="preserveComments-checkbox" />  
-                    <span aria-hidden="true">Yes</span>  
-                    <span aria-hidden="true">No</span>  
-                  </label>  
+                  <nycss-toggle id="preserveComments" label="Comments?" off-text="Yes" on-text="No"></nycss-toggle>  
                 </div>  
               </li>  
               <li>  
                 <span id="mode-group-label">Mode</span>  
                 <div>  
-                  <label id="mode" class="radio-group" role="radiogroup" aria-labelledby="mode-group-label">  
-                    <label>Minify<input type="radio" name="mode" role="radio" id="mode-minify" /></label>  
-                    <label>Beautify<input type="radio" name="mode" role="radio" id="mode-beautify" /></label>  
-                    <label>Denest<input type="radio" name="mode" role="radio" id="mode-denest" /></label>  
-                    <label>Nest<input type="radio" name="mode" role="radio" id="mode-nest" checked /></label>  
-                  </label>  
+                  <nycss-radio-group id="mode" label="Mode">  
+                    <label>Minify</label>  
+                    <label>Beautify</label>  
+                    <label>Denest</label>  
+                    <label>Nest</label>  
+                  </nycss-radio-group>  
                 </div>  
               </li>  
               <li>  
                 <span id="auto-label">Auto</span>  
                 <div>  
-                  <label id="auto" class="checkbox" for="auto-checkbox">  
-                    <input type="checkbox" checked role="switch" aria-labelledby="auto-label" id="auto-checkbox" />  
-                    <span aria-hidden="true">Off</span>  
-                    <span aria-hidden="true">On</span>  
-                  </label>  
+                  <nycss-toggle id="auto" label="Auto" on-text="On" off-text="Off"></nycss-toggle>  
                 </div>  
               </li>  
             </ul>  
           </section>  
-          <section>  
+          <section role="alert">  
             <h2 id="error-table">Errors</h2>  
             <div aria-live="polite">  
               <table id="errors" aria-labelledby="error-table">  
@@ -504,7 +460,7 @@
               </div>  
             </figure>  
           </section>  
-          <article id="editorSide">
+          <article id="editorSide" role="region" aria-label="CSS editor">
             <button id="nestBtn" onclick="this.lastElementChild?.click()" aria-label="Start Nesting">  
               <span class="orb1" aria-hidden="true"></span>  
               <span class="orb2" aria-hidden="true"></span>  
@@ -519,7 +475,6 @@
             </div>  
           </article>  
         </section>
-      </div>
     </main>  
     <article>  
       <section id="reducingBoilerplateCode" class="optimize" aria-labelledby="parallaxText">  
@@ -595,12 +550,12 @@
           <p><a href="#" tabindex="-1">Click anywhere to...</a></p>  
         </hgroup>  
   
-        <p id="splittingText" data-text="Nesting in CSS allows you to define styles for child elements within the context of their parent element's style rule. This creates a hierarchy that reflects your HTML structure document, making your CSS code more intuitive and easier to manage.">  
-          This powerful hierarchy makes your code more intuitive, <a href="#improvedCodeReadability">easier to read</a>, and ultimately, <a href="#easierMaintenance">easier to manage</a>.  
-        </p>  
+        <p id="splittingText" data-text="CSS Nesting allows you to style elements within the context of an ancestor's rule. If you want your CSS code to be easier to read, this will create a hierarchy that reflects your HTML structure document that also makes your code easier to manage.">
+          CSS Nesting allows you to style elements within the context of an ancestor's rule. If you want your CSS code to be <a href="#improvedCodeReadability">easier to read</a>, this will create a hierarchy that reflects your HTML structure document that also makes your code <a href="#easierMaintenance">easier to manage</a>.
+        </p>
         <a id="nycssLogoGroup" href="#" tabindex="-1" aria-label="Go to top of page">  
-          <img id="nycssLogo" loading="lazy" class="optimize" hidden alt="The official logo for NestYourCSS..." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/">  
-          <img id="nycssBadge" loading="lazy" class="optimize main-animation" alt="The official CSS badge..." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/">  
+          <img id="nycssLogo" loading="lazy" class="optimize" hidden alt="The official logo for NestYourCSS." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/a8b762ae-dab2-4230-901c-0d1f90baebd3/-/resize/256x/-/format/auto/-/quality/smart/">  
+          <img id="nycssBadge" loading="lazy" class="optimize main-animation" alt="The official CSS badge." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/6b309d2e-58af-41a3-bff3-c7b623fff2c5/-/resize/256x/-/format/auto/-/quality/smart/">  
           <img id="nycssNest" loading="lazy" class="optimize" alt="A bird's nest..." loading="lazy" width="256" height="256" sizes="(max-height: 1600px) 23.703dvh, 384px" srcset="https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/48x/-/format/auto/-/quality/smart/ 48w, https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/152x/-/format/auto/-/quality/smart/ 152w, https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/256x/-/format/auto/-/quality/smart/ 256w, https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/384x/-/format/auto/-/quality/smart/ 384w" src="https://ucarecdn.com/9c577dee-14bf-476e-86eb-9fd7a6ad9289/-/resize/256x/-/format/auto/-/quality/smart/">  
         </a>  
       </section>  
@@ -610,41 +565,43 @@
   <!--  
     Third-Party Library Scripts  
   -->  
-  <script src="./lib/lenis/lenis.min.js" defer></script>  
+  <script src="/lib/lenis/lenis.min.js" defer></script>  
     
-  <script src="./lib/ace/scripts/ace.min.js" defer></script>  
-  <script src="./lib/ace/scripts/mode-css.min.js" defer></script>  
-  <script src="./lib/ace/scripts/theme-nycss.min.js" defer></script>  
+  <script src="/lib/ace/scripts/ace.min.js" defer></script>  
+  <script src="/lib/ace/scripts/mode-css.min.js" defer></script>  
+  <script src="/lib/ace/scripts/theme-nycss.min.js" defer></script>  
   <script src="https://unpkg.com/@phosphor-icons/web" defer></script>  
     
-  <script src="./lib/ace/scripts/ext-searchbox.min.js" defer></script>  
+  <script src="/lib/ace/scripts/ext-searchbox.min.js" defer></script>  
   <!-- <script src="./lib/ace/scripts/ext-diff.min.js"></script> -->  
   <!-- <script src="./lib/ace/scripts/ext-stickyscroll.js"></script> -->  
   <!-- <script src="./lib/ace/scripts/ext-language_tools.min.js"></script> -->  
     
-  <script src="./lib/ace-linters/ace-linters.min.js" defer></script>  
+  <script src="/lib/ace-linters/ace-linters.min.js" defer></script>  
     
   <!--  
-    Application Scripts - To be bundled & minified  
+    Application Scripts - Monorepo build
   -->  
-  <!-- build:js scripts/app.min.js -->  
-  <script src="./scripts/var.js" type="text/javascript"></script>  
-  <script src="./scripts/main.js" type="text/javascript"></script>  
-  <script src="./scripts/setup.js" type="text/javascript"></script>  
-  <script src="./scripts/sample.js" type="text/javascript"></script>  
-  <script src="./scripts/nesting.js" type="text/javascript"></script>  
-  <script src="./scripts/handlers.js" type="text/javascript"></script>  
-  <script src="./scripts/debugging.js" type="text/javascript"></script>  
-  <script src="./scripts/minieditor.js" type="text/javascript"></script>  
-  <script src="./scripts/splashtexts.js" type="text/javascript"></script>  
-  <script src="./scripts/fallingbadge.js" type="text/javascript"></script>  
-  <script src="./scripts/animateCursor.js" type="text/javascript"></script>  
-  <script src="./scripts/smoothlyScroll.js" type="text/javascript"></script>  
-  <script src="./scripts/nestingSettings.js" type="text/javascript"></script>
-  <!-- endbuild -->  
+  <script type="module" src="./src/main.js"></script>
+  <script src="./scripts/var.js" defer></script>  
+  <script src="./scripts/main.js" defer></script>  
+  <script src="./scripts/setup.js" defer></script>  
+  <script src="./scripts/sample.js" defer></script>  
+  <script src="./scripts/nesting.js" defer></script>  
+  <script src="./scripts/handlers.js" defer></script>  
+  <script src="./scripts/debugging.js" defer></script>  
+  <script src="./scripts/minieditor.js" defer></script>  
+  <script src="./scripts/splashtexts.js" defer></script>  
+  <script src="./scripts/fallingbadge.js" defer></script>  
+  <script src="./scripts/animateCursor.js" defer></script>  
+  <script src="./scripts/smoothlyScroll.js" defer></script>  
+  <script src="./scripts/nestingSettings.js" defer></script>  
   
-  <script>(async () => Object.assign(window, await import('https://quickly.nestyourcss.com/scripts/converters.js')))();</script>  
     
+  <!--  
+    PWA Service Worker  
+  -->  
+
   <!--  
     Ad Scripts  
   -->  

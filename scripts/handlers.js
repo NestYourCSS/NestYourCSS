@@ -1,12 +1,3 @@
-mainContent.querySelectorAll('nav > button').forEach((btn) => {
-  function repositionButtonBG(e) {
-    let { top, left } = e.target.getBoundingClientRect();
-    e.target.style.backgroundPosition = `top -${top}px left -${left}px`;
-  }
-
-  ['transitionrun', 'transitionstart', 'transitioncancel', 'transitionend'].forEach(event => btn.lastElementChild.addEventListener(event, repositionButtonBG));
-});
-
 const mainContentBackgroundString = (horizValue) => `
 url("https://ucarecdn.com/380d4e4c-268c-4913-8c92-e049c44234ec/-/preview/189x189/") 0 0.1dvh / 5dvh repeat,
 linear-gradient(to right, rgb(from var(--shades-black) r g b / var(--opacity-medium)), rgb(from var(--pri-colour-em-darker) r g b / var(--opacity-medium))) 0 0 / 100dvw 100dvh,
@@ -17,15 +8,24 @@ var(--shades-black)
 document.body.addEventListener('pointermove', (e) => {
   if (typeof splashTextElem === 'undefined' || splashTextElem === null || !mainElement) return;
 
+  const prefersReducedMotion = window.prefersReducedMotion;
+
   window.cursorX = e.clientX;
   window.cursorY = e.clientY;
   
   requestAnimationFrame(() => {
-    const horizValue = roundNumber((e.clientX / document.body.clientWidth) * 100) + '%';
-    if (window.isNesting || scrollWrapper.scrollTop < mainElement.offsetHeight)
-      mainContent.style.background = mainContentBackgroundString(horizValue);
+    // 1. Handle the background motion
+    if (prefersReducedMotion) {
+      // Set a static "safe" value (e.g., 50%) so it doesn't move
+      mainContent.style.background = mainContentBackgroundString("50%");
+    } else {
+      const horizValue = roundNumber((e.clientX / document.body.clientWidth) * 100) + '%';
+      if (window.isNesting || scrollWrapper.scrollTop < mainElement.offsetHeight)
+        mainContent.style.background = mainContentBackgroundString(horizValue);
+    }
 
-    if (window.isNesting) {
+    // 2. Handle nested nav buttons (Safe-ish, but good to check)
+    if (window.isNesting && !prefersReducedMotion) {
       // Offset is needed since containing box has been changed from root to mainSettings (or some other element)
       const [ offsetX, offsetY ] = [(mainSettings.scrollLeft - mainSettings.lastElementChild.clientHeight / 2), (mainSettings.scrollTop - (mainSettings.lastElementChild.clientHeight / 2))];
 
@@ -34,7 +34,7 @@ document.body.addEventListener('pointermove', (e) => {
       nestedNavButtons.style.setProperty('--cursor-y-pos', (e.clientY + offsetY) + 'px');
     }
     else {
-      if (e.target === splashTextElem) attemptSplashTextUpdate();
+      if (e.target === splashTextElem) window.attemptSplashTextUpdate();
       
       const scrollTop = scrollWrapper.scrollTop;
       const editorTop = editorSection.offsetTop;
@@ -44,46 +44,60 @@ document.body.addEventListener('pointermove', (e) => {
       const isEditorBottomNotScrolledPassed = (editorTop + editorHeight + window.innerHeight) > scrollTop;
 
       const isEditorInView = isEditorTopScrolledPassed && isEditorBottomNotScrolledPassed;
-      if (isEditorInView) updateActiveLine(e.clientX, e.clientY);
+      if (isEditorInView) window.updateActiveLine(e.clientX, e.clientY);
     }
   });
 });
 
-document.addEventListener('visibilitychange', () => document.body.classList.toggle('hidden', document.hidden));
+document.addEventListener('visibilitychange', () => document.body.hidden = document.hidden);
 
 const elements = [
-  '#nestBtn',
-  '#mainSettings > nav > button > figure.inner-cursor',
+  '#mainSettings > nav > a > figure.inner-cursor',
   '#repeatingText span.repeat',
   '#changingText s',
   '#groupedText',
   '#nycssCursor',
-  '#splittingText',
-  '#nycssBadge'
+  '#splittingText'
 ];
-const intersectionObserver = new IntersectionObserver((entries) => entries.forEach(entry => entry.target.classList.toggle('hidden', !entry.isIntersecting)), { threshold: 0.01 });
+const intersectionObserver = new IntersectionObserver((entries) => {
+  const reduce = window.prefersReducedMotion;
+  entries.forEach(entry => {
+    if (entry.target.id === 'nycssCursor' && reduce) return;
+    entry.target.hidden = !entry.isIntersecting;
+  });
+}, { threshold: 0.01 });
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
-scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof updateLogoState !== 'undefined' && updateLogoState())));
+scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof window.updateLogoState !== 'undefined' && window.updateLogoState())));
+
+function announce(message) {
+    const liveRegion = document.getElementById('a11y-live-region');
+    if (liveRegion) {
+        liveRegion.textContent = '';
+        requestAnimationFrame(() => { liveRegion.textContent = message; });
+    }
+}
+window.announce = announce;
 
 window.tabButtonHandler = (e) => {
   let tabButton = e.currentTarget;
-  let editor = (tabButton.closest('.editorWrapper')?.id.startsWith("input")) ? inputEditorInstance : outputEditorInstance;
+  let editor = (tabButton.closest('.editorWrapper')?.id.startsWith("input")) ? window.inputEditorInstance : window.outputEditorInstance;
 
   switch (tabButton.className) {
     case "tabCopyAll":
       let copiedText = editor.getValue(); 
       navigator.clipboard.writeText(copiedText);
+      announce(window.i18n.copiedToClipboard);
       break;
     case "tabInsertCSS":
       window.insertCSSFileInput.click();
       break;
     case "tabOpenRaw":
-      // Get the raw text from the editor
+      announce(window.i18n.openingNewWindow);
+
       let content = editor.getValue();
 
-      // Open a new blank window
-      let rawFileWindow = window.open("", "_blank");
+      let rawFileWindow = window.open("", "_blank", "noopener,noreferrer");
       rawFileWindow.document.write(`
         <html style="color-scheme: dark;">
             <body style="
@@ -122,7 +136,10 @@ window.tabButtonHandler = (e) => {
 
       break;
     case "tabDeleteAll":
-      editor.setValue("");
+      if (confirm(window.i18n.confirmDeleteAll)) {
+        editor.setValue("");
+        announce(window.i18n.contentDeleted);
+      }
       break;
   }
 };
@@ -153,12 +170,17 @@ window.setupDragAndDrop = (editor) => {
 
       if (file && (file.type === "text/css" || file.name.endsWith('.css'))) { // css file
           const reader = new FileReader();
-          reader.onload = (event) => inputEditorInstance.setValue(event.target.result);
+          reader.onload = (event) => {
+            window.inputEditorInstance.setValue(event.target.result);
+            announce(window.i18n.fileImported + ": " + file.name);
+          };
           reader.readAsText(file);
       }
-      else if (e.dataTransfer.getData('text/plain'));
+      else if (e.dataTransfer.getData('text/plain')) {
+        announce(window.i18n.textInsertedDragDrop);
+      }
       else {
-          alert("Only .css files or text are allowed!");
+          announce(window.i18n.onlyCSSFilesAllowed);
       }
   });
 };
@@ -177,7 +199,7 @@ window.addEventListener('load', () => {
     deferredScripts.forEach((dScript) => dScript());
 
     document.querySelectorAll('#strechingText, #visibleText u b').forEach(element => {
-      splitTextForAnimation(element);
+      window.splitTextForAnimation(element);
     });
   }, 100);
 });

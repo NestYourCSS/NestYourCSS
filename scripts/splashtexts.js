@@ -170,6 +170,16 @@ function initializeSplashTextAnimator() {
 
     // --- Function to Start/Trigger the Animation ---
     function startSplashTextAnimation(originalText, newText) {
+        // 1. Check for reduced motion preference
+        // 2. If they want reduced motion, just "snap" the text and skip the logic
+        if (window.prefersReducedMotion) {
+            splashTextElem.textContent = newText;
+            // Trigger the "cooldown" immediately so the next update can happen later
+            isUpdating = true;
+            setTimeout(() => { isUpdating = false; }, 1000); 
+            return; 
+        }
+        
         if (isUpdating && animationState.animationFrameId) return;
         
         isUpdating = true;
