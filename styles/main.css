@@ -965,7 +965,7 @@
     margin-right: 2rem;
     height: 100%;
     width: min(50vw, calc(100% - 6rem)); /* margin-left + right */
-    container: ads-container / size;
+    container-type: inline-size; /* ads-container */
 
     > figcaption {
       text-overflow: ellipsis;
@@ -1481,10 +1481,10 @@
         opacity 1s,
         top 1s;
       pointer-events: none;
-
-      &article {
-        top: 0dvh;
-      }
+    }
+    
+    & + article {
+      top: 0dvh;
     }
 
     #mainSettings {

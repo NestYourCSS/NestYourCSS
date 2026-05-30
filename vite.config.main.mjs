@@ -14,9 +14,20 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'esnext',
+    cssTarget: 'chrome120',
     outDir: 'dist',
+    chunkSizeWarningLimit: 2000, 
     rollupOptions: {
       input: resolve(__dirname, 'index.html'),
+      output: {
+        manualChunks(id) {
+          // Move everything in /lib/ (Ace, Lenis) into a vendor file
+          if (id.includes('lib')) {
+            return 'vendor';
+          }
+        }
+      }
     },
   },
   server: { port: 3000 },

@@ -10,6 +10,8 @@
     "build:main": "vite build --config vite.config.main.mjs && node scripts/postbuild.mjs main",
     "build:quickly": "vite build --config vite.config.quickly.mjs && node scripts/postbuild.mjs quickly",
     "preview": "vite preview",
+    "preview:main": "vite preview --config vite.config.main.mjs",
+    "preview:quickly": "vite preview --config vite.config.quickly.mjs",
     "build:packages": "pnpm -r --filter='./packages/*' run build",
     "lint": "eslint packages/",
     "typecheck": "tsc --noEmit"
