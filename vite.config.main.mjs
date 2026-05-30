@@ -1,10 +1,25 @@
-import { defineConfig } from 'vite';
+import { defineConfig, createLogger } from 'vite';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+// 1. Create a custom logger
+const logger = createLogger();
+const originalWarn = logger.warn;
+
+// 2. Intercept warnings and filter out the annoying one
+logger.warn = (msg, options) => {
+  if (msg.includes('can\'t be bundled without type="module" attribute')) {
+    return; // Drop the warning silently
+  }
+  originalWarn(msg, options);
+};
+
 export default defineConfig({
+  // 3. Apply the custom logger
+  customLogger: logger, 
+  
   resolve: {
     alias: {
       '@nycss/state': resolve(__dirname, 'packages/state/src/store.js'),
@@ -22,7 +37,6 @@ export default defineConfig({
       input: resolve(__dirname, 'index.html'),
       output: {
         manualChunks(id) {
-          // Move everything in /lib/ (Ace, Lenis) into a vendor file
           if (id.includes('lib')) {
             return 'vendor';
           }

@@ -24,5 +24,5 @@ function initializeFallingBadgeManager() {
       }, 1000);
     }
   };
-  updateLogoState();
+  window.updateLogoState();
 };

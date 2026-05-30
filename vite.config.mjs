@@ -1,10 +1,22 @@
-import { defineConfig } from 'vite';
+import { defineConfig, createLogger } from 'vite';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+const logger = createLogger();
+const originalWarn = logger.warn;
+
+logger.warn = (msg, options) => {
+  if (msg.includes('can\'t be bundled without type="module" attribute')) {
+    return;
+  }
+  originalWarn(msg, options);
+};
+
 export default defineConfig({
+  customLogger: logger,
+
   resolve: {
     alias: {
       '@nycss/state': resolve(__dirname, 'packages/state/src/store.js'),
@@ -15,6 +27,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),

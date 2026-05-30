@@ -27,7 +27,7 @@ function initializeMiniEditor() {
   
     /* Vertical */
     
-    debounce(() => {
+    window.debounce(() => {
       const segmentHeight = miniEditor.parentElement.offsetHeight / lines.length;
       
       const activeLine = Math.ceil(cursorY / segmentHeight);
@@ -42,7 +42,7 @@ function initializeMiniEditor() {
       let horizontalPos = cursorX / document.body.clientWidth;
       let padding = nycssCodeExample.parentElement.offsetLeft / miniEditor.offsetWidth;
       let horizontalRePos = ((1 - (padding * 2)) * horizontalPos) + padding;
-      nycssCodeExample.parentElement.style.setProperty('--intensityPos', roundNumber(horizontalRePos * 100) + '%');
+      nycssCodeExample.parentElement.style.setProperty('--intensityPos', window.roundNumber(horizontalRePos * 100) + '%');
     }
   };
 };

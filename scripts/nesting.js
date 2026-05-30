@@ -13,12 +13,12 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     
     if (annotations.length === 0) {  
       // --- POSITIVE FEEDBACK: Announce that errors are gone ---  
-      outputEditorInstance.getSession().setValue(i18n.cssIsValid);  
-        
+      outputEditorInstance.getSession().setValue(window.i18n.cssIsValid);  
+     
       // Create a single, reassuring row for screen reader users.  
       const successRow = tableBodyElem.insertRow();  
       const successCell = successRow.insertCell();  
-      successCell.textContent = i18n.noErrorsFound;  
+      successCell.textContent = window.i18n.noErrorsFound;  
       successCell.colSpan = 3; // Span across all columns.  
         
       // No need to scroll into view if there are no errors.  
@@ -26,7 +26,7 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     }  
     
     // --- NEGATIVE FEEDBACK: Announce errors exist and populate the table ---  
-    outputEditorInstance.getSession().setValue(i18n.cssContainsErrors);  
+    outputEditorInstance.getSession().setValue(window.i18n.cssContainsErrors);  
     
     // 2. Loop through annotations and create an ACCESSIBLE row for each.  
     annotations.forEach(({ column, row, text }) => {  
@@ -79,30 +79,30 @@ function nestCode(onClick = false) {
         scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
     }  
   
-    if (typeof outputEditorInstance === 'undefined' || !inputEditorInstance) return;  
+    if (typeof window.outputEditorInstance === 'undefined' || !window.inputEditorInstance) return;  
 
-    if (typeof announce === 'function') announce(i18n.processing);
+    if (typeof window.announce === 'function') window.announce(window.i18n.processing);
     const wrapper = document.getElementById('codeEditor') || document.getElementById('siteWrapper');
     if (wrapper) wrapper.setAttribute('aria-busy', 'true');
   
     let tableBodyElem = errorTable.tBodies[0];  
-	const annotations = inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
+	const annotations = window.inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
 	if (annotations.length == 0) {  
-		outputEditorInstance.getSession().setValue(convertToNestedCSS(inputEditorInstance.getValue()) || i18n.outputPlaceholder);  
-         
+		window.outputEditorInstance.getSession().setValue(convertToNestedCSS(window.inputEditorInstance.getValue()) || window.i18n.outputPlaceholder);  
+        
         if (tableBodyElem.rows.length) tableBodyElem.innerHTML = '';  
-        if (typeof announce === 'function') announce(i18n.conversionComplete);
+        if (typeof window.announce === 'function') window.announce(window.i18n.conversionComplete);
 	} else {  
-		outputEditorInstance.getSession().setValue(i18n.cssContainsErrors);  
+		window.outputEditorInstance.getSession().setValue(window.i18n.cssContainsErrors);  
 		console.log('Code Errors:', annotations);  
 		  
         updateAccessibleErrorTable(  
           annotations,  
           tableBodyElem,  
-          inputEditorInstance,  
-          outputEditorInstance  
+          window.inputEditorInstance,  
+          window.outputEditorInstance  
         );  
-        if (typeof announce === 'function') announce(i18n.cssContainsErrors);
+        if (typeof window.announce === 'function') window.announce(window.i18n.cssContainsErrors);
 	}  
     if (wrapper) wrapper.removeAttribute('aria-busy');
 };  
@@ -164,3 +164,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }  
     });  
 });
+

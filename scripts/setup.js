@@ -7,17 +7,15 @@ function initializeAceEditors() {
     await waitForVar('LanguageProvider');
     const languageProvider = LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
   
-    inputEditorInstance = initEditor("inputEditor", i18n.inputEditorLabel, sample || i18n.inputPlaceholder);
-    outputEditorInstance = initEditor("outputEditor", i18n.outputEditorLabel, i18n.outputPlaceholder);
-  
-  
-    if (!(inputEditorInstance && outputEditorInstance)) return;
+    window.inputEditorInstance = initEditor("inputEditor", window.i18n.inputEditorLabel, sample || window.i18n.inputPlaceholder);
+    window.outputEditorInstance = initEditor("outputEditor", window.i18n.outputEditorLabel, window.i18n.outputPlaceholder);
+    if (!(window.inputEditorInstance && window.outputEditorInstance)) return;
 
     const editorMql = window.matchMedia('(prefers-reduced-motion: reduce)');
     const updateEditorAnimatedScroll = () => {
       const shouldAnimate = !window.prefersReducedMotion;
-      inputEditorInstance.setAnimatedScroll(shouldAnimate);
-      outputEditorInstance.setAnimatedScroll(shouldAnimate);
+      window.inputEditorInstance.setAnimatedScroll(shouldAnimate);
+      window.outputEditorInstance.setAnimatedScroll(shouldAnimate);
     };
     editorMql.addEventListener('change', updateEditorAnimatedScroll);
     updateEditorAnimatedScroll();
@@ -26,15 +24,15 @@ function initializeAceEditors() {
     let codeChanged = false;
     let isProcessing = false;
   
-    inputEditorInstance.getSession().on('change', () => ((!window.appIsInitializing) && (window.processAuto ?? true)) && (codeChanged = true));
+    window.inputEditorInstance.getSession().on('change', () => ((!window.appIsInitializing) && (window.processAuto ?? true)) && (codeChanged = true));
 
-    inputEditorInstance.getSession().on('changeAnnotation', () => {
+    window.inputEditorInstance.getSession().on('changeAnnotation', () => {
       if ((!window.appIsInitializing) && (window.processAuto ?? true) && !isProcessing) {
         isProcessing = true;
   
         setTimeout(() => {
           if (codeChanged) {
-            nestCode();
+            window.nestCode();
             codeChanged = false;
           }
   
@@ -139,7 +137,7 @@ function initializeAceEditors() {
           this.getElement().style.top = y + "px";
       };
   
-      editor.session.selection.on('changeCursor', () => updateCoordinateDisplay(editor));
+      editor.session.selection.on('changeCursor', () => window.updateCoordinateDisplay(editor));
     
       languageProvider.registerEditor(editor);
       return editor;
@@ -147,7 +145,7 @@ function initializeAceEditors() {
   
     // (The rest of your function remains unchanged)
     // ...
-    let inputEditorElem = inputEditorInstance.container;
+    let inputEditorElem = window.inputEditorInstance.container;
     let outputEditorElem = inputEditorElem.parentElement.lastElementChild;
   
     const shadowCount = 3;
@@ -159,7 +157,7 @@ function initializeAceEditors() {
       if (isShadowEditor) button.setAttribute('aria-hidden', 'true');
       else {
         button.setAttribute('aria-label', accessibleLabel);
-        button.addEventListener("click", tabButtonHandler);
+        button.addEventListener("click", window.tabButtonHandler);
       }
       return button;
     }
@@ -177,10 +175,10 @@ function initializeAceEditors() {
       const tabButtons = document.createElement("div");
       tabButtons.classList.add('tabButtons');
       tabButtons.setAttribute('role', 'toolbar');
-      tabButtons.setAttribute('aria-label', i18n.editorControls.replace('{name}', editorName));
+      tabButtons.setAttribute('aria-label', window.i18n.editorControls.replace('{name}', editorName));
       tabButtons.setAttribute('aria-orientation', 'horizontal');
 
-      tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, i18n.copyAll));
+      tabButtons.appendChild(createButton(`${editorName}TabCopyAll`, 'tabCopyAll', isShadowEditor, window.i18n.copyAll));
   
       if (isInputEditor) {
         if (!isShadowEditor) {
@@ -191,24 +189,24 @@ function initializeAceEditors() {
   
           fileInput.addEventListener("change", (event) => {
             if (file = event.target.files[0]) {
-              fileReader.onload = (e) => inputEditorInstance.setValue(e.target.result);
+              fileReader.onload = (e) => window.inputEditorInstance.setValue(e.target.result);
               fileReader.readAsText(file);
             };
           });
   
-          setupDragAndDrop(editor);
+          window.setupDragAndDrop(editor);
           
           window.insertCSSFileInput = fileInput;
         }
         
-        const insertBtn = createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, i18n.insertCSSFile);
+        const insertBtn = createButton(`${editorName}TabInsertCSS`, 'tabInsertCSS', isShadowEditor, window.i18n.insertCSSFile);
         insertBtn.setAttribute('aria-controls', 'inputEditor');
         tabButtons.appendChild(insertBtn);
       } else {
-        tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, i18n.openRawOutput));
+        tabButtons.appendChild(createButton(`${editorName}TabOpenRaw`, 'tabOpenRaw', isShadowEditor, window.i18n.openRawOutput));
       }
 
-      tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor, i18n.deleteAll));
+      tabButtons.appendChild(createButton(`${editorName}TabDeleteAll`, 'tabDeleteAll', isShadowEditor, window.i18n.deleteAll));
   
       editorTab.appendChild(fileName);
       editorTab.appendChild(tabButtons);
@@ -239,11 +237,10 @@ function initializeAceEditors() {
       editorGroup.appendChild(editor);
       wrapperElement.appendChild(editorGroup);
     }
-  
     [inputEditorElem, outputEditorElem].forEach((editor) => {
       const editorTab = createEditorTab(editor, editor === inputEditorElem, false);
       wrapEditorWithGroup(editor, editorTab);
-      updateCoordinateDisplay(ace.edit(editor));
+      window.updateCoordinateDisplay(ace.edit(editor));
     });
   
     const shadowWrapperElement = document.createElement("div");
@@ -366,7 +363,7 @@ function initializeAceEditors() {
     });
   };
   
-  setupEditors();
+  window.setupEditors();
   
   /**
    * Splits the text content of elements into individual <span>s for animation.
@@ -389,9 +386,9 @@ function initializeAceEditors() {
   };
   
   toggleBtn.addEventListener('click', () => {
-    if (typeof nestCode === 'undefined') return;
-  
-    nestCode(true);
+    if (typeof window.nestCode === 'undefined') return;
+
+    window.nestCode(true);
   });
   
   window.updateCoordinateDisplay = (editor) => {
@@ -442,7 +439,7 @@ function initializeAceEditors() {
     // Step 2: The element must be visible.
     // Assumes a robust `isElementVisible` function is available that checks for
     // `display: none`, `visibility: hidden`, and disconnected elements.
-    if (!isElementVisible(el)) {
+    if (!window.isElementVisible(el)) {
       return false;
     }
   
@@ -511,14 +508,14 @@ function initializeAceEditors() {
     while (node) {
       // Search inside shadow roots recursively
       if (node.shadowRoot) {
-        focusableCandidates.push(...getAllFocusableElements(node.shadowRoot));
+        focusableCandidates.push(...window.getAllFocusableElements(node.shadowRoot));
       }
       focusableCandidates.push(node);
       node = walker.nextNode();
     }
   
     // Filter the candidates using our robust checker
-    const focusableElements = focusableCandidates.filter(isElementFocusable);
+    const focusableElements = focusableCandidates.filter(window.isElementFocusable);
     
     // Sort the elements to respect `tabindex`
     return focusableElements.sort((a, b) => {
@@ -544,7 +541,7 @@ function initializeAceEditors() {
    * Moves focus to the previous focusable element on the page.
    */
   window.focusPreviousElement = () => {
-    const allFocusable = getAllFocusableElements();
+    const allFocusable = window.getAllFocusableElements();
     if (allFocusable.length === 0) return;
   
     const currentElement = document.activeElement.shadowRoot 
@@ -562,7 +559,7 @@ function initializeAceEditors() {
    * Moves focus to the next focusable element on the page.
    */
   window.focusNextElement = () => {
-    const allFocusable = getAllFocusableElements();
+    const allFocusable = window.getAllFocusableElements();
     if (allFocusable.length === 0) return;
   
     const currentElement = document.activeElement.shadowRoot 

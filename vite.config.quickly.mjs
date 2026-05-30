@@ -1,10 +1,22 @@
-import { defineConfig } from 'vite';
+import { defineConfig, createLogger } from 'vite';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
+const logger = createLogger();
+const originalWarn = logger.warn;
+
+logger.warn = (msg, options) => {
+  if (msg.includes('can\'t be bundled without type="module" attribute')) {
+    return;
+  }
+  originalWarn(msg, options);
+};
+
 export default defineConfig({
+  customLogger: logger,
+
   root: resolve(__dirname, 'apps/quickly'),
   resolve: {
     alias: {
@@ -17,6 +29,7 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, 'dist/apps/quickly'),
     emptyOutDir: true,
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       input: resolve(__dirname, 'apps/quickly/index.html'),
     },

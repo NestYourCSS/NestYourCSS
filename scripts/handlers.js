@@ -34,7 +34,7 @@ document.body.addEventListener('pointermove', (e) => {
       nestedNavButtons.style.setProperty('--cursor-y-pos', (e.clientY + offsetY) + 'px');
     }
     else {
-      if (e.target === splashTextElem) attemptSplashTextUpdate();
+      if (e.target === splashTextElem) window.attemptSplashTextUpdate();
       
       const scrollTop = scrollWrapper.scrollTop;
       const editorTop = editorSection.offsetTop;
@@ -44,7 +44,7 @@ document.body.addEventListener('pointermove', (e) => {
       const isEditorBottomNotScrolledPassed = (editorTop + editorHeight + window.innerHeight) > scrollTop;
 
       const isEditorInView = isEditorTopScrolledPassed && isEditorBottomNotScrolledPassed;
-      if (isEditorInView) updateActiveLine(e.clientX, e.clientY);
+      if (isEditorInView) window.updateActiveLine(e.clientX, e.clientY);
     }
   });
 });
@@ -68,7 +68,7 @@ const intersectionObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.01 });
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
-scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof updateLogoState !== 'undefined' && updateLogoState())));
+scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof window.updateLogoState !== 'undefined' && window.updateLogoState())));
 
 function announce(message) {
     const liveRegion = document.getElementById('a11y-live-region');
@@ -77,22 +77,23 @@ function announce(message) {
         requestAnimationFrame(() => { liveRegion.textContent = message; });
     }
 }
+window.announce = announce;
 
 window.tabButtonHandler = (e) => {
   let tabButton = e.currentTarget;
-  let editor = (tabButton.closest('.editorWrapper')?.id.startsWith("input")) ? inputEditorInstance : outputEditorInstance;
+  let editor = (tabButton.closest('.editorWrapper')?.id.startsWith("input")) ? window.inputEditorInstance : window.outputEditorInstance;
 
   switch (tabButton.className) {
     case "tabCopyAll":
       let copiedText = editor.getValue(); 
       navigator.clipboard.writeText(copiedText);
-      announce(i18n.copiedToClipboard);
+      announce(window.i18n.copiedToClipboard);
       break;
     case "tabInsertCSS":
       window.insertCSSFileInput.click();
       break;
     case "tabOpenRaw":
-      announce(i18n.openingNewWindow);
+      announce(window.i18n.openingNewWindow);
 
       let content = editor.getValue();
 
@@ -135,9 +136,9 @@ window.tabButtonHandler = (e) => {
 
       break;
     case "tabDeleteAll":
-      if (confirm(i18n.confirmDeleteAll)) {
+      if (confirm(window.i18n.confirmDeleteAll)) {
         editor.setValue("");
-        announce(i18n.contentDeleted);
+        announce(window.i18n.contentDeleted);
       }
       break;
   }
@@ -170,16 +171,16 @@ window.setupDragAndDrop = (editor) => {
       if (file && (file.type === "text/css" || file.name.endsWith('.css'))) { // css file
           const reader = new FileReader();
           reader.onload = (event) => {
-            inputEditorInstance.setValue(event.target.result);
-            announce(i18n.fileImported + ": " + file.name);
+            window.inputEditorInstance.setValue(event.target.result);
+            announce(window.i18n.fileImported + ": " + file.name);
           };
           reader.readAsText(file);
       }
       else if (e.dataTransfer.getData('text/plain')) {
-        announce(i18n.textInsertedDragDrop);
+        announce(window.i18n.textInsertedDragDrop);
       }
       else {
-          announce(i18n.onlyCSSFilesAllowed);
+          announce(window.i18n.onlyCSSFilesAllowed);
       }
   });
 };
@@ -198,7 +199,7 @@ window.addEventListener('load', () => {
     deferredScripts.forEach((dScript) => dScript());
 
     document.querySelectorAll('#strechingText, #visibleText u b').forEach(element => {
-      splitTextForAnimation(element);
+      window.splitTextForAnimation(element);
     });
   }, 100);
 });

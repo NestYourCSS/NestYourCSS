@@ -27,7 +27,7 @@ function initializeSmoothScrollAndNestingController() {
     if (window.prefersReducedMotion) lenisOpts.lerp = 1;
     const newLenis = new Lenis(lenisOpts);
 
-    if (window.currentLenis == null && newLenis.dimensions.wrapper == siteWrapper) {
+    if (window.currentLenis == null && newLenis.dimensions.wrapper == scrollWrapper) {
       // 3. Use the 'scroll' event to check the position
       newLenis.on('scroll', (e) => {
         const maxScrollTop = mainElement.nextElementSibling.offsetHeight;
@@ -69,9 +69,9 @@ function initializeSmoothScrollAndNestingController() {
     if (nestBtn) nestBtn.disabled = false;
   
     // Update UI state (Editor <-> Homepage)
-    document.title = window.isNesting ? i18n.pageTitleEditor : i18n.pageTitleHomepage;
-    if (nestBtn) nestBtn.setAttribute('aria-label', window.isNesting ? i18n.viewHomepage : i18n.startNesting);
-    toggleBtn.textContent = window.isNesting ? i18n.startNesting : i18n.visitHomepage;
+    document.title = window.isNesting ? window.i18n.pageTitleEditor : window.i18n.pageTitleHomepage;
+    if (nestBtn) nestBtn.setAttribute('aria-label', window.isNesting ? window.i18n.viewHomepage : window.i18n.startNesting);
+    toggleBtn.textContent = window.isNesting ? window.i18n.startNesting : window.i18n.visitHomepage;
   };
   
   const observer = new MutationObserver(() => {

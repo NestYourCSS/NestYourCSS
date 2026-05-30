@@ -56,6 +56,8 @@ const i18n = {
     contentDeleted: 'Content deleted',
 };
 
+window.i18n = i18n;
+
 function applyI18n() {
     document.getElementById('settingsBtn')?.setAttribute('title', i18n.settings);
     document.getElementById('settingsBtn')?.setAttribute('aria-label', i18n.settings);
