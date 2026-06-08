@@ -74,6 +74,11 @@ function nestCode(onClick = false) {
     if (nestBtn?.hasAttribute('disabled')) return; 
 
     if (onClick) {
+        if (nestBtn) nestBtn.disabled = true;
+        if (typeof toggleBtn !== 'undefined' && toggleBtn) {
+            toggleBtn.style.pointerEvents = 'none';
+        }
+
         mainElement.classList.toggle('nesting', !window.isNesting);
         if (window.isNesting) return;  
         scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
