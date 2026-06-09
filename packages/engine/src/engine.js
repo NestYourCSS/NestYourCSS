@@ -1,9 +1,11 @@
 let _preserveComments = false;
 let _indentChar = '\t';
+let _maxDepth = Infinity;
 
 export function configureEngine(opts = {}) {
   if (opts.preserveComments !== undefined) _preserveComments = opts.preserveComments;
   if (opts.indentChar !== undefined) _indentChar = opts.indentChar;
+  if (opts.maxDepth !== undefined) _maxDepth = opts.maxDepth === 0 ? Infinity : opts.maxDepth;
 }
 
 function parseSelector(selectorText) {
@@ -903,7 +905,7 @@ export function renestCSS(ast) {
         return { typeOrder, score };
     }
 
-    function _renest(node) {
+    function _renest(node, depth = 0) {
         if (!node.body || node.body.length === 0) {
             return;
         }
@@ -912,6 +914,16 @@ export function renestCSS(ast) {
         const n = body.length;
         const parentOf = new Int32Array(n).fill(-1);
         const rels = new Array(n);
+
+        function getDepth(nodeIndex, parentArray) {
+            let d = 0;
+            let cur = parentArray[nodeIndex];
+            while (cur !== -1) {
+                d++;
+                cur = parentArray[cur];
+            }
+            return d;
+        }
 
         const firstTokenMap = new Map();
         const lastTokenMap = new Map();
@@ -1005,6 +1017,21 @@ export function renestCSS(ast) {
             }
         }
 
+        let depthChanged = true;
+        while (depthChanged) {
+            depthChanged = false;
+            for (let i = 0; i < n; i++) {
+                if (parentOf[i] !== -1) {
+                    const totalDepth = depth + getDepth(i, parentOf);
+                    if (totalDepth > _maxDepth) {
+                        parentOf[i] = -1;
+                        rels[i] = null;
+                        depthChanged = true;
+                    }
+                }
+            }
+        }
+
         const newBody = [];
         for (let i = 0; i < n; i++) {
             if (parentOf[i] === -1) {
@@ -1030,11 +1057,11 @@ export function renestCSS(ast) {
 
         for (const childNode of node.body) {
             if (childNode.type === 'Rule' || (childNode.type === 'AtRule' && childNode.body)) {
-                _renest(childNode);
+                _renest(childNode, depth + 1);
             }
         }
     }
 
-    _renest(ast);
+    _renest(ast, 0);
     return ast;
 }

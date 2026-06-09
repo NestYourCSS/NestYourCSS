@@ -169,6 +169,19 @@
         window.preserveComments = !value;
         configureEngine({ preserveComments: !value, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      nestingDepth: (value) => {
+        const infinite = store.nestingDepthInfinite;
+        const stepper = document.getElementById('nestingDepth');
+        if (stepper) stepper.disabled = infinite;
+        configureEngine({ maxDepth: infinite ? Infinity : value, indentChar: window.editorIndentChar || '\t' });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      nestingDepthInfinite: (value) => {
+        const stepper = document.getElementById('nestingDepth');
+        if (stepper) stepper.disabled = value;
+        configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
       }
     });
 
@@ -214,6 +227,16 @@
     // Auto
     document.getElementById('auto').addEventListener('change', (e) => {
       store.auto = e.detail;
+    });
+
+    // Max Depth
+    document.getElementById('nestingDepth').addEventListener('change', (e) => {
+      store.nestingDepth = e.detail;
+    });
+
+    // Max Depth Infinite
+    document.getElementById('nestingDepthInfinite').addEventListener('change', (e) => {
+      store.nestingDepthInfinite = e.detail;
     });
 
     // Apply initial state to components (DOM only, not editors)

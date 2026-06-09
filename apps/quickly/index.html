@@ -63,7 +63,7 @@
                 <li>
                   <span id="indentation-type-label">Indentation</span>
                   <div>
-                    <nycss-toggle id="indentationType" label="Indentation" on-text="Hard" off-text="Soft"></nycss-toggle>
+                    <nycss-toggle id="indentationType" on-text="Hard" off-text="Soft"></nycss-toggle>
 
                     <nycss-stepper id="indentationSize" label="Size:" min="1" max="16"></nycss-stepper>
                   </div>
@@ -71,7 +71,7 @@
                 <li>
                   <span id="word-wrap-label">Word Wrap</span>
                   <div>
-                    <nycss-toggle id="wordWrap" label="Word Wrap" off-text="Off" on-text="On"></nycss-toggle>
+                    <nycss-toggle id="wordWrap" off-text="Off" on-text="On"></nycss-toggle>
                   </div>
                 </li>
                 <li>
@@ -93,7 +93,7 @@
                 <li>
                   <span id="preserveComments-label">Comments?</span>
                   <div>
-                    <nycss-toggle id="preserveComments" label="Comments?" off-text="Yes" on-text="No"></nycss-toggle>
+                    <nycss-toggle id="preserveComments" off-text="Yes" on-text="No"></nycss-toggle>
                   </div>
                 </li>
                 <li>
@@ -110,7 +110,14 @@
                 <li>
                   <span id="auto-label">Auto</span>
                   <div>
-                    <nycss-toggle id="auto" label="Auto" on-text="On" off-text="Off"></nycss-toggle>
+                    <nycss-toggle id="auto" on-text="On" off-text="Off"></nycss-toggle>
+                  </div>
+                </li>
+                <li>
+                  <span id="max-depth-label">Max Depth</span>
+                  <div>
+                    <nycss-stepper id="nestingDepth" label="Level:" valeu="3" min="1" max="10"></nycss-stepper>
+                    <nycss-toggle id="nestingDepthInfinite" on-text="Infinite" off-text="Limited"></nycss-toggle>
                   </div>
                 </li>
               </ul>

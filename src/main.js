@@ -16,6 +16,8 @@ const settingsConfig = {
   mode: { defaultValue: 3 },
   auto: { defaultValue: true },
   preserveComments: { defaultValue: false },
+  nestingDepth: { defaultValue: 3 },
+  nestingDepthInfinite: { defaultValue: true },
 };
 
 const defaults = {};

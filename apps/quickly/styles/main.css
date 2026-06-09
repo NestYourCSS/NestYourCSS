@@ -272,7 +272,7 @@ html {
     }
 }
 
-#mainSettings > section > ul > li > div > :is(.dropdown, .combobox, .toggle, .radio-group) {
+#mainSettings > section > ul > li > div > :first-child {
     flex: 1;
 }
 
@@ -283,16 +283,6 @@ html {
 }
 
 /* Stepper - quickly uses inline arrows */
-#mainSettings .number {
-    display: flex;
-    gap: 1rem;
-}
-
-#mainSettings .number > output {
-    display: flex;
-    align-items: center;
-}
-
 #mainSettings .number > output > input {
     background: transparent;
     border: none;

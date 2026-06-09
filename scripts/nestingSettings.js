@@ -117,6 +117,19 @@
         const label = document.querySelector('#preserveComments');
         if (label) label.classList.toggle('button', !window.preserveComments);
         if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      nestingDepth: (value) => {
+        const infinite = store.nestingDepthInfinite;
+        const stepper = document.getElementById('nestingDepth');
+        if (stepper) stepper.disabled = infinite;
+        configureEngine({ maxDepth: infinite ? Infinity : value, indentChar: window.editorIndentChar || '\t' });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      nestingDepthInfinite: (value) => {
+        const stepper = document.getElementById('nestingDepth');
+        if (stepper) stepper.disabled = value;
+        configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
       }
     });
 

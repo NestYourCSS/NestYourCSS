@@ -5,27 +5,42 @@ function initializeSmoothScrollAndNestingController() {
   window.currentLenis = null;
 
   // Helper to check if we should skip animations
-  const shouldSkipMotion = () => window.prefersReducedMotion || 
-                               window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldSkipMotion = () => {
+    const result = window.prefersReducedMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    console.log('[NEST] shouldSkipMotion:', result, '| window.prefersReducedMotion:', window.prefersReducedMotion);
+    return result;
+  };
 
   // --- Methods ---
   window.switchToNestingMode = () => {
-    if (mainElement.classList.contains('nesting')) return;
+    console.log('[NEST] switchToNestingMode called | DOM has nesting:', mainElement.classList.contains('nesting'));
+    if (mainElement.classList.contains('nesting')) {
+      console.log('[NEST] switchToNestingMode: already nesting, returning');
+      return;
+    }
     mainElement.classList.add('nesting');
+    console.log('[NEST] switchToNestingMode: added nesting class');
   };
 
   window.switchToHomepage = () => {
-    if (!mainElement.classList.contains('nesting')) return;
+    console.log('[NEST] switchToHomepage called | DOM has nesting:', mainElement.classList.contains('nesting'));
+    if (!mainElement.classList.contains('nesting')) {
+      console.log('[NEST] switchToHomepage: already homepage, returning');
+      return;
+    }
     mainElement.classList.remove('nesting');
+    console.log('[NEST] switchToHomepage: removed nesting class');
   };
 
   window.lockToNestingMode = () => {
+    console.log('[NEST] lockToNestingMode called');
     window._nestingLocked = true;
     window.switchToNestingMode();
     if (nestBtn) nestBtn.style.display = 'none';
   };
 
   window.unlockNestingMode = () => {
+    console.log('[NEST] unlockNestingMode called');
     window._nestingLocked = false;
     if (nestBtn) nestBtn.style.display = '';
   };
@@ -56,12 +71,21 @@ function initializeSmoothScrollAndNestingController() {
   async function handleNestingChange(isCurrentlyNesting) {
     // 1. Increment sequence ID so older "ghost" calls know to stop
     const currentCallId = ++transitionId;
+    console.log('[NEST] handleNestingChange ENTER | currentCallId:', currentCallId, '| isCurrentlyNesting:', isCurrentlyNesting, '| transitionId:', transitionId);
+    console.log('[NEST] handleNestingChange | window.isNesting BEFORE:', window.isNesting, '| btn disabled:', nestBtn?.disabled);
     
     window.isNesting = isCurrentlyNesting;
+    console.log('[NEST] handleNestingChange | window.isNesting SET to:', window.isNesting);
 
     // 2. Immediate UI Feedback (Disable both buttons)
-    if (nestBtn) nestBtn.disabled = true;
-    if (window.toggleBtn) window.toggleBtn.style.pointerEvents = 'none'; // Guard the skip link
+    if (nestBtn) {
+      console.log('[NEST] handleNestingChange | disabling nestBtn');
+      nestBtn.disabled = true;
+    }
+    if (window.toggleBtn) {
+      console.log('[NEST] handleNestingChange | disabling toggleBtn pointer-events');
+      window.toggleBtn.style.pointerEvents = 'none'; // Guard the skip link
+    }
 
     // Update 'inert' immediately for accessibility
     [mainSettings, mainElement.nextElementSibling, textSideElem].forEach((elem, i) => {
@@ -79,40 +103,55 @@ function initializeSmoothScrollAndNestingController() {
       const target = isSmallScreen ? document.querySelector('#outputEditorWrapper') : animatingElem;
       const eventType = isSmallScreen ? 'transitionend' : 'animationend';
 
+      console.log('[NEST] handleNestingChange | waiting for transition. target:', target?.id, '| eventType:', eventType);
       if (target) {
         await waitElementTransitionEnd(target, 2000, eventType);
+        console.log('[NEST] handleNestingChange | transition ended');
       }
     } else {
-      // If reduced motion is on, skip the wait entirely!
-      await Promise.resolve();
+      console.log('[NEST] handleNestingChange | SKIPPING transition wait (reduced motion)');
     }
 
     // 4. THE GUARD: If a newer click happened, stop here and let that call finish.
-    if (currentCallId !== transitionId) return;
+    if (currentCallId !== transitionId) {
+      console.log('[NEST] handleNestingChange | GUARD TRIGGERED: currentCallId', currentCallId, '!== transitionId', transitionId, '→ returning early');
+      return;
+    }
+    console.log('[NEST] handleNestingChange | GUARD PASSED: currentCallId', currentCallId, '=== transitionId', transitionId);
 
     // 5. Finalize UI
     if (nestBtn) {
+      console.log('[NEST] handleNestingChange | re-enabling nestBtn, aria-label:', window.isNesting ? 'viewHomepage' : 'startNesting');
       nestBtn.disabled = false;
       nestBtn.setAttribute('aria-label', window.isNesting ? window.i18n.viewHomepage : window.i18n.startNesting);
     }
     
     if (window.toggleBtn) {
+      console.log('[NEST] handleNestingChange | re-enabling toggleBtn, text:', window.isNesting ? window.i18n.visitHomepage : window.i18n.startNesting);
       window.toggleBtn.style.pointerEvents = ''; // Re-enable skip link
       window.toggleBtn.textContent = window.isNesting ? window.i18n.visitHomepage : window.i18n.startNesting;
     }
 
-    document.title = window.isNesting ? window.i18n.pageTitleEditor : window.i18n.pageTitleHomepage;
+    const newTitle = window.isNesting ? window.i18n.pageTitleEditor : window.i18n.pageTitleHomepage;
+    console.log('[NEST] handleNestingChange | setting document.title:', newTitle);
+    document.title = newTitle;
+    console.log('[NEST] handleNestingChange EXIT');
   }
 
   // --- Observer ---
   const observer = new MutationObserver(() => {
     const isCurrentlyNesting = mainElement.classList.contains('nesting');
+    console.log('[NEST] MutationObserver fired | DOM has nesting:', isCurrentlyNesting, '| window.isNesting:', window.isNesting, '| btn disabled:', nestBtn?.disabled, '| _nestingLocked:', window._nestingLocked);
     if (isCurrentlyNesting !== window.isNesting) {
+      console.log('[NEST] MutationObserver: state DIFFERS, will handle');
       if (window._nestingLocked && !isCurrentlyNesting) {
+        console.log('[NEST] MutationObserver: _nestingLocked true AND class removed → calling switchToNestingMode');
         window.switchToNestingMode();
         return;
       }
       handleNestingChange(isCurrentlyNesting);
+    } else {
+      console.log('[NEST] MutationObserver: state MATCHES, no action taken');
     }
   });
 

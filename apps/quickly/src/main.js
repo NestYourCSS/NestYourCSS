@@ -16,6 +16,8 @@ const store = createStore({
   mode: 3,
   auto: true,
   preserveComments: false,
+  nestingDepth: 3,
+  nestingDepthInfinite: true,
 }, {
   key: 'nycss-settings',
   onSet: {

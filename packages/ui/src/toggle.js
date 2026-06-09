@@ -1,5 +1,5 @@
 export class NycssToggle extends HTMLElement {
-  static observedAttributes = ['checked', 'label'];
+  static observedAttributes = ['checked'];
 
   get checked() { return this.hasAttribute('checked'); }
   set checked(v) { v ? this.setAttribute('checked', '') : this.removeAttribute('checked'); }

@@ -422,6 +422,10 @@
         color: var(--component-text);
         font-size: 1rem;
 
+        > :first-child {
+            flex: 1;
+        }
+
         > #externalCss {
           max-width: 100%;
         }
@@ -437,15 +441,6 @@
           display: flex;
           align-items: center;
           gap: var(--component-gap);
-        }
-
-        > label,
-        > nycss-dropdown,
-        > nycss-combobox,
-        > nycss-toggle,
-        > nycss-stepper,
-        > nycss-radio-group {
-          flex: 1;
         }
 
         > nycss-radio-group.button {
@@ -1415,7 +1410,7 @@
       animation: moveRight 2s cubic-bezier(1, 0, 0.5, 1) both;
 
       @media (prefers-reduced-motion: reduce) {
-        animation-delay: -2s;
+        animation: none;
       }
 
       > #codeEditor > .editorWrapper {
@@ -1529,7 +1524,8 @@
           animation: moveLeft 2s cubic-bezier(1, 0, 0.5, 1) both;
 
           @media (prefers-reduced-motion: reduce) {
-            animation-delay: -2s;
+            animation: none;
+            translate: calc(0% - var(--padding));
           }
 
           #editorGap {

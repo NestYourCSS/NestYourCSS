@@ -71,25 +71,49 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
 };  
     
 function nestCode(onClick = false) {  
-    if (nestBtn?.hasAttribute('disabled')) return; 
+    console.log('[NEST] nestCode called | onClick:', onClick, '| window.isNesting:', window.isNesting, '| DOM .contains("nesting"):', mainElement?.classList.contains('nesting'), '| btn disabled:', nestBtn?.disabled, '| btn hasAttribute disabled:', nestBtn?.hasAttribute('disabled'));
+
+    if (nestBtn?.hasAttribute('disabled')) {
+        console.log('[NEST] nestCode: BUTTON DISABLED, returning early');
+        return;
+    }
 
     if (onClick) {
-        if (nestBtn) nestBtn.disabled = true;
+        console.log('[NEST] nestCode: onClick branch | wasNesting (window.isNesting):', window.isNesting);
+
+        if (nestBtn) {
+            nestBtn.disabled = true;
+            console.log('[NEST] nestCode: nestBtn disabled set to true');
+        }
         if (typeof toggleBtn !== 'undefined' && toggleBtn) {
             toggleBtn.style.pointerEvents = 'none';
         }
 
+        const domState = mainElement.classList.contains('nesting');
+        console.log('[NEST] nestCode: about to toggle | DOM has nesting:', domState, '| window.isNesting:', window.isNesting, '| toggle force:', !window.isNesting);
+        
         mainElement.classList.toggle('nesting', !window.isNesting);
-        if (window.isNesting) return;  
+        
+        console.log('[NEST] nestCode: after toggle | DOM has nesting:', mainElement.classList.contains('nesting'), '| window.isNesting still:', window.isNesting);
+        
+        if (window.isNesting) {
+            console.log('[NEST] nestCode: was nesting, returning early (going to homepage)');
+            return;
+        }
+        
+        console.log('[NEST] nestCode: was NOT nesting, scrolling to top and continuing (going to nesting)');
         scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
     }  
-  
-    if (typeof window.outputEditorInstance === 'undefined' || !window.inputEditorInstance) return;  
+   
+    if (typeof window.outputEditorInstance === 'undefined' || !window.inputEditorInstance) {
+        console.log('[NEST] nestCode: editors not ready, returning');
+        return;
+    }
 
-    if (typeof window.announce === 'function') window.announce(window.i18n.processing);
+    if (typeof window.announce === 'function') window.announce(window.i18n.process);
     const wrapper = document.getElementById('codeEditor') || document.getElementById('siteWrapper');
     if (wrapper) wrapper.setAttribute('aria-busy', 'true');
-  
+   
     let tableBodyElem = errorTable.tBodies[0];  
 	const annotations = window.inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
 	if (annotations.length == 0) {  
@@ -99,7 +123,7 @@ function nestCode(onClick = false) {
         if (typeof window.announce === 'function') window.announce(window.i18n.conversionComplete);
 	} else {  
 		window.outputEditorInstance.getSession().setValue(window.i18n.cssContainsErrors);  
-		console.log('Code Errors:', annotations);  
+		console.log('[NEST] Code Errors:', annotations);  
 		  
         updateAccessibleErrorTable(  
           annotations,  
@@ -110,7 +134,8 @@ function nestCode(onClick = false) {
         if (typeof window.announce === 'function') window.announce(window.i18n.cssContainsErrors);
 	}  
     if (wrapper) wrapper.removeAttribute('aria-busy');
-};  
+    console.log('[NEST] nestCode: finished normally');
+};
   
 function convertToNestedCSS(cssProvided, htmlString) {  
 	window.processMode ??= 3; // 0: Minify, 1: Beautify, 2: Denest, 3: Nest  

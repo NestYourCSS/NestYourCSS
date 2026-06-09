@@ -6,5 +6,8 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test test/engine.test.js"
   }
 }

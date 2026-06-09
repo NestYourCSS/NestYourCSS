@@ -163,7 +163,8 @@
     outline: none !important;
     user-select: none;
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     border-radius: 1rem;
     background: var(--component-background);
   }
@@ -202,7 +203,6 @@
   nycss-toggle > span {
     position: relative;
     cursor: pointer;
-    flex: 1;
     padding: 1rem 2.5ch;
     text-align: center;
     align-content: center;
@@ -217,14 +217,16 @@
      ====================================================================== */
 
   nycss-stepper {
+    display: flex;
     user-select: none;
     position: relative;
     width: fit-content;
     border: none;
     padding: 1rem;
-    gap: calc(2 * var(--component-gap));
+    gap: var(--component-gap);
     background: var(--component-background);
     border-radius: 1rem;
+    justify-content: center;
   }
 
   nycss-stepper:hover {
@@ -234,6 +236,11 @@
   nycss-stepper:has(input:focus, input:active) {
     z-index: 1;
     box-shadow: var(--component-box-shadow-focused);
+  }
+    
+  nycss-stepper > output {
+      display: flex;
+      align-items: center;
   }
 
   nycss-stepper > output > input {

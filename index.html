@@ -158,8 +158,8 @@
   <link rel="preload" href="./assets/fonts/poppins-medium-latin.otf" as="font" type="font/otf" crossorigin>  
 </head>  
 <body itemscope itemtype="https://schema.org/WebPage">  
-  <button class="skip-to-section" id="nestingToggleBtn">Start Nesting</button>  
   <a class="skip-to-section" href="#reducingBoilerplateCode" onkeydown="if (event.key === ' ' || event.keyCode === 32) event.preventDefault() , this.click();">Learn why we should nest our code.</a>  
+  <button class="skip-to-section" id="nestingToggleBtn">Start Nesting</button>  
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-543TRXJR" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>  
   <svg hidden xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -203,8 +203,7 @@
   </svg>  
   
   <div id="siteWrapper">  
-    <main role="main">  
-    <!-- <main class="nesting"> -->  
+    <main role="main">
       <div id="a11y-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
       <button id="settingsBtn" class="header-btn vibrant" title="Settings" aria-label="Settings">  
         <i class="ph ph-gear-six"></i>  
@@ -273,14 +272,14 @@
               <li>  
                 <span id="indentation-type-label">Indentation</span>  
                 <div>  
-                  <nycss-toggle id="indentationType" label="Indentation" on-text="Hard" off-text="Soft"></nycss-toggle>  
+                  <nycss-toggle id="indentationType" on-text="Hard" off-text="Soft"></nycss-toggle>  
                   <nycss-stepper id="indentationSize" label="Size:" min="1" max="16"></nycss-stepper>  
                 </div>  
               </li>  
               <li>  
                 <span id="word-wrap-label">Word Wrap</span>  
                 <div>  
-                  <nycss-toggle id="wordWrap" label="Word Wrap" on-text="On" off-text="Off"></nycss-toggle>  
+                  <nycss-toggle id="wordWrap" on-text="On" off-text="Off"></nycss-toggle>  
                 </div>  
               </li>  
               <li>  
@@ -302,7 +301,7 @@
               <li>  
                 <span id="preserveComments-label">Comments?</span>  
                 <div>  
-                  <nycss-toggle id="preserveComments" label="Comments?" off-text="Yes" on-text="No"></nycss-toggle>  
+                  <nycss-toggle id="preserveComments" off-text="Yes" on-text="No"></nycss-toggle>  
                 </div>  
               </li>  
               <li>  
@@ -319,7 +318,14 @@
               <li>  
                 <span id="auto-label">Auto</span>  
                 <div>  
-                  <nycss-toggle id="auto" label="Auto" on-text="On" off-text="Off"></nycss-toggle>  
+                  <nycss-toggle id="auto" on-text="On" off-text="Off"></nycss-toggle>  
+                </div>  
+              </li>  
+              <li>  
+                <span id="max-depth-label">Max Depth</span>  
+                <div>  
+                  <nycss-stepper id="nestingDepth" label="Level:" min="1" max="10"></nycss-stepper>  
+                  <nycss-toggle id="nestingDepthInfinite" on-text="Infinite" off-text="Limited"></nycss-toggle>  
                 </div>  
               </li>  
             </ul>  
@@ -466,7 +472,7 @@
               <span class="orb2" aria-hidden="true"></span>  
               <span class="orb3" aria-hidden="true"></span>  
               
-              <div onclick="typeof nestCode !== 'undefined' && nestCode(true);"></div>  
+              <div onclick="event.stopPropagation(); typeof nestCode !== 'undefined' && nestCode(true);"></div>  
             </button>  
             <div id="codeEditor">  
               <div class="editor" id="inputEditor"></div>  
