@@ -713,6 +713,14 @@ export function denestCSS(ast) {
                         if (childNodes[0].spacesAbove === 0) childNodes[0].spacesAbove = 1;
                     }
                     denestedNodes.push(...childNodes);
+                } else if (node.body.length === 0) {
+                    const emptyRule = {
+                        type: 'Rule',
+                        selector: cloneASTNode(newSelector),
+                        body: [],
+                        spacesAbove: denestedNodes.length > 0 && ['Rule', 'AtRule'].includes(denestedNodes.at(-1)?.type) ? 1 : 0
+                    };
+                    denestedNodes.push(emptyRule);
                 }
             }
 
@@ -739,6 +747,12 @@ export function denestCSS(ast) {
                     denestedNodes.push(atRuleWrapper);
                 } else if (node.body === null) {
                     denestedNodes.push(cloneASTNode(node));
+                } else if (node.body.length === 0) {
+                    const emptyAtRule = cloneASTNode(node);
+                    emptyAtRule.params = combinedAtRuleParams;
+                    emptyAtRule.body = [];
+                    if (denestedNodes.length > 0) emptyAtRule.spacesAbove = 1;
+                    denestedNodes.push(emptyAtRule);
                 }
             }
         }
