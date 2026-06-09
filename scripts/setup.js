@@ -386,11 +386,7 @@ function initializeAceEditors() {
   };
   
   toggleBtn.addEventListener('click', () => {
-    console.log('[NEST] toggleBtn clicked');
-    if (typeof window.nestCode === 'undefined') {
-      console.log('[NEST] toggleBtn: nestCode undefined, returning');
-      return;
-    }
+    if (typeof window.nestCode === 'undefined') return;
 
     window.nestCode(true);
   });
