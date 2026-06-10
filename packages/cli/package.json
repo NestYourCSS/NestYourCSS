@@ -1,0 +1,25 @@
+{
+  "name": "@nycss/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "nycss": "./dist/nycss.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "node --test test/cli.spec.js",
+    "build": "esbuild bin/nycss.js --bundle --platform=node --format=esm --outfile=dist/nycss.js --packages=external --banner:js=\"#!/usr/bin/env node\""
+  },
+  "dependencies": {
+    "@nycss/engine": "workspace:*",
+    "cac": "^6.7.14",
+    "chokidar": "^3.6.0",
+    "fast-glob": "^3.3.2",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
