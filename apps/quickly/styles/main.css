@@ -341,6 +341,13 @@ html {
     opacity: 0;
 }
 
+#mainSettings .number[disabled],
+#mainSettings .number[disabled] *,
+#mainSettings .toggle[disabled],
+#mainSettings .toggle[disabled] * {
+    cursor: not-allowed;
+}
+
 body {
     font-size: clamp(8px, 1.5vh, 24px);
     margin: 0;

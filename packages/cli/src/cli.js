@@ -45,7 +45,7 @@ function transformCSS(cssString, opts) {
   configureEngine({
     preserveComments: opts.comments !== false,
     indentChar: opts._indentChar,
-    maxDepth: opts.depth !== undefined ? parseInt(opts.depth, 10) : undefined,
+    maxDepth: opts.depth !== undefined ? (parseInt(opts.depth, 10) || Infinity) : undefined,
   });
 
   const ast = parseCSS(cssString);

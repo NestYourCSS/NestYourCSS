@@ -5,7 +5,7 @@ let _maxDepth = Infinity;
 export function configureEngine(opts = {}) {
   if (opts.preserveComments !== undefined) _preserveComments = opts.preserveComments;
   if (opts.indentChar !== undefined) _indentChar = opts.indentChar;
-  if (opts.maxDepth !== undefined) _maxDepth = opts.maxDepth === 0 ? Infinity : opts.maxDepth;
+  if (opts.maxDepth !== undefined) _maxDepth = opts.maxDepth;
 }
 
 function parseSelector(selectorText) {

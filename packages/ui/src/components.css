@@ -208,8 +208,16 @@
     align-content: center;
   }
 
-  nycss-toggle > span:hover {
+  nycss-toggle:not([disabled]) > span:hover {
     color: var(--component-text-hover);
+  }
+
+  nycss-toggle[disabled],
+  nycss-toggle[disabled] * {
+    cursor: not-allowed;
+  }
+  nycss-toggle[disabled] {
+    opacity: 0.5;
   }
 
   /* ======================================================================
@@ -229,11 +237,11 @@
     justify-content: center;
   }
 
-  nycss-stepper:hover {
+  nycss-stepper:not([disabled]):hover {
     color: var(--component-text-hover);
   }
 
-  nycss-stepper:has(input:focus, input:active) {
+  nycss-stepper:not([disabled]):has(input:focus, input:active) {
     z-index: 1;
     box-shadow: var(--component-box-shadow-focused);
   }
@@ -247,6 +255,10 @@
     cursor: auto;
     display: inline-block;
     outline: none !important;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 
   nycss-stepper > output > input[type="text"] {
@@ -275,6 +287,14 @@
     cursor: pointer;
     width: 1ch;
     fill: var(--component-text-accent);
+  }
+
+  nycss-stepper[disabled],
+  nycss-stepper[disabled] * {
+    cursor: not-allowed;
+  }
+  nycss-stepper[disabled] {
+    opacity: 0.5;
   }
 
   /* ======================================================================

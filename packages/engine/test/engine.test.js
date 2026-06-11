@@ -42,10 +42,10 @@ describe('renestCSS with maxDepth', () => {
     assert.ok(depth >= 3, `Expected deep nesting with Infinity, got nesting depth ${depth}`);
   });
 
-  it('should nest fully when maxDepth is 0 (treated as Infinity by config)', () => {
+  it('should produce flat CSS when maxDepth is 0 (no nesting)', () => {
     const result = nest(deeplyNestableCSS, 0);
     const depth = nestingDepth(result);
-    assert.ok(depth >= 3, `Expected deep nesting with maxDepth=0, got nesting depth ${depth}`);
+    assert.ok(depth === 0, `Expected no nesting with maxDepth=0, got nesting depth ${depth}`);
   });
 
   it('should limit nesting to depth 1 when maxDepth is 1', () => {
@@ -60,14 +60,14 @@ describe('renestCSS with maxDepth', () => {
     assert.ok(depth <= 2, `Expected max depth 2, got nesting depth ${depth}`);
   });
 
-  it('should treat maxDepth=0 as Infinity (no limit)', () => {
+  it('should produce flat CSS when maxDepth is 0', () => {
     const result = nest(deeplyNestableCSS, 0);
     const depth = nestingDepth(result);
-    assert.ok(depth >= 3, `Expected full nesting with maxDepth=0, got nesting depth ${depth}`);
+    assert.ok(depth === 0, `Expected no nesting with maxDepth=0, got nesting depth ${depth}`);
   });
 
   it('should preserve existing nesting behavior with default maxDepth', () => {
-    configureEngine({ indentChar: '\t' });
+    configureEngine({ maxDepth: Infinity, indentChar: '\t' });
     const ast = parseCSS(deeplyNestableCSS);
     renestCSS(ast);
     const result = beautifyCSS(ast);

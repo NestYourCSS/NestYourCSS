@@ -1,10 +1,12 @@
 export class NycssStepper extends HTMLElement {
-  static observedAttributes = ['value', 'min', 'max', 'label'];
+  static observedAttributes = ['value', 'min', 'max', 'label', 'disabled'];
 
   get value() { return parseInt(this.getAttribute('value')) || 0; }
   set value(v) { this.setAttribute('value', v); }
   get min() { return parseInt(this.getAttribute('min')) || 0; }
   get max() { return parseInt(this.getAttribute('max')) || 99999; }
+  get disabled() { return this.hasAttribute('disabled'); }
+  set disabled(v) { v ? this.setAttribute('disabled', '') : this.removeAttribute('disabled'); }
 
   connectedCallback() {
     this.classList.add('number');
@@ -29,6 +31,7 @@ export class NycssStepper extends HTMLElement {
     this.output = this.querySelector('output');
 
     this.input.addEventListener('input', () => {
+      if (this.disabled) return;
       let v = parseInt(this.input.value) || 0;
       v = Math.max(this.min, Math.min(v, this.max));
       this.value = v;
@@ -40,12 +43,14 @@ export class NycssStepper extends HTMLElement {
     });
 
     this.input.addEventListener('keydown', (e) => {
+      if (this.disabled) return;
       if (e.key === 'ArrowUp') { e.preventDefault(); this._step(1); }
       if (e.key === 'ArrowDown') { e.preventDefault(); this._step(-1); }
     });
 
     this._addHoldSupport(this.upBtn, 1);
     this._addHoldSupport(this.downBtn, -1);
+    this._updateDisabled();
   }
 
   _addHoldSupport(btn, dir) {
@@ -81,9 +86,17 @@ export class NycssStepper extends HTMLElement {
       this.input.value = newVal;
       this._adjustWidth();
     }
+    if (name === 'disabled' && this.input) {
+      this._updateDisabled();
+    }
+  }
+
+  _updateDisabled() {
+    this.input.disabled = this.disabled;
   }
 
   _step(dir) {
+    if (this.disabled) return;
     let v = this.value + dir;
     v = Math.max(this.min, Math.min(v, this.max));
     this.value = v;
