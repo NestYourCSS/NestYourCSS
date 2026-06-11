@@ -53,6 +53,6 @@ window.editorIndentChar = '\t';
 window.__store = store;
 
 // Register PWA
-registerSW();
+registerSW('./sw.js');
 
 console.log('[QuicklyNYCSS] Monorepo entry point loaded');

@@ -1,5 +1,6 @@
-export function registerSW() {
+export function registerSW(swPath = '/sw.js', scope) {
   if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' });
+    const swScope = scope || (swPath.startsWith('/') ? '/' : undefined);
+    navigator.serviceWorker.register(swPath, { scope: swScope });
   }
 }

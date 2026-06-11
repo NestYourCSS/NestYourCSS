@@ -4,27 +4,12 @@ This document tracks upcoming features, bug fixes, and architectural changes for
 
 ## 🟢 Tier 1 – Trivial (Single Attribute/Line Changes)
 
-*   **Set minimum max depth level to 3**
-    *   **Context:** `index.html` & `apps/quickly/index.html` (Settings section).
-    *   **Action:** Find `<nycss-stepper id="nestingDepth" min="1" max="10">` and change the `min` attribute to `3`.
-*   **Disable stepper if "Infinite" is selected**
-    *   **Context:** `packages/ui/src/stepper.js` and the state bindings in `scripts/nestingSettings.js` / `apps/quickly/scripts/settings.js`.
-    *   **Action:** Ensure the `nestingDepthInfinite` subscriber in the store properly toggles the `disabled` attribute or class on the `<nycss-stepper id="nestingDepth">` element.
-*   **Add placeholders to setting components**
-    *   **Context:** `packages/ui/src/combobox.js` and `dropdown.js`.
-    *   **Action:** Ensure the web components correctly parse and render the `placeholder` attribute down to the internal `<input>` or `<div contenteditable="true">`.
-*   **Show file size checkbox**
-    *   **Context:** `index.html` (Settings panel) & `src/main.js` (State config).
-    *   **Action:** Add a `<nycss-toggle id="showFileSize">` to the HTML, add it to the proxy store default values, and link it to a UI function that calculates `new Blob([editor.getValue()]).size`.
 *   **Show minimap checkbox**
     *   **Context:** Settings HTML and Ace Editor initialization (`scripts/setup.js`).
     *   **Action:** Add `<nycss-toggle id="showMinimap">`, add state variable, and dynamically toggle the Ace Editor minimap (requires Ace minimap extension).
 *   **Show sticky scroll checkbox**
     *   **Context:** Settings HTML and Ace Editor.
     *   **Action:** Add `<nycss-toggle id="showStickyScroll">`. Link it to Ace's sticky scroll configuration.
-*   **Indentation input field**
-    *   **Context:** Settings HTML.
-    *   **Action:** Validate if the current `<nycss-stepper id="indentationSize">` satisfies this. If a direct text input is preferred, swap it for a standard input or `<nycss-combobox>`.
 
 ---
 
@@ -33,18 +18,6 @@ This document tracks upcoming features, bug fixes, and architectural changes for
 *   **Sticky Scroll**
     *   **Context:** `index.html` and `scripts/setup.js`.
     *   **Action:** Uncomment `<script src="./lib/ace/scripts/ext-stickyscroll.js"></script>` in `index.html`. In `setup.js`, add `editor.setOption("stickyScroll", true)` inside `initEditor()`, bound to the new store setting.
-*   **Fix PWA caching**
-    *   **Context:** `packages/pwa/src/sw.js` and Vite build process.
-    *   **Action:** Currently, `sw.js` hardcodes `/styles/app.min.css`. Since Vite hashes filenames (e.g., `main-[hash].css`), use Vite PWA plugin (`vite-plugin-pwa`) or write a script in `postbuild.mjs` to inject the correct hashed filenames into the Service Worker cache list.
-*   **Add an anti-adblock background with a border**
-    *   **Context:** `styles/main.css` (Ads scope: `#textSide > figure`).
-    *   **Action:** Add a background placeholder image/text and a border behind the `.adsbygoogle` container. If the ad fails to load (height == 0), the fallback UI will naturally show.
-*   **Auto-save every minute**
-    *   **Context:** `scripts/setup.js` (Editor initialization) and `packages/state`.
-    *   **Action:** Attach a `setInterval` or a debounced `editor.getSession().on('change')` listener that saves `editor.getValue()` to `localStorage`. Add a `<nycss-toggle id="autoSave">` to settings.
-*   **Light/Dark mode toggle**
-    *   **Context:** `styles/main.css` (Root variables) and `packages/state`.
-    *   **Action:** Add a `theme` property to the store. Create a CSS `[data-theme="light"]` selector in `main.css` that overrides the `--shades-*` and background color variables. Swap the Ace editor theme accordingly.
 
 ---
 
@@ -62,9 +35,6 @@ This document tracks upcoming features, bug fixes, and architectural changes for
 *   **Mobile mode settings on main**
     *   **Context:** `scripts/nestingSettings.js` & `styles/main.css`.
     *   **Action:** The logic for popping open the settings on mobile is partially there. Refine the CSS `@media (max-aspect-ratio: 1.097 / 1)` to ensure the settings panel slides up cleanly over the editor.
-*   **Provide functionality for the 5 hero section buttons**
-    *   **Context:** `index.html` (`#textSide > header > nav > a`).
-    *   **Action:** Currently, these are anchors. Wire them up to either trigger scroll-to functions, open new browser tabs, or trigger modals (for feedback/history).
 
 ---
 
@@ -78,7 +48,7 @@ This document tracks upcoming features, bug fixes, and architectural changes for
     *   **Action:** Change the `.fileName` div to `contenteditable="true"`. On `blur` or `Enter`, grab the text. If it's a URL, use the existing `fetch()` logic from `nestingSettings.js` (External CSS setting) to load the code into the editor and update the filename label.
 *   **Centralize the two settings UI**
     *   **Context:** `index.html` vs `apps/quickly/index.html` and `nestingSettings.js` vs `settings.js`.
-    *   **Action:** The `<aside id="mainSettings">` is duplicated. Extract this into a Web Component (e.g., `<nycss-settings-panel>`) in `packages/ui` to maintain a single source of truth for UI and state binding.
+    *   **Action:** The `<aside id="mainSettings">` is duplicated. Extract this into a centralized system to maintain a single source of truth for UI and state binding.
 *   **Add ability to change the colour theme (Hue Rotation)**
     *   **Context:** `styles/main.css` (`#mainContent`) and `packages/ui/src/stepper.js`.
     *   **Action:** Add a range slider to settings. Bind it to `store.themeHue`. Apply `filter: hue-rotate(var(--rotation))` to `#mainContent`. Ensure the logo/images get a reverse `hue-rotate` so they retain their original colors.
@@ -125,13 +95,10 @@ This document tracks upcoming features, bug fixes, and architectural changes for
 *   **Design nesting editors like Google Docs**
     *   **Context:** Main UI layout (`index.html` and `styles/main.css`).
     *   **Action:** Shift from a side-by-side split view to a centered, top-down view (toolbar at top, input above output, or toggled views). Requires a total layout overhaul.
-*   **Make settings area fixed width, center editors**
-    *   **Context:** `styles/main.css` (`#mainSettings` and `#codeEditor`).
-    *   **Action:** Decouple the settings panel from the flex layout. Make it a fixed sidebar (`position: fixed` or rigid grid column) and ensure the remaining space centers the editor canvas perfectly.
 *   **Allow input for both HTML and CSS code**
     *   **Context:** `packages/engine` and `index.html`.
-    *   **Action:** Add a third editor for HTML. Build a parser that extracts inline `<style>` tags or maps inline `style="..."` attributes, passes them to `@nycss/engine`, and outputs the nested CSS while optionally stripping the inline styles from the HTML output.
-*   **Enable nesting multiple CSS files simultaneously**
+    *   **Action:** Add a third editor for HTML. Use the DOM tree to remove redundancy and provide more optimal selectors. Build a parser that extracts inline `<style>` tags or maps inline `style="..."` attributes, passes them to `@nycss/engine`, and outputs the nested CSS while optionally stripping the inline styles from the HTML output.
+*   **Enable nesting multiple CSS files simultaneously via UI**
     *   **Context:** `packages/engine/src/engine.js` and Editor UI.
     *   **Action:** Add a tabbed interface to `inputEditorWrapper`. Modify the engine to accept an array of strings, resolve CSS `@import` statements (if applicable), merge the ASTs, deduplicate, and output a single bundled stylesheet.
 *   **Implement Locomotive Scroll (or similar)**

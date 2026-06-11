@@ -1,10 +1,10 @@
 const CACHE_NAME = `nycss-cache-v1`;
 
+// PRECACHE_URLS is generated at build time by scripts/postbuild.mjs
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/styles/app.min.css',
-  '/scripts/app.min.js',
+  '__PRECACHE_ENTRIES__'
 ];
 
 self.addEventListener('install', (e) => {

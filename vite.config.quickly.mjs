@@ -18,6 +18,7 @@ export default defineConfig({
   customLogger: logger,
 
   root: resolve(__dirname, 'apps/quickly'),
+  publicDir: resolve(__dirname, 'public/apps/quickly'),
   resolve: {
     alias: {
       '@nycss/state': resolve(__dirname, 'packages/state/src/store.js'),
