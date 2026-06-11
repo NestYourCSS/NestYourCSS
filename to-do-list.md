@@ -48,3 +48,11 @@
 - Allow input for both HTML and CSS code, and display the Nested CSS output
 - Enable nesting multiple CSS files simultaneously
 - Option to allow Emmet
+
+## Settings Panel:
+- Indentation input field
+- Show file size checkbox
+- Editor settings button?
+- keyboard shortcuts + allow the creation of custom ones
+- Show minimap checkbox
+- Show sticky scroll checkbox
