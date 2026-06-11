@@ -134,6 +134,36 @@
         if (stepper) stepper.disabled = value || window.processMode !== 3;
         configureEngine({ maxDepth: value ? Infinity : store.nestingDepth - 1, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      showFileSize: (value) => {
+        const editors = [window.inputEditorInstance, window.outputEditorInstance].filter(Boolean);
+        editors.forEach(editor => {
+          const fileNameEl = editor.container.previousElementSibling?.firstElementChild;
+          if (!fileNameEl) return;
+          if (value) {
+            const update = () => {
+              const bytes = new Blob([editor.getValue()]).size;
+              const kb = (bytes / 1024).toFixed(1);
+              const text = bytes >= 1024 ? ` | ${kb} KB` : ` | ${bytes} B`;
+              fileNameEl.setAttribute('file-size', text);
+              const baseName = fileNameEl.textContent;
+              const coords = fileNameEl.getAttribute('caret-pos') || '';
+              fileNameEl.setAttribute('aria-label', baseName + coords + text);
+            };
+            fileNameEl.__fsUpdate = update;
+            editor.session.on('change', update);
+            update();
+          } else {
+            fileNameEl.removeAttribute('file-size');
+            if (fileNameEl.__fsUpdate) {
+              editor.session.off('change', fileNameEl.__fsUpdate);
+              delete fileNameEl.__fsUpdate;
+            }
+            const baseName = fileNameEl.textContent;
+            const coords = fileNameEl.getAttribute('caret-pos') || '';
+            fileNameEl.setAttribute('aria-label', baseName + coords);
+          }
+        });
       }
     });
 

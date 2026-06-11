@@ -1198,7 +1198,7 @@
 
         &[caret-pos]::after {
           font-size: 0.75em;
-          content: attr(caret-pos);
+          content: attr(caret-pos) attr(file-size);
           color: var(--shades-m-darker);
         }
       }

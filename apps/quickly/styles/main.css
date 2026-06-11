@@ -422,7 +422,7 @@ main {
                 align-content: center;
                 &[caret-pos]::after {
 
-                    content: attr(caret-pos);
+                    content: attr(caret-pos) attr(file-size);
                     font-size: 0.75em;
                     opacity: 0.6;
                 }

@@ -410,7 +410,8 @@ function initializeAceEditors() {
     fileNameEl.setAttribute('caret-pos', cursorText);
     
     const baseName = fileNameEl.textContent;
-    fileNameEl.setAttribute('aria-label', baseName + cursorText);
+    const fsText = fileNameEl.getAttribute('file-size') || '';
+    fileNameEl.setAttribute('aria-label', baseName + cursorText + fsText);
   };
   
   /**

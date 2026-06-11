@@ -186,6 +186,30 @@
         if (stepper) stepper.disabled = value || window.processMode !== 3;
         configureEngine({ maxDepth: value ? Infinity : store.nestingDepth - 1, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      showFileSize: (value) => {
+        const editors = [window.inputEditor, window.outputEditor].filter(Boolean);
+        editors.forEach(editor => {
+          const fileNameEl = editor.container.parentElement?.querySelector('.fileName');
+          if (!fileNameEl) return;
+          if (value) {
+            const update = () => {
+              const bytes = new Blob([editor.getValue()]).size;
+              const kb = (bytes / 1024).toFixed(1);
+              const text = bytes >= 1024 ? ` | ${kb} KB` : ` | ${bytes} B`;
+              fileNameEl.setAttribute('file-size', text);
+            };
+            fileNameEl.__fsUpdate = update;
+            editor.session.on('change', update);
+            update();
+          } else {
+            fileNameEl.removeAttribute('file-size');
+            if (fileNameEl.__fsUpdate) {
+              editor.session.off('change', fileNameEl.__fsUpdate);
+              delete fileNameEl.__fsUpdate;
+            }
+          }
+        });
       }
     });
 
@@ -241,6 +265,11 @@
     // Max Depth Infinite
     document.getElementById('nestingDepthInfinite').addEventListener('change', (e) => {
       store.nestingDepthInfinite = e.detail;
+    });
+
+    // File Size
+    document.getElementById('showFileSize').addEventListener('change', (e) => {
+      store.showFileSize = e.detail;
     });
 
     // Apply initial state to components (DOM only, not editors)

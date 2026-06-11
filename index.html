@@ -273,7 +273,7 @@
                 <span id="indentation-type-label">Indentation</span>  
                 <div>  
                   <nycss-toggle id="indentationType" on-text="Hard" off-text="Soft"></nycss-toggle>  
-                  <nycss-stepper id="indentationSize" label="Size:" min="1" max="16"></nycss-stepper>  
+                  <nycss-stepper id="indentationSize" label="Size:" min="1" max="16" placeholder="4"></nycss-stepper>  
                 </div>  
               </li>  
               <li>  
@@ -298,6 +298,12 @@
           <section>  
             <h2>Functionality</h2>  
             <ul>  
+              <li>  
+                <span id="showFileSize-label">File Size</span>  
+                <div>  
+                  <nycss-toggle id="showFileSize" off-text="Show" on-text="Hide"></nycss-toggle>  
+                </div>  
+              </li>  
               <li>  
                 <span id="preserveComments-label">Comments?</span>  
                 <div>  
@@ -324,7 +330,7 @@
               <li>  
                 <span id="max-depth-label">Max Depth</span>  
                 <div>  
-                  <nycss-stepper id="nestingDepth" label="Level:" min="3" max="10"></nycss-stepper>  
+                  <nycss-stepper id="nestingDepth" label="Level:" min="3" max="10" placeholder="3"></nycss-stepper>  
                   <nycss-toggle id="nestingDepthInfinite" on-text="Infinite" off-text="Limited"></nycss-toggle>  
                 </div>  
               </li>  

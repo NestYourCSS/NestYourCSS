@@ -1,5 +1,5 @@
 export class NycssStepper extends HTMLElement {
-  static observedAttributes = ['value', 'min', 'max', 'label', 'disabled'];
+  static observedAttributes = ['value', 'min', 'max', 'label', 'disabled', 'placeholder'];
 
   get value() { return parseInt(this.getAttribute('value')) || 0; }
   set value(v) { this.setAttribute('value', v); }
@@ -7,6 +7,8 @@ export class NycssStepper extends HTMLElement {
   get max() { return parseInt(this.getAttribute('max')) || 99999; }
   get disabled() { return this.hasAttribute('disabled'); }
   set disabled(v) { v ? this.setAttribute('disabled', '') : this.removeAttribute('disabled'); }
+  get placeholder() { return this.getAttribute('placeholder') || ''; }
+  set placeholder(v) { this.setAttribute('placeholder', v); }
 
   connectedCallback() {
     this.classList.add('number');
@@ -17,7 +19,7 @@ export class NycssStepper extends HTMLElement {
     this.innerHTML = `
       ${label ? `<span id="${labelId}" class="stepper-label">${label}</span>` : ''}
       <output>
-        <input type="text" inputmode="numeric" value="${this.value}" class="stepper-input" id="${inputId}"${labelId ? ` aria-labelledby="${labelId}"` : ''}>
+        <input type="text" inputmode="numeric" value="${this.value}" placeholder="${this.placeholder}" class="stepper-input" id="${inputId}"${labelId ? ` aria-labelledby="${labelId}"` : ''}>
         <div>
           <svg class="stepper-up" role="button" aria-label="Increase" viewBox="0 0 24 24" tabindex="0"><path d="M3 19h18a1.002 1.002 0 0 0 .823-1.569l-9-13c-.373-.539-1.271-.539-1.645 0l-9 13A.999.999 0 0 0 3 19z"/></svg>
           <svg class="stepper-down" role="button" aria-label="Decrease" viewBox="0 0 24 24" tabindex="0"><path d="M11.178 19.569a.998.998 0 0 0 1.644 0l9-13A.999.999 0 0 0 21 5H3a1.002 1.002 0 0 0-.822 1.569l9 13z"/></svg>
@@ -88,6 +90,9 @@ export class NycssStepper extends HTMLElement {
     }
     if (name === 'disabled' && this.input) {
       this._updateDisabled();
+    }
+    if (name === 'placeholder' && this.input) {
+      this.input.placeholder = newVal || '';
     }
   }
 
