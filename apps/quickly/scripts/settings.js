@@ -297,6 +297,11 @@
     const initCheck = setInterval(() => {
       if (window.inputEditor && window.outputEditor) {
         clearInterval(initCheck);
+        // Ensure file-size is cleared on all tab buttons
+        [window.inputEditor, window.outputEditor].forEach(editor => {
+          const fileNameEl = editor.container.parentElement?.querySelector('.fileName');
+          if (fileNameEl) fileNameEl.removeAttribute('file-size');
+        });
         store._init(Object.keys(snapshot));
 
         // Cursor tracking for coordinates

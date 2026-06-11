@@ -233,6 +233,11 @@
     const initCheck = setInterval(() => {
       if (window.inputEditorInstance && window.outputEditorInstance) {
         clearInterval(initCheck);
+        // Ensure file-size is cleared on all tab buttons
+        [window.inputEditorInstance.container, window.outputEditorInstance.container].forEach(el => {
+          const fileNameEl = el.previousElementSibling?.firstElementChild;
+          if (fileNameEl) fileNameEl.removeAttribute('file-size');
+        });
         store._init(Object.keys(snapshot));
         window.appIsInitializing = false;
       }
