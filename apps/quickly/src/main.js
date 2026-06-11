@@ -16,7 +16,7 @@ const store = createStore({
   mode: 3,
   auto: true,
   preserveComments: false,
-  showFileSize: false,
+  showFileSize: true,
   nestingDepth: 3,
   nestingDepthInfinite: true,
 }, {

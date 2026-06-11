@@ -16,7 +16,7 @@ const settingsConfig = {
   mode: { defaultValue: 3 },
   auto: { defaultValue: true },
   preserveComments: { defaultValue: false },
-  showFileSize: { defaultValue: false },
+  showFileSize: { defaultValue: true },
   nestingDepth: { defaultValue: 3 },
   nestingDepthInfinite: { defaultValue: true },
 };

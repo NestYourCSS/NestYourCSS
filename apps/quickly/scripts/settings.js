@@ -193,6 +193,12 @@
           const fileNameEl = editor.container.parentElement?.querySelector('.fileName');
           if (!fileNameEl) return;
           if (value) {
+            fileNameEl.removeAttribute('file-size');
+            if (fileNameEl.__fsUpdate) {
+              editor.session.off('change', fileNameEl.__fsUpdate);
+              delete fileNameEl.__fsUpdate;
+            }
+          } else {
             const update = () => {
               const bytes = new Blob([editor.getValue()]).size;
               const kb = (bytes / 1024).toFixed(1);
@@ -202,12 +208,6 @@
             fileNameEl.__fsUpdate = update;
             editor.session.on('change', update);
             update();
-          } else {
-            fileNameEl.removeAttribute('file-size');
-            if (fileNameEl.__fsUpdate) {
-              editor.session.off('change', fileNameEl.__fsUpdate);
-              delete fileNameEl.__fsUpdate;
-            }
           }
         });
       }

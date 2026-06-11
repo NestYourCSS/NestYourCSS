@@ -141,6 +141,15 @@
           const fileNameEl = editor.container.previousElementSibling?.firstElementChild;
           if (!fileNameEl) return;
           if (value) {
+            fileNameEl.removeAttribute('file-size');
+            if (fileNameEl.__fsUpdate) {
+              editor.session.off('change', fileNameEl.__fsUpdate);
+              delete fileNameEl.__fsUpdate;
+            }
+            const baseName = fileNameEl.textContent;
+            const coords = fileNameEl.getAttribute('caret-pos') || '';
+            fileNameEl.setAttribute('aria-label', baseName + coords);
+          } else {
             const update = () => {
               const bytes = new Blob([editor.getValue()]).size;
               const kb = (bytes / 1024).toFixed(1);
@@ -153,15 +162,6 @@
             fileNameEl.__fsUpdate = update;
             editor.session.on('change', update);
             update();
-          } else {
-            fileNameEl.removeAttribute('file-size');
-            if (fileNameEl.__fsUpdate) {
-              editor.session.off('change', fileNameEl.__fsUpdate);
-              delete fileNameEl.__fsUpdate;
-            }
-            const baseName = fileNameEl.textContent;
-            const coords = fileNameEl.getAttribute('caret-pos') || '';
-            fileNameEl.setAttribute('aria-label', baseName + coords);
           }
         });
       }
