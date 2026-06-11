@@ -87,6 +87,17 @@ html {
     }
 }
 
+.settings-container {
+    position: relative;
+    display: flex;
+    translate: 50%;
+    z-index: 999;
+
+    @media (width < 1024px) {
+        position: static;
+    }
+}
+
 .header-btn {
     cursor: pointer;
     padding: 1rem 1.75ch;
@@ -111,6 +122,10 @@ html {
 
     @media not (prefers-reduced-motion: reduce) {
         transition: background-position 0.125s ease-out, translate 0.2s, filter 0.2s;
+    }
+
+    &#settings-toggle {
+        translate: -50%;
     }
 }
 
@@ -138,32 +153,23 @@ html {
     background-position: 0% 0%;
 }
 
-.settings-container {
-    position: relative;
-    display: flex;
-
-    @media (width < 1024px) {
-        position: static;
-    }
-}
-
 #mainSettings {
     position: absolute;
     z-index: 1001;
     top: calc(100% + var(--header-top)); /* dynamic gap below the buttons */
     right: 0;
     width: max-content;
-    max-height: calc(100vh - 9rem);
+    max-height: calc(100vh - 10rem);
     overflow: hidden auto;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    padding: 2rem;
-    box-sizing: content-box;
     background: rgb(from #000 r g b / 0.25);
+    border: 2rem solid transparent;
     border-radius: 4rem;
     scrollbar-width: none; /* Hide scrollbar */
     -ms-overflow-style: none; /* IE and Edge */
+    
 
     @media (width < 1024px) {
         left: 0;
@@ -193,7 +199,7 @@ html {
     display: flex;
     position: relative;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.05) inset;
 
     @media (width < 1024px) {

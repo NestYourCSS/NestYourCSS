@@ -16,75 +16,125 @@ An Awwwards-inspired online converter tool to minify, beautify, denest, and nest
 
 ## Table of Contents
 
-- [About The Project](#about-the-project)
-- [Built With](#built-with)
+- [The NYCSS Suite](#the-nycss-suite)
 - [Features](#features)
-- [Getting Started](#getting-started)
+- [NYCSS vs. Preprocessors](#nycss-vs-preprocessors)
+- [CLI Documentation](#cli-documentation)
+- [Monorepo Architecture](#monorepo-architecture)
+- [Accessibility Commitment](#accessibility-commitment)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
 ---
 
-## About The Project
+## The NYCSS Suite
 
-With the arrival of the native CSS Nesting module, there was a clear need for a simple, pure CSS converter. The available tools were often CSS-to-SCSS converters that produced code requiring significant manual cleanup.
+Nest Your CSS is a full suite of tools designed to bring native CSS nesting and more, into any workflow, exactly how you need it:
 
-**Nest Your CSS was created to fill that gap.**
+1. **Main:** The primary site featuring the full, accessible interactive converter and an Awwwards-inspired, scroll-driven educational experience.
+2. **Quickly:** A lightweight, visual, and highly accessible browser-based GUI focused entirely on fast conversions.
+3. **CLI (`@nycss/cli`):** A robust command-line interface for local terminal processing, batch conversions, and build-step integration.
+4. **Engine (`@nycss/engine`):** The core. A zero-dependency Vanilla JS parsing and transforming library ready to be imported into any JavaScript/Node.js project.
 
-The project began with a simple goal: create a reliable A-to-B converter. This goal expanded into a mission to build a portfolio-worthy, "Awwwards-level" application that champions high-quality user experience, accessibility, and modern web standards.
-
-The result is [nestyourcss.com](https://nestyourcss.com/): a free, open-source tool with no backend and no sign-up required, now maintained as a public, open-source application.
-
-## Built With
-
-This project is a testament to the power of web fundamentals, built with **zero frameworks**.
-
--   HTML5 (Semantic & ARIA-enhanced)
--   CSS3 (Utilizing modern features like `@layer`, Container Queries, and Relative Color Syntax)
--   Vanilla JavaScript (ES6+)
--   [Ace Editor](https://ace.c9.io/) for the code editing experience
--   [Lenis](https://lenis.studiofreight.com/) for smooth scrolling effects
+![Screenshot of the Quickly Web GUI showing the minimilistic UI, customizable editor settings, and formatted CSS output](https://github.com/user-attachments/assets/7ab29d2a-09c2-4a5d-8041-4b94ee5652a7)
 
 ## Features
 
--   **Nest CSS:** Convert standard CSS to the latest native nested syntax.
--   **De-nest CSS:** Flatten nested CSS back to standard, browser-compatible CSS.
+-   **Nest CSS:** Convert any standard CSS to the latest native nested syntax.
+-   **Denest CSS:** Flatten nested CSS back to standard, legacy-browser-compatible CSS.
 -   **Minify CSS:** Optimize your stylesheets by removing unnecessary characters.
--   **Beautify CSS:** Format and indent your code for maximum readability and maintainability.
+-   **Beautify CSS:** Format and indent your code for maximum readability.
+-   **Configurable Depth Limit:** Choose exactly how deep your CSS is allowed to nest (e.g; limit to the industry standard: 3-4 levels) to avoid overly specific selectors.
+-   **Batch Processing:** Watch and transform entire directories of stylesheets using the CLI.
 -   **Customizable Editor:** Adjust font, font size, indentation, and word wrap to your preference.
 -   **Load External CSS:** Fetch and convert stylesheets directly from a URL.
 -   **Deep Accessibility:** Fully navigable and usable with screen readers, thanks to extensive ARIA implementation.
 -   **Awwwards-Inspired UI/UX:** A focus on smooth animations, visual appeal, and a high-quality user experience.
+-   **Zero Dependencies:** The core `@nycss/engine` is written in 100% Vanilla JavaScript without a single external dependency.
+-   **Custom Lexer/Parser:** NYCSS achieves high performance on large stylesheets by avoiding expensive, heavy Regular Expressions. It parses code character-by-character statelessly, ensuring accurate AST generation without freezing the browser.
+-   **Modern Standards:** Native support for complex pseudo-classes like `:is()`, relative color syntax, and structural grouping.
 
-## Getting Started
+## NYCSS vs. Preprocessors
 
-To get a local copy up and running for development or contribution, follow these simple steps.
+How does Nest Your CSS compare to established preprocessors like Sass, Less, or PostCSS?
 
-### Prerequisites
+| Feature | Nest Your CSS (NYCSS) | Sass / PostCSS |
+| :--- | :--- | :--- |
+| **Syntax** | Follows the W3C Native CSS Nesting specification. | Uses proprietary preprocessor syntax or plugins. |
+| **No Build Step?**| **Yes.** Browsers can read Native Nested CSS directly. | **No.** Raw Sass/SCSS files must be converted into CSS. |
+| **Bidirectional?** | **Yes.** You can nest *and* denest instantly. | **No.** Compilation is strictly a one-way street. |
 
-Make sure you have Node.js and npm installed on your machine.
--   You can download them from [nodejs.org](https://nodejs.org/).
+*Native CSS nesting is the future of the web. NYCSS bridges the gap by letting you easily convert old codebases to modern standards, without locking you into a proprietary build ecosystem.*
 
-### Installation & Production Build
+## CLI Documentation
 
-1.  Clone the repo:
-    ```sh
-    git clone https://github.com/NestYourCSS/NestYourCSS.git
-    ```
-2.  Navigate to the project directory:
-    ```sh
-    cd NestYourCSS
-    ```
-3.  Install NPM packages and build the project for production:
-    ```sh
-    npm install && npm run build
-    ```
-4.  This will create a `dist` folder with the optimized production files. Open `dist/index.html` in your browser to run the live version locally.
+You can also use NYCSS directly into your terminal or build pipelines.
 
-#### Development Mode
+![GIF showing the nycss CLI running in a terminal, watching for file changes, and processing multiple CSS files simultaneously](https://github.com/user-attachments/assets/ed89202e-3e5d-4711-ac50-459f010c212e)
 
-If you simply want to view the raw, `in-development` files without running the build process, you can open the `index.html` file in the root directory directly in your browser after cloning. Note that some features may behave differently than in the production build.
+
+### Installation
+
+Install the CLI globally to use it anywhere:
+```sh
+npm install -g @nycss/cli
+```
+
+### Basic Usage
+
+Transform a single file and output it to a new destination:
+```sh
+nycss input.css -o output.css
+```
+
+You can also pipe standard input directly into NYCSS:
+```sh
+cat input.css | nycss --mode minify > output.min.css
+```
+
+### Arguments Table
+
+| Flag | Description | Default |
+| :--- | :--- | :--- |
+| `-m, --mode <mode>` | The processing mode. Valid options: `nest`, `denest`, `minify`, `beautify`. | `nest` |
+| `-d, --depth <level>` | Max nesting depth. Limits how deep selectors can nest (use `0` for infinite). | Infinite |
+| `-i, --indent <size>` | Indent size. Use a number (e.g; `2`, `4`) or `tab`. | `4` |
+| `--no-comments` | Strips all comments from the output CSS. | `false` (keeps comments) |
+| `-o, --out <path>` | Output destination (file or directory). | N/A |
+| `--out-dir <dir>` | Output directory for batch processing. | N/A |
+| `--base <dir>` | Base directory for preserving the folder structure during batch processing. | Auto-detected |
+| `-w, --watch` | Watches the input files/globs for changes and recompiles automatically. | `false` |
+
+### Batch Processing
+
+You can process entire directories using glob patterns. When doing so, use `--out-dir` (and optionally `--base` to preserve the exact folder hierarchy).
+
+```sh
+# Process all CSS files in /src and output them to /dist
+nycss "src/**/*.css" --out-dir dist --base src
+```
+
+## Monorepo Architecture
+
+The project is structured as a `pnpm` monorepo, separating core logic from user interfaces.
+
+- `packages/engine/` - The core, zero-dependency Vanilla JS parsing and transforming logic.
+- `packages/cli/` - The terminal command-line interface.
+- `packages/ui/` - Reusable, framework-agnostic web components (Dropdowns, Steppers, Toggles, etc.).
+- `packages/state/` - Custom proxy-based state management logic.
+- `packages/pwa/` - Service worker caching and offline capabilities.
+
+## Accessibility Commitment
+
+We believe developer tools should be accessible to all developers. NYCSS is built with deep adherence to `a11y` principles:
+
+-   **Live Regions:** Screen readers are notified gracefully of file imports, clipboard copies, and conversion success/errors via `aria-live` regions.
+-   **Keyboard Navigation:** Custom web components (`@nycss/ui`) are rigorously tested for full keyboard support, trapping, and focus management.
+-   **Interactive Error Tables:** Syntax errors populate a semantic HTML table where each row acts as an interactive, focusable button that automatically transports you to the exact line/column in the code editor.
+-   **Respect for User Preferences:** Respects `@media (prefers-reduced-motion: reduce)` to disable heavy canvas gradients, smooth scrolling, and UI transitions automatically.
+
+*If you are a screen-reader user and experience friction, please open an issue! Your feedback is highly valued.*
 
 ## Contributing
 
@@ -95,6 +145,50 @@ Contributions are the lifeblood of the open-source community and are **greatly a
 3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4.  Push to the Branch (`git push origin feature/AmazingFeature`)
 5.  Open a Pull Request
+
+Want to contribute to the project? We use `pnpm` for workspace management.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (Recommended: v24)
+- [pnpm](https://pnpm.io/installation) (Recommended: v11)
+
+### Installation & Local Development
+
+1. Clone the repo and navigate to the project directory:
+   ```sh
+   git clone https://github.com/NestYourCSS/NestYourCSS.git
+   cd NestYourCSS
+   ```
+2. Install dependencies across all packages:
+   ```sh
+   pnpm install
+   ```
+
+**Running the Development Servers:**
+- To run the **Main Site**: `pnpm run dev:main`
+- To run **Quickly**: `pnpm run dev:quickly`
+- To run both/default routing: `pnpm run dev`
+
+**Building for Production:**
+- Build the **Main Site**: `pnpm run build:main`
+- Build **Quickly**: `pnpm run build:quickly`
+- Build everything: `pnpm run build`
+
+*(Built assets are output to the `/dist` directory via the postbuild script).*
+
+**Previewing Production Builds locally:**
+- Preview the **Main Site**: `pnpm run preview:main`
+- Preview **Quickly**: `pnpm run preview:quickly`
+
+### Testing the CLI Locally
+
+To test CLI changes locally during development:
+```sh
+cd packages/cli
+pnpm add -g .
+```
+You can now run the `nycss` command anywhere on your local machine.
 
 ## License
 
