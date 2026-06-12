@@ -293,9 +293,9 @@
                   </nycss-radio-group>  
                 </div>  
               </li>  
-            </ul>  
-          </section>  
-          <section>  
+            </ul>
+          </section>
+          <section>
             <h2>Functionality</h2>  
             <ul>  
               <li>  
@@ -309,7 +309,7 @@
                 <div>  
                   <nycss-toggle id="preserveComments" off-text="Yes" on-text="No"></nycss-toggle>  
                 </div>  
-              </li>  
+              </li>   
               <li>  
                 <span id="mode-group-label">Mode</span>  
                 <div>  
@@ -327,6 +327,16 @@
                   <nycss-toggle id="auto" on-text="On" off-text="Off"></nycss-toggle>  
                 </div>  
               </li>  
+              <li>  
+                <span id="nestingStrategy-label">Strategy</span>  
+                <div>  
+                  <nycss-dropdown id="nestingStrategy" label="Strategy">
+                    <span role="option" value="balanced">Balanced Split</span>
+                    <span role="option" value="maximize">Maximize Depth</span>
+                    <span role="option" value="flattened">Flattened Overflow</span>
+                  </nycss-dropdown>
+                </div>  
+              </li> 
               <li>  
                 <span id="max-depth-label">Max Depth</span>  
                 <div>  
@@ -487,6 +497,7 @@
             </div>  
           </article>  
         </section>
+        <div id="mobile-overlay"></div>
     </main>  
     <article>  
       <section id="reducingBoilerplateCode" class="optimize" aria-labelledby="parallaxText">  

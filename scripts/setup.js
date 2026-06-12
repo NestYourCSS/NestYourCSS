@@ -93,7 +93,7 @@ function initializeAceEditors() {
     
       editor.setValue(value, -1);
       editor.setAnimatedScroll(!window.prefersReducedMotion);
-    
+
       let tabIndexSet = false;
       let lastGutterWidth = null;
       const scrollbars = editor.container.querySelectorAll('.ace_scrollbar');

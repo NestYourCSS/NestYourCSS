@@ -59,8 +59,16 @@
     padding-right: calc(1rem + 2ch);
   }
 
-  nycss-dropdown > output:hover,
-  nycss-combobox > output:hover {
+  nycss-dropdown[disabled],
+  nycss-dropdown[disabled] * {
+    cursor: not-allowed;
+  }
+  nycss-dropdown[disabled] {
+    opacity: 0.5;
+  }
+
+  nycss-dropdown:not([disabled]) > output:hover,
+  nycss-combobox:not([disabled]) > output:hover {
     color: var(--component-text-hover);
   }
 
@@ -102,8 +110,8 @@
     outline: none !important;
   }
 
-  nycss-dropdown > ul > li:hover,
-  nycss-combobox > ul > li:hover {
+  nycss-dropdown:not([disabled]) > ul > li:hover,
+  nycss-combobox:not([disabled]) > ul > li:hover {
     color: var(--component-text-hover);
     cursor: pointer;
   }
@@ -151,7 +159,7 @@
     color: var(--component-text-accent);
   }
 
-  nycss-combobox > output:hover > div:not(:focus):empty::before {
+  nycss-combobox:not([disabled]) > output:hover > div:not(:focus):empty::before {
     color: var(--component-text-hover);
   }
 
@@ -337,7 +345,7 @@
     background-position: 0% 0%;
   }
 
-  nycss-radio-group > label:hover {
+  nycss-radio-group:not([disabled]) > label:hover {
     color: var(--component-text-hover);
   }
 

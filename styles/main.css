@@ -1196,7 +1196,7 @@
         font-size: 1rem;
         align-content: center;
 
-        &[caret-pos]::after {
+        &::after {
           font-size: 0.75em;
           content: attr(caret-pos) attr(file-size);
           color: var(--shades-m-darker);
@@ -2479,29 +2479,51 @@
         border-radius: 1rem;
       }
 
-      #mainSettings:not(.mobile-open),
       #mainContent :is(#textSide, #shadowEditorsWrapper) {
         display: none;
+      }
+
+      #mainSettings:not(.mobile-open) {
+        display: flex !important;
+        position: fixed;
+        z-index: 1000;
+        bottom: 0;
+        left: 2rem;
+        right: 2rem;
+        width: calc(100% - 4rem);
+        max-height: calc(100dvh - 8rem);
+        margin-right: 0;
+        min-width: 0;
+        padding: 0;
+        transform: translateY(100%);
+        visibility: hidden;
+        pointer-events: none;
       }
 
       #mainSettings.mobile-open {
         display: flex !important;
         position: fixed;
-        z-index: 1001;
-        top: calc(
-          2rem + 4rem
-        ); /* Header padding + button height approximately */
+        z-index: 1000;
+        bottom: 0;
         left: 2rem;
         right: 2rem;
         width: calc(100% - 4rem);
-        max-height: calc(100vh - 8rem);
+        max-height: calc(100dvh - 8rem);
         overflow-y: auto;
         padding: 0;
-        background: rgb(from var(--shades-black) r g b / 0.5);
         margin-right: 0;
         outline: 2px solid var(--sec-colour-medium);
         outline-offset: 2px;
         min-width: 0;
+        visibility: visible;
+        pointer-events: auto;
+        background: rgb(from var(--shades-black) r g b / 0.85);
+        transform: translateY(0);
+        border-radius: 2rem 2rem 0 0;
+
+        @media not (prefers-reduced-motion: reduce) {
+          transition: transform 0.3s ease-out;
+        }
 
         > section {
           border-radius: 2rem;
@@ -2732,6 +2754,24 @@
           }
         }
       }
+    }
+  }
+
+  #mobile-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgb(from var(--shades-black) r g b / 0.6);
+    pointer-events: none;
+    opacity: 0;
+
+    @media not (prefers-reduced-motion: reduce) {
+      transition: opacity 0.3s ease-out;
+    }
+
+    &.active {
+      opacity: 1;
+      pointer-events: auto;
     }
   }
 }

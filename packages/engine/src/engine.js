@@ -1,11 +1,12 @@
 let _preserveComments = false;
 let _indentChar = '\t';
 let _maxDepth = Infinity;
-
+let _strategy = 'balanced';
 export function configureEngine(opts = {}) {
   if (opts.preserveComments !== undefined) _preserveComments = opts.preserveComments;
   if (opts.indentChar !== undefined) _indentChar = opts.indentChar;
   if (opts.maxDepth !== undefined) _maxDepth = opts.maxDepth;
+  if (opts.strategy !== undefined && ['balanced', 'maximize', 'flattened'].includes(opts.strategy)) _strategy = opts.strategy;
 }
 
 function parseSelector(selectorText) {
@@ -1019,32 +1020,145 @@ export function renestCSS(ast) {
             }
         }
 
+        console.log(`\n[DEBUG RENEST] Found ${candidates.length} nesting candidates. Sorting...`);
         candidates.sort((a, b) => {
             if (a.score.typeOrder !== b.score.typeOrder) return a.score.typeOrder - b.score.typeOrder;
             if (a.score.score !== b.score.score) return b.score.score - a.score.score;
             return a.parentIdx - b.parentIdx;
         });
+
+        for (let idx = 0; idx < candidates.length; idx++) {
+            const c = candidates[idx];
+            console.log(`[DEBUG RENEST] Candidate ${idx}: child=${c.childIdx}, parent=${c.parentIdx}, relType=${c.relationship.type}, score=${c.score.score}`);
+        }
+
+        console.log(`\n[DEBUG RENEST] Assigning parents based on candidates...`);
         for (const c of candidates) {
             if (parentOf[c.childIdx] === -1) {
                 parentOf[c.childIdx] = c.parentIdx;
                 rels[c.childIdx] = c.relationship;
+                console.log(`[DEBUG RENEST] -> Assigned parentOf[${c.childIdx}] = ${c.parentIdx}`);
+            } else {
+                console.log(`[DEBUG RENEST] -> Skipped child ${c.childIdx} (already has parent ${parentOf[c.childIdx]})`);
             }
         }
 
+        function getAncestorAtDepth(nodeIdx, parentArray, targetDepth) {
+            let currentIdx = nodeIdx;
+            const path = [];
+            while (currentIdx !== -1) {
+                path.push(currentIdx);
+                currentIdx = parentArray[currentIdx];
+            }
+            path.reverse();
+            if (targetDepth >= 0 && targetDepth < path.length - 1) {
+                return path[targetDepth];
+            }
+            return -1;
+        }
+
+        const effectiveMaxDepth = _maxDepth === Infinity ? Infinity : _maxDepth - 1;
+
+        console.log(`\n[DEBUG RENEST] Starting depth adjustment loop.`);
+        console.log(`[DEBUG RENEST] _maxDepth: ${_maxDepth}, effectiveMaxDepth: ${effectiveMaxDepth}, _strategy: ${_strategy}`);
+
         let depthChanged = true;
+        let passCounter = 0;
+        
         while (depthChanged) {
+            passCounter++;
+            console.log(`\n[DEBUG RENEST] --- Pass ${passCounter} ---`);
             depthChanged = false;
+            
+            const treeMaxDepth = new Int32Array(n).fill(0);
+            
+            console.log(`[DEBUG RENEST] Calculating treeMaxDepth for ${n} nodes...`);
             for (let i = 0; i < n; i++) {
                 if (parentOf[i] !== -1) {
-                    const totalDepth = depth + getDepth(i, parentOf);
-                    if (totalDepth > _maxDepth) {
+                    let d = getDepth(i, parentOf);
+                    let cur = i;
+                    while (parentOf[cur] !== -1) {
+                        cur = parentOf[cur];
+                    }
+                    if (d > treeMaxDepth[cur]) {
+                        treeMaxDepth[cur] = d;
+                    }
+                }
+            }
+
+            for (let i = 0; i < n; i++) {
+                if (treeMaxDepth[i] > 0 || parentOf[i] === -1) {
+                    console.log(`[DEBUG RENEST] Tree Root ${i} -> max descendants depth: ${treeMaxDepth[i]}`);
+                }
+            }
+
+            const cutRoots = new Set();
+
+            for (let i = 0; i < n; i++) {
+                if (parentOf[i] !== -1) {
+                    let curRoot = i;
+                    let cur = i;
+                    while (parentOf[cur] !== -1) { cur = parentOf[cur]; }
+                    curRoot = cur;
+
+                    const dynamicDepth = getDepth(i, parentOf);
+                    const totalDepth = depth + dynamicDepth;
+                    
+                    let limit = effectiveMaxDepth;
+                    let cValue = 1;
+                    let nValue = 0;
+
+                    if (_strategy === 'balanced' && effectiveMaxDepth !== Infinity) {
+                        const M = treeMaxDepth[curRoot];
+                        nValue = M + 1;
+                        const MaxN = effectiveMaxDepth + 1;
+                        cValue = Math.ceil(nValue / MaxN);
+                        if (cValue > 1) {
+                            limit = Math.floor(nValue / cValue) - 1;
+                        }
+                    }
+
+                    console.log(`[DEBUG RENEST] Node ${i} | parentOf: ${parentOf[i]} | curRoot: ${curRoot} | dynamicDepth: ${dynamicDepth} | totalDepth: ${totalDepth} | limit: ${limit} (N=${nValue}, C=${cValue})`);
+
+                    if (totalDepth > limit) {
+                        if (cutRoots.has(curRoot)) {
+                            console.log(`[DEBUG RENEST] -> Node ${i} exceeds limit, but root ${curRoot} already cut in this pass. Skipping.`);
+                            continue;
+                        }
+
+                        console.log(`[DEBUG RENEST] -> Node ${i} EXCEEDS limit! (totalDepth ${totalDepth} > ${limit})`);
+                        cutRoots.add(curRoot);
+                        
+                        if (_strategy === 'flattened' && _maxDepth !== Infinity) {
+                            const targetAncestorDepth = _maxDepth - 2;
+                            if (targetAncestorDepth >= 0) {
+                                const ancestorIdx = getAncestorAtDepth(i, parentOf, targetAncestorDepth);
+                                console.log(`[DEBUG RENEST] -> Flattened strategy: targetAncestorDepth ${targetAncestorDepth}, ancestorIdx ${ancestorIdx}`);
+                                if (ancestorIdx !== -1 && ancestorIdx !== parentOf[i]) {
+                                    const newRel = findNestingRelationship(body[ancestorIdx].selector, body[i].selector);
+                                    if (newRel) {
+                                        console.log(`[DEBUG RENEST] -> Reparenting node ${i} to ancestor ${ancestorIdx}`);
+                                        parentOf[i] = ancestorIdx;
+                                        rels[i] = newRel;
+                                        depthChanged = true;
+                                        continue;
+                                    } else {
+                                        console.log(`[DEBUG RENEST] -> Could not find valid nesting relationship for reparenting.`);
+                                    }
+                                }
+                            }
+                        }
+
+                        console.log(`[DEBUG RENEST] -> Cutting node ${i} from parent ${parentOf[i]}`);
                         parentOf[i] = -1;
                         rels[i] = null;
                         depthChanged = true;
                     }
                 }
             }
+            console.log(`[DEBUG RENEST] End of Pass ${passCounter}. depthChanged = ${depthChanged}`);
         }
+        console.log(`[DEBUG RENEST] Depth adjustment complete.`);
 
         const newBody = [];
         for (let i = 0; i < n; i++) {

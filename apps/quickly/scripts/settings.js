@@ -159,6 +159,7 @@
         if (stepper) stepper.disabled = value !== 3 || store.nestingDepthInfinite;
         const infiniteToggle = document.getElementById('nestingDepthInfinite');
         if (infiniteToggle) infiniteToggle.disabled = value !== 3;
+        document.getElementById('nestingStrategy').disabled = value !== 3;
         if (window.processAuto && typeof nestCode === 'function') nestCode();
         const modeLabels = { 0: i18n.minify, 1: i18n.beautify, 2: i18n.denest, 3: i18n.nest };
         document.title = `Quickly '${modeLabels[value] || 'Nest'}' Your CSS - Editor`;
@@ -174,17 +175,21 @@
         configureEngine({ preserveComments: !value, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
+      nestingStrategy: (value) => {
+        configureEngine({ strategy: value });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
       nestingDepth: (value) => {
         const infinite = store.nestingDepthInfinite;
         const stepper = document.getElementById('nestingDepth');
         if (stepper) stepper.disabled = infinite || window.processMode !== 3;
-        configureEngine({ maxDepth: infinite ? Infinity : value - 1, indentChar: window.editorIndentChar || '\t' });
+        configureEngine({ maxDepth: infinite ? Infinity : value, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
       nestingDepthInfinite: (value) => {
         const stepper = document.getElementById('nestingDepth');
         if (stepper) stepper.disabled = value || window.processMode !== 3;
-        configureEngine({ maxDepth: value ? Infinity : store.nestingDepth - 1, indentChar: window.editorIndentChar || '\t' });
+        configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
       showFileSize: (value) => {

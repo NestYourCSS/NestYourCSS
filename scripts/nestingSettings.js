@@ -107,6 +107,7 @@
         if (stepper) stepper.disabled = value !== 3 || store.nestingDepthInfinite;
         const infiniteToggle = document.getElementById('nestingDepthInfinite');
         if (infiniteToggle) infiniteToggle.disabled = value !== 3;
+        document.getElementById('nestingStrategy').disabled = value !== 3;
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
       auto: (value) => {
@@ -122,17 +123,21 @@
         if (label) label.classList.toggle('button', !window.preserveComments);
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
+      nestingStrategy: (value) => {
+        configureEngine({ strategy: value });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
       nestingDepth: (value) => {
         const infinite = store.nestingDepthInfinite;
         const stepper = document.getElementById('nestingDepth');
         if (stepper) stepper.disabled = infinite || window.processMode !== 3;
-        configureEngine({ maxDepth: infinite ? Infinity : value - 1, indentChar: window.editorIndentChar || '\t' });
+        configureEngine({ maxDepth: infinite ? Infinity : value, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
       nestingDepthInfinite: (value) => {
         const stepper = document.getElementById('nestingDepth');
         if (stepper) stepper.disabled = value || window.processMode !== 3;
-        configureEngine({ maxDepth: value ? Infinity : store.nestingDepth - 1, indentChar: window.editorIndentChar || '\t' });
+        configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
       showFileSize: (value) => {
@@ -247,4 +252,30 @@
   document.addEventListener('DOMContentLoaded', () => {
     initSettings(window.__store);
   });
+
+  function openSettingsPanel() {
+    const panel = document.getElementById('mainSettings');
+    const btn = document.getElementById('settingsBtn');
+    const overlay = document.getElementById('mobile-overlay');
+    if (!panel) return;
+    panel.classList.add('mobile-open');
+    panel.removeAttribute('inert');
+    if (overlay) overlay.classList.add('active');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    const focusable = panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label');
+    if (focusable.length) focusable[0].focus();
+  }
+
+  function closeSettingsPanel() {
+    const panel = document.getElementById('mainSettings');
+    const btn = document.getElementById('settingsBtn');
+    const overlay = document.getElementById('mobile-overlay');
+    if (!panel) return;
+    panel.classList.remove('mobile-open');
+    if (overlay) overlay.classList.remove('active');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    if (btn) btn.focus();
+  }
 })();

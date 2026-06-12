@@ -19,6 +19,7 @@ const settingsConfig = {
   showFileSize: { defaultValue: true },
   nestingDepth: { defaultValue: 3 },
   nestingDepthInfinite: { defaultValue: true },
+  nestingStrategy: { defaultValue: 'balanced' },
 };
 
 const defaults = {};

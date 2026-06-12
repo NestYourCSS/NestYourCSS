@@ -85,6 +85,7 @@
                     </nycss-radio-group>
                   </div>
                 </li>
+              
               </ul>
             </section>
             <section>
@@ -117,6 +118,16 @@
                   <span id="auto-label">Auto</span>
                   <div>
                     <nycss-toggle id="auto" on-text="On" off-text="Off"></nycss-toggle>
+                  </div>
+                </li>
+                <li>
+                  <span id="nestingStrategy-label">Strategy</span>
+                  <div>
+                    <nycss-dropdown id="nestingStrategy" label="Strategy">
+                      <span role="option" value="balanced">Balanced Split</span>
+                      <span role="option" value="maximize">Maximize Depth</span>
+                      <span role="option" value="flattened">Flattened Overflow</span>
+                    </nycss-dropdown>
                   </div>
                 </li>
                 <li>

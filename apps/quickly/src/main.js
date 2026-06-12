@@ -19,6 +19,7 @@ const store = createStore({
   showFileSize: true,
   nestingDepth: 3,
   nestingDepthInfinite: true,
+  nestingStrategy: 'balanced',
 }, {
   key: 'nycss-settings',
   onSet: {

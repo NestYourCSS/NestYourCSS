@@ -1,8 +1,10 @@
 export class NycssDropdown extends HTMLElement {
-  static observedAttributes = ['value', 'label'];
+  static observedAttributes = ['value', 'label', 'disabled'];
 
   get value() { return this.getAttribute('value') || ''; }
   set value(v) { this.setAttribute('value', v); }
+  get disabled() { return this.hasAttribute('disabled'); }
+  set disabled(v) { v ? this.setAttribute('disabled', '') : this.removeAttribute('disabled'); }
 
   connectedCallback() {
     this.classList.add('dropdown');
@@ -30,11 +32,13 @@ export class NycssDropdown extends HTMLElement {
     this._initSelection();
 
     this.output.addEventListener('click', () => {
+      if (this.disabled) return;
       this.toggle.checked = !this.toggle.checked;
       this._syncToggle();
     });
 
     this.output.addEventListener('keydown', (e) => {
+      if (this.disabled) return;
       if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown') {
         e.preventDefault();
         this.toggle.checked = true;
@@ -97,6 +101,8 @@ export class NycssDropdown extends HTMLElement {
         }
       }, 0);
     });
+
+    this._updateDisabled();
   }
 
   _renderItems() {
@@ -162,6 +168,21 @@ export class NycssDropdown extends HTMLElement {
         item.setAttribute('aria-selected', 'true');
         this._updateActiveDescendant();
       }
+    }
+    if (name === 'disabled') {
+      this._updateDisabled();
+    }
+  }
+
+  _updateDisabled() {
+    if (this.disabled) {
+      this.setAttribute('aria-disabled', 'true');
+      this.output?.setAttribute('aria-disabled', 'true');
+      this.output?.setAttribute('tabindex', '-1');
+    } else {
+      this.removeAttribute('aria-disabled');
+      this.output?.removeAttribute('aria-disabled');
+      this.output?.setAttribute('tabindex', '0');
     }
   }
 
