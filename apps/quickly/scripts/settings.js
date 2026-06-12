@@ -179,6 +179,16 @@
         configureEngine({ strategy: value });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
+      deduplicate: (value) => {
+        console.log('[QUICKLY_SETTINGS_SUB] deduplicate subscription fired with value:', value);
+        console.log('[QUICKLY_SETTINGS_SUB] Calling configureEngine({ deduplicate:', value, '})');
+        configureEngine({ deduplicate: value });
+        console.log('[QUICKLY_SETTINGS_SUB] window.processAuto:', window.processAuto, 'nestCode exists:', typeof nestCode === 'function');
+        if (window.processAuto && typeof nestCode === 'function') {
+          console.log('[QUICKLY_SETTINGS_SUB] Calling nestCode()');
+          nestCode();
+        }
+      },
       nestingDepth: (value) => {
         const infinite = store.nestingDepthInfinite;
         const stepper = document.getElementById('nestingDepth');
@@ -227,54 +237,23 @@
       });
     });
 
-    // Indentation Type
-    document.getElementById('indentationType').addEventListener('change', (e) => {
-      store.indentationType = e.detail;
+    // All steppers, radio groups, and toggles wire generically by id
+    document.querySelectorAll('nycss-stepper').forEach(el => {
+      el.addEventListener('change', (e) => {
+        store[el.id] = e.detail;
+      });
     });
 
-    // Indentation Size
-    document.getElementById('indentationSize').addEventListener('change', (e) => {
-      store.indentationSize = e.detail;
+    document.querySelectorAll('nycss-radio-group').forEach(el => {
+      el.addEventListener('change', (e) => {
+        store[el.id] = e.detail;
+      });
     });
 
-    // Word Wrap
-    document.getElementById('wordWrap').addEventListener('change', (e) => {
-      store.wordWrap = e.detail;
-    });
-
-    // Coordinates
-    document.getElementById('coordinates').addEventListener('change', (e) => {
-      store.coordinates = e.detail;
-    });
-
-    // Comments
-    document.getElementById('preserveComments').addEventListener('change', (e) => {
-      store.preserveComments = e.detail;
-    });
-
-    // Mode
-    document.getElementById('mode').addEventListener('change', (e) => {
-      store.mode = e.detail;
-    });
-
-    // Auto
-    document.getElementById('auto').addEventListener('change', (e) => {
-      store.auto = e.detail;
-    });
-
-    // Max Depth
-    document.getElementById('nestingDepth').addEventListener('change', (e) => {
-      store.nestingDepth = e.detail;
-    });
-
-    // Max Depth Infinite
-    document.getElementById('nestingDepthInfinite').addEventListener('change', (e) => {
-      store.nestingDepthInfinite = e.detail;
-    });
-
-    // File Size
-    document.getElementById('showFileSize').addEventListener('change', (e) => {
-      store.showFileSize = e.detail;
+    document.querySelectorAll('nycss-toggle').forEach(el => {
+      el.addEventListener('change', (e) => {
+        store[el.id] = e.detail;
+      });
     });
 
     // Apply initial state to components (DOM only, not editors)

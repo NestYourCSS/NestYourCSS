@@ -29,9 +29,9 @@ This document tracks upcoming features, bug fixes, and architectural changes for
 *   **Enable Ace minimap extension**
     *   **Context:** `index.html` and `scripts/setup.js`.
     *   **Action:** Load `ext-minimap.js`. Bind the Tier 1 "Show Minimap" toggle to `editor.setOption("showMinimap", true)`. Ensure CSS layout accommodates the extra width.
-*   **Add settings to toggle de-duplication**
-    *   **Context:** `packages/engine/src/engine.js` (`minifyCSS` / `renestCSS`) and `packages/state`.
-    *   **Action:** Add a `deduplicate` boolean to `configureEngine`. If true, parse the AST for identical properties inside the same Rule node and remove duplicates before stringifying.
+~~*   **Add settings to toggle de-duplication**~~
+    ~~*   **Context:** `packages/engine/src/engine.js` (`minifyCSS` / `renestCSS`) and `packages/state`.~~
+    ~~*   **Action:** Add a `deduplicate` boolean to `configureEngine`. If true, parse the AST for identical properties inside the same Rule node and remove duplicates before stringifying.~~
 *   **Mobile mode settings on main**
     *   **Context:** `scripts/nestingSettings.js` & `styles/main.css`.
     *   **Action:** The logic for popping open the settings on mobile is partially there. Refine the CSS `@media (max-aspect-ratio: 1.097 / 1)` to ensure the settings panel slides up cleanly over the editor.

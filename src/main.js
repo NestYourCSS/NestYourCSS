@@ -20,6 +20,7 @@ const settingsConfig = {
   nestingDepth: { defaultValue: 3 },
   nestingDepthInfinite: { defaultValue: true },
   nestingStrategy: { defaultValue: 'balanced' },
+  deduplicate: { defaultValue: false },
 };
 
 const defaults = {};
@@ -36,6 +37,13 @@ const store = createStore(defaults, {
     },
     mode: (value) => { window.processMode = value; },
     auto: (value) => { window.processAuto = value; },
+    deduplicate: (value) => {
+      console.log('[MAIN_ONSET] deduplicate handler called with value:', value);
+      console.log('[MAIN_ONSET] Setting window.deduplicate =', value);
+      window.deduplicate = value;
+      console.log('[MAIN_ONSET] Calling configureEngine({ deduplicate:', value, '})');
+      configureEngine({ deduplicate: value });
+    },
     indentationSize: () => {
       if (window.editorIndentChar?.startsWith(' ') || window.editorIndentChar === '') {
         window.editorIndentChar = ' '.repeat(store.indentationSize);
@@ -64,6 +72,7 @@ window.processAuto ??= store.auto;
 window.preserveComments ??= !store.preserveComments;
 window.editorIndentChar ??= '\t';
 window.coordDisplayMode ??= store.coordinates;
+window.deduplicate ??= store.deduplicate;
 
 // Register PWA
 registerSW();

@@ -42,10 +42,15 @@ async function resolveOutPath(out, filePaths) {
 }
 
 function transformCSS(cssString, opts) {
+  console.log('[CLI_TRANSFORM] transformCSS called');
+  console.log('[CLI_TRANSFORM] opts.dedupe =', opts.dedupe);
+  console.log('[CLI_TRANSFORM] opts.mode =', opts.mode);
+  console.log('[CLI_TRANSFORM] Calling configureEngine with deduplicate:', opts.dedupe);
   configureEngine({
     preserveComments: opts.comments !== false,
     indentChar: opts._indentChar,
     maxDepth: opts.depth !== undefined ? (parseInt(opts.depth, 10) || Infinity) : undefined,
+    deduplicate: opts.dedupe,
   });
 
   const ast = parseCSS(cssString);
@@ -128,6 +133,7 @@ export async function main() {
     .option('--no-comments', 'Strip comments from output')
     .option('--base <dir>', 'Base directory for preserving output structure')
     .option('-w, --watch', 'Watch input files for changes')
+    .option('--dedupe', 'Remove duplicate rules and declarations', { default: false })
     .action(async (files, options) => {
       if (!files || files.length === 0) {
         if (!process.stdin.isTTY) {
@@ -139,6 +145,8 @@ export async function main() {
             ...options,
             _indentChar: parseIndent(options.indent),
           };
+          console.log('[CLI_ACTION] Stdin path: options.dedupe =', options.dedupe);
+          console.log('[CLI_ACTION] Stdin path: opts.dedupe =', opts.dedupe);
           const output = transformCSS(inputCSS, opts);
           process.stdout.write(output);
           process.exit(0);
@@ -192,6 +200,8 @@ export async function main() {
         _outDest: outDest,
         _baseDir: options.base ? resolve(options.base) : findBaseDir(resolvedFiles),
       };
+      console.log('[CLI_ACTION] File path: options.dedupe =', options.dedupe);
+      console.log('[CLI_ACTION] File path: opts.dedupe =', opts.dedupe);
 
       if (opts._outDest && opts._outDest.path) {
         await mkdir(dirname(opts._outDest.path), { recursive: true });

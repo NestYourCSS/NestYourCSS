@@ -20,6 +20,7 @@ const store = createStore({
   nestingDepth: 3,
   nestingDepthInfinite: true,
   nestingStrategy: 'balanced',
+  deduplicate: false,
 }, {
   key: 'nycss-settings',
   onSet: {
@@ -29,6 +30,13 @@ const store = createStore({
     },
     mode: (value) => { window.processMode = value; },
     auto: (value) => { window.processAuto = value; window.autoProcess = value; },
+    deduplicate: (value) => {
+      console.log('[QUICKLY_MAIN_ONSET] deduplicate handler called with value:', value);
+      console.log('[QUICKLY_MAIN_ONSET] Setting window.deduplicate =', value);
+      window.deduplicate = value;
+      console.log('[QUICKLY_MAIN_ONSET] Calling configureEngine({ deduplicate:', value, '})');
+      configureEngine({ deduplicate: value });
+    },
   },
 });
 
@@ -49,6 +57,7 @@ window.processAuto = store.auto;
 window.autoProcess = store.auto;
 window.preserveComments = !store.preserveComments;
 window.editorIndentChar = '\t';
+window.deduplicate = store.deduplicate;
 
 // Export store
 window.__store = store;

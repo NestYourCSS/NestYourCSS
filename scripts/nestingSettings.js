@@ -127,6 +127,16 @@
         configureEngine({ strategy: value });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
+      deduplicate: (value) => {
+        console.log('[NESTING_SETTINGS_SUB] deduplicate subscription fired with value:', value);
+        console.log('[NESTING_SETTINGS_SUB] Calling configureEngine({ deduplicate:', value, '})');
+        configureEngine({ deduplicate: value });
+        console.log('[NESTING_SETTINGS_SUB] window.processAuto:', window.processAuto, 'nestCode exists:', typeof nestCode === 'function');
+        if (window.processAuto && typeof nestCode === 'function') {
+          console.log('[NESTING_SETTINGS_SUB] Calling nestCode()');
+          nestCode();
+        }
+      },
       nestingDepth: (value) => {
         const infinite = store.nestingDepthInfinite;
         const stepper = document.getElementById('nestingDepth');

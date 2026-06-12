@@ -45,7 +45,10 @@ Nest Your CSS is a full suite of tools designed to bring native CSS nesting and 
 -   **Denest CSS:** Flatten nested CSS back to standard, legacy-browser-compatible CSS.
 -   **Minify CSS:** Optimize your stylesheets by removing unnecessary characters.
 -   **Beautify CSS:** Format and indent your code for maximum readability.
--   **Configurable Depth Limit:** Choose exactly how deep your CSS is allowed to nest (e.g; limit to the industry standard: 3-4 levels) to avoid overly specific selectors.
+-   **Nesting Strategy:** Choose how deeply the engine nests your CSS — `balanced` (splits deep selectors), `maximize` (prefers depth over readability), or `flattened` (caps at one level of nesting).
+-   **Configurable Depth Limit:** Set a maximum depth of your choice to avoid overly specific selectors while maintaining readability (3-4 is industry standard).
+-   **Deduplication:** Automatically remove duplicate declarations from your output CSS.
+-   **File Size Display:** Toggle the display of file sizes in the editor tabs.
 -   **Batch Processing:** Watch and transform entire directories of stylesheets using the CLI.
 -   **Customizable Editor:** Adjust font, font size, indentation, and word wrap to your preference.
 -   **Load External CSS:** Fetch and convert stylesheets directly from a URL.
@@ -101,6 +104,7 @@ cat input.css | nycss --mode minify > output.min.css
 | `-d, --depth <level>` | Max nesting depth. Limits how deep selectors can nest (use `0` for infinite). | Infinite |
 | `-i, --indent <size>` | Indent size. Use a number (e.g; `2`, `4`) or `tab`. | `4` |
 | `--no-comments` | Strips all comments from the output CSS. | `false` (keeps comments) |
+| `--dedupe` | Removes duplicate rules and declarations from the output. | `false` |
 | `-o, --out <path>` | Output destination (file or directory). | N/A |
 | `--out-dir <dir>` | Output directory for batch processing. | N/A |
 | `--base <dir>` | Base directory for preserving the folder structure during batch processing. | Auto-detected |
