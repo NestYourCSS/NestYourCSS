@@ -252,30 +252,4 @@
   document.addEventListener('DOMContentLoaded', () => {
     initSettings(window.__store);
   });
-
-  function openSettingsPanel() {
-    const panel = document.getElementById('mainSettings');
-    const btn = document.getElementById('settingsBtn');
-    const overlay = document.getElementById('mobile-overlay');
-    if (!panel) return;
-    panel.classList.add('mobile-open');
-    panel.removeAttribute('inert');
-    if (overlay) overlay.classList.add('active');
-    if (btn) btn.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-    const focusable = panel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), nycss-dropdown output, nycss-combobox output, nycss-toggle, nycss-stepper, nycss-radio-group label');
-    if (focusable.length) focusable[0].focus();
-  }
-
-  function closeSettingsPanel() {
-    const panel = document.getElementById('mainSettings');
-    const btn = document.getElementById('settingsBtn');
-    const overlay = document.getElementById('mobile-overlay');
-    if (!panel) return;
-    panel.classList.remove('mobile-open');
-    if (overlay) overlay.classList.remove('active');
-    if (btn) btn.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-    if (btn) btn.focus();
-  }
 })();

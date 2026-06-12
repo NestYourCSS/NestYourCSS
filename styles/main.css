@@ -1483,7 +1483,7 @@
     }
 
     #mainSettings {
-      /* A manually calculated minimum width based on it's children elements, but due to `contain` use, getting in dynamically isn't possible. */
+      /* A manually calculated minimum width based on it's children elements, but due to `contain` use, getting it dynamically isn't possible. */
       min-width: calc((58.441558ch * 1.232));
       margin-right: var(--padding);
     }
@@ -1500,9 +1500,8 @@
         align-content: center;
 
         > #nestBtn {
-          opacity: 0.75;
           font-size: 0.75rem;
-          translate: 0% 0%;
+          translate: 0% calc(-100% - 0.5rem);
           --nestBtn-shadow-direction: -1;
 
           > div {
@@ -2479,52 +2478,26 @@
         border-radius: 1rem;
       }
 
+      #mainSettings:not(.mobile-open),
       #mainContent :is(#textSide, #shadowEditorsWrapper) {
         display: none;
-      }
-
-      #mainSettings:not(.mobile-open) {
-        display: flex !important;
-        position: fixed;
-        z-index: 1000;
-        bottom: 0;
-        left: 2rem;
-        right: 2rem;
-        width: calc(100% - 4rem);
-        max-height: calc(100dvh - 8rem);
-        margin-right: 0;
-        min-width: 0;
-        padding: 0;
-        transform: translateY(100%);
-        visibility: hidden;
-        pointer-events: none;
       }
 
       #mainSettings.mobile-open {
         display: flex !important;
         position: fixed;
-        z-index: 1000;
-        bottom: 0;
+        z-index: 1001;
+        top: calc(2rem + 4rem); /* Header padding + button height approximately */
         left: 2rem;
         right: 2rem;
         width: calc(100% - 4rem);
-        max-height: calc(100dvh - 8rem);
+        max-height: calc(100vh - 8rem);
         overflow-y: auto;
         padding: 0;
+        background: rgb(from var(--shades-black) r g b / 0.5);
         margin-right: 0;
-        outline: 2px solid var(--sec-colour-medium);
-        outline-offset: 2px;
         min-width: 0;
-        visibility: visible;
-        pointer-events: auto;
-        background: rgb(from var(--shades-black) r g b / 0.85);
-        transform: translateY(0);
-        border-radius: 2rem 2rem 0 0;
-
-        @media not (prefers-reduced-motion: reduce) {
-          transition: transform 0.3s ease-out;
-        }
-
+        
         > section {
           border-radius: 2rem;
           padding: 1.25rem;
@@ -2754,24 +2727,6 @@
           }
         }
       }
-    }
-  }
-
-  #mobile-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    background: rgb(from var(--shades-black) r g b / 0.6);
-    pointer-events: none;
-    opacity: 0;
-
-    @media not (prefers-reduced-motion: reduce) {
-      transition: opacity 0.3s ease-out;
-    }
-
-    &.active {
-      opacity: 1;
-      pointer-events: auto;
     }
   }
 }
