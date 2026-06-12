@@ -726,8 +726,7 @@
     @media not (prefers-reduced-motion: reduce) {
       transition:
         width 2s,
-        opacity 2s,
-        padding 2s;
+        opacity 2s;
     }
 
     > header {
@@ -1414,12 +1413,6 @@
       }
 
       > #codeEditor > .editorWrapper {
-        transition: 1s 0.5s;
-        
-        @media (prefers-reduced-motion: reduce) {
-          transition: none;
-        }
-
         /* &#inputEditorWrapper { */
         &:first-child {
           display: block;
@@ -1501,7 +1494,7 @@
 
         > #nestBtn {
           font-size: 0.75rem;
-          translate: 0% calc(-100% - 0.5rem);
+          translate: 0% 0%;
           --nestBtn-shadow-direction: -1;
 
           > div {
@@ -2467,11 +2460,17 @@
     /* --- Main Section Scope --- */
 
     & > main {
-      &.nesting > #settingsBtn {
-        display: flex;
-        margin: 0 auto 1rem auto;
-        justify-content: center;
-        align-items: center;
+      &.nesting {
+        > #settingsBtn {
+          display: flex;
+          margin: 0 auto 1rem auto;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        #mainContent > #editorSide > #nestBtn {
+          translate: 0% calc(-100% - 0.5rem);
+        }
       }
 
       #mainContent {
