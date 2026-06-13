@@ -202,6 +202,11 @@
         configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
+      showMinimap: (value) => {
+        [window.inputEditor, window.outputEditor].filter(Boolean).forEach(ed => {
+          if (ed._minimap) ed._minimap.el.style.display = value ? '' : 'none';
+        });
+      },
       showFileSize: (value) => {
         const editors = [window.inputEditor, window.outputEditor].filter(Boolean);
         editors.forEach(editor => {

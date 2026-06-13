@@ -18,10 +18,13 @@
   <script defer src="/_vercel/insights/script.js"></script>
 
   <script src="./lib/ace.min.js"></script>
+  <script src="./lib/theme-nycss.min.js" defer></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link href="./styles/editor.css" rel="stylesheet">
   <link href="./styles/main.css" rel="stylesheet">
+  <link rel="preload" href="./lib/theme-nycss.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="./lib/theme-nycss.css"></noscript>
 </head>
 <body>
   <div id="a11y-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
@@ -89,6 +92,12 @@
                   <span id="showFileSize-label">File Size</span>
                   <div>
                     <nycss-toggle id="showFileSize" off-text="Show" on-text="Hide"></nycss-toggle>
+                  </div>
+                </li>
+                <li>
+                  <span id="showMinimap-label">Minimap</span>
+                  <div>
+                    <nycss-toggle id="showMinimap" on-text="Show" off-text="Hide"></nycss-toggle>
                   </div>
                 </li>
               </ul>

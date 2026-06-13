@@ -21,6 +21,7 @@ const store = createStore({
   nestingDepthInfinite: true,
   nestingStrategy: 'balanced',
   deduplicate: false,
+  showMinimap: false,
 }, {
   key: 'nycss-settings',
   onSet: {

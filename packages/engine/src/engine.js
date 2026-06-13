@@ -4,14 +4,11 @@ let _maxDepth = Infinity;
 let _strategy = 'balanced';
 let _deduplicate = false;
 export function configureEngine(opts = {}) {
-  console.log('[CONFIGURE_ENGINE] Called with opts:', JSON.stringify(opts));
-  console.log('[CONFIGURE_ENGINE] Current _deduplicate before:', _deduplicate);
   if (opts.preserveComments !== undefined) _preserveComments = opts.preserveComments;
   if (opts.indentChar !== undefined) _indentChar = opts.indentChar;
   if (opts.maxDepth !== undefined) _maxDepth = opts.maxDepth;
   if (opts.strategy !== undefined && ['balanced', 'maximize', 'flattened'].includes(opts.strategy)) _strategy = opts.strategy;
   if (opts.deduplicate !== undefined) _deduplicate = opts.deduplicate;
-  console.log('[CONFIGURE_ENGINE] Current _deduplicate after:', _deduplicate);
 }
 
 function parseSelector(selectorText) {
@@ -410,30 +407,10 @@ function minifyValue(tokens) {
 }
 
 export function deduplicateCSS(ast, depth = 0) {
-    const prefix = '  '.repeat(depth);
-    console.group(`${prefix}[DEDUP] Enter deduplicateCSS depth=${depth}, nodeType=${ast?.type}, bodyLength=${ast?.body?.length}`);
-
     if (!ast || !ast.body) {
-        console.log(`${prefix}[DEDUP] No body to process, returning`);
-        console.groupEnd();
         return;
     }
 
-    console.log(`${prefix}[DEDUP] Initial body items:`);
-    ast.body.forEach((child, i) => {
-        if (child.type === 'Rule') {
-            const selStr = child.selector.map(g => g.parts.join('')).join(',');
-            console.log(`${prefix}[DEDUP]   [${i}] Rule selector="${selStr}", body has ${child.body.length} items`);
-        } else if (child.type === 'Declaration') {
-            console.log(`${prefix}[DEDUP]   [${i}] Declaration ${child.property}: ${child.value.map?.(v => v)?.join(' ') || child.value}`);
-        } else if (child.type === 'AtRule') {
-            console.log(`${prefix}[DEDUP]   [${i}] AtRule @${child.name} ${child.params}, body=${child.body ? 'exists (' + child.body.length + ' items)' : 'null'}`);
-        } else {
-            console.log(`${prefix}[DEDUP]   [${i}] ${child.type}`);
-        }
-    });
-
-    console.log(`${prefix}[DEDUP] === Step 1: Merge identical selector Rules ===`);
     const newBody = [];
     const ruleMap = new Map();
 
@@ -442,85 +419,54 @@ export function deduplicateCSS(ast, depth = 0) {
 
         if (child.type === 'Rule') {
             const selStr = child.selector.map(g => g.parts.join('')).join(',');
-            console.log(`${prefix}[DEDUP] Step1: Processing Rule at index ${i}, selector="${selStr}"`);
             if (ruleMap.has(selStr)) {
                 const existingRule = ruleMap.get(selStr);
-                console.log(`${prefix}[DEDUP] Step1: DUPLICATE selector "${selStr}"! Merging body (${existingRule.body.length} items + ${child.body.length} items)`);
                 existingRule.body.push(...child.body);
                 const index = newBody.indexOf(existingRule);
                 if (index !== -1) {
-                    console.log(`${prefix}[DEDUP] Step1: Removing existing rule from position ${index}, will re-push to end`);
                     newBody.splice(index, 1);
                 }
                 newBody.push(existingRule);
-                console.log(`${prefix}[DEDUP] Step1: Merged rule now has ${existingRule.body.length} body items`);
             } else {
-                console.log(`${prefix}[DEDUP] Step1: First occurrence of selector "${selStr}", adding to map`);
                 ruleMap.set(selStr, child);
                 newBody.push(child);
             }
         } else {
-            console.log(`${prefix}[DEDUP] Step1: Non-Rule child at index ${i}, passing through`);
             newBody.push(child);
         }
     }
 
     ast.body = newBody;
-    console.log(`${prefix}[DEDUP] After Step1, body has ${ast.body.length} items`);
 
-    console.log(`${prefix}[DEDUP] === Step 2: Deduplicate Declarations ===`);
     const declMap = new Map();
     const blockBody = [];
     for (const child of ast.body) {
         if (child.type === 'Declaration') {
-            const valStr = Array.isArray(child.value) ? child.value.join(' ') : String(child.value);
-            console.log(`${prefix}[DEDUP] Step2: Processing Declaration: ${child.property}: ${valStr}`);
             if (declMap.has(child.property)) {
                 const existing = declMap.get(child.property);
-                const existingVal = Array.isArray(existing.value) ? existing.value.join(' ') : String(existing.value);
-                console.log(`${prefix}[DEDUP] Step2: DUPLICATE property "${child.property}"! Removing earlier value="${existingVal}", keeping later value="${valStr}"`);
                 const index = blockBody.indexOf(existing);
                 if (index !== -1) {
-                    console.log(`${prefix}[DEDUP] Step2: Removing earlier declaration at blockBody index ${index}`);
                     blockBody.splice(index, 1);
                 }
-            } else {
-                console.log(`${prefix}[DEDUP] Step2: First occurrence of property "${child.property}"`);
             }
             declMap.set(child.property, child);
             blockBody.push(child);
         } else {
-            console.log(`${prefix}[DEDUP] Step2: Non-Declaration child, passing through`);
             blockBody.push(child);
         }
     }
     ast.body = blockBody;
-    console.log(`${prefix}[DEDUP] After Step2, body has ${ast.body.length} items`);
 
-    console.log(`${prefix}[DEDUP] === Step 3: Recurse into nested Rules/AtRules ===`);
     for (const child of ast.body) {
         if (child.type === 'Rule' || child.type === 'AtRule') {
-            const label = child.type === 'Rule'
-                ? `Rule selector="${child.selector.map(g => g.parts.join('')).join(',')}"`
-                : `AtRule @${child.name} ${child.params}`;
-            console.log(`${prefix}[DEDUP] Step3: Recursing into ${label}`);
             deduplicateCSS(child, depth + 1);
         }
     }
-
-    console.log(`${prefix}[DEDUP] Exit deduplicateCSS depth=${depth}`);
-    console.groupEnd();
 }
 
 export function minifyCSS(ast) {
-    console.log('[MINIFY_CSS] Called _deduplicate flag =', _deduplicate);
     if (_deduplicate) {
-        console.log('[MINIFY_CSS] _deduplicate is TRUE, calling deduplicateCSS');
-        console.log('[MINIFY_CSS] AST before dedup root body length:', ast?.body?.length);
         deduplicateCSS(ast);
-        console.log('[MINIFY_CSS] AST after dedup root body length:', ast?.body?.length);
-    } else {
-        console.log('[MINIFY_CSS] _deduplicate is FALSE, skipping deduplicateCSS');
     }
     function _minify(node) {
         if (!node || !node.body) return '';
@@ -665,14 +611,8 @@ function beautifyValue(valueTokens) {
 }
 
 export function beautifyCSS(ast, initialIndent = '') {
-    console.log('[BEAUTIFY_CSS] Called _deduplicate flag =', _deduplicate);
     if (_deduplicate) {
-        console.log('[BEAUTIFY_CSS] _deduplicate is TRUE, calling deduplicateCSS');
-        console.log('[BEAUTIFY_CSS] AST before dedup root body length:', ast?.body?.length);
         deduplicateCSS(ast);
-        console.log('[BEAUTIFY_CSS] AST after dedup root body length:', ast?.body?.length);
-    } else {
-        console.log('[BEAUTIFY_CSS] _deduplicate is FALSE, skipping deduplicateCSS');
     }
     const indentChar = _indentChar;
     
@@ -1146,26 +1086,16 @@ export function renestCSS(ast) {
             }
         }
 
-        console.log(`\n[DEBUG RENEST] Found ${candidates.length} nesting candidates. Sorting...`);
         candidates.sort((a, b) => {
             if (a.score.typeOrder !== b.score.typeOrder) return a.score.typeOrder - b.score.typeOrder;
             if (a.score.score !== b.score.score) return b.score.score - a.score.score;
             return a.parentIdx - b.parentIdx;
         });
 
-        for (let idx = 0; idx < candidates.length; idx++) {
-            const c = candidates[idx];
-            console.log(`[DEBUG RENEST] Candidate ${idx}: child=${c.childIdx}, parent=${c.parentIdx}, relType=${c.relationship.type}, score=${c.score.score}`);
-        }
-
-        console.log(`\n[DEBUG RENEST] Assigning parents based on candidates...`);
         for (const c of candidates) {
             if (parentOf[c.childIdx] === -1) {
                 parentOf[c.childIdx] = c.parentIdx;
                 rels[c.childIdx] = c.relationship;
-                console.log(`[DEBUG RENEST] -> Assigned parentOf[${c.childIdx}] = ${c.parentIdx}`);
-            } else {
-                console.log(`[DEBUG RENEST] -> Skipped child ${c.childIdx} (already has parent ${parentOf[c.childIdx]})`);
             }
         }
 
@@ -1185,20 +1115,15 @@ export function renestCSS(ast) {
 
         const effectiveMaxDepth = _maxDepth === Infinity ? Infinity : _maxDepth - 1;
 
-        console.log(`\n[DEBUG RENEST] Starting depth adjustment loop.`);
-        console.log(`[DEBUG RENEST] _maxDepth: ${_maxDepth}, effectiveMaxDepth: ${effectiveMaxDepth}, _strategy: ${_strategy}`);
-
         let depthChanged = true;
         let passCounter = 0;
         
         while (depthChanged) {
             passCounter++;
-            console.log(`\n[DEBUG RENEST] --- Pass ${passCounter} ---`);
             depthChanged = false;
             
             const treeMaxDepth = new Int32Array(n).fill(0);
             
-            console.log(`[DEBUG RENEST] Calculating treeMaxDepth for ${n} nodes...`);
             for (let i = 0; i < n; i++) {
                 if (parentOf[i] !== -1) {
                     let d = getDepth(i, parentOf);
@@ -1209,12 +1134,6 @@ export function renestCSS(ast) {
                     if (d > treeMaxDepth[cur]) {
                         treeMaxDepth[cur] = d;
                     }
-                }
-            }
-
-            for (let i = 0; i < n; i++) {
-                if (treeMaxDepth[i] > 0 || parentOf[i] === -1) {
-                    console.log(`[DEBUG RENEST] Tree Root ${i} -> max descendants depth: ${treeMaxDepth[i]}`);
                 }
             }
 
@@ -1244,47 +1163,36 @@ export function renestCSS(ast) {
                         }
                     }
 
-                    console.log(`[DEBUG RENEST] Node ${i} | parentOf: ${parentOf[i]} | curRoot: ${curRoot} | dynamicDepth: ${dynamicDepth} | totalDepth: ${totalDepth} | limit: ${limit} (N=${nValue}, C=${cValue})`);
-
                     if (totalDepth > limit) {
                         if (cutRoots.has(curRoot)) {
-                            console.log(`[DEBUG RENEST] -> Node ${i} exceeds limit, but root ${curRoot} already cut in this pass. Skipping.`);
                             continue;
                         }
 
-                        console.log(`[DEBUG RENEST] -> Node ${i} EXCEEDS limit! (totalDepth ${totalDepth} > ${limit})`);
                         cutRoots.add(curRoot);
                         
                         if (_strategy === 'flattened' && _maxDepth !== Infinity) {
                             const targetAncestorDepth = _maxDepth - 2;
                             if (targetAncestorDepth >= 0) {
                                 const ancestorIdx = getAncestorAtDepth(i, parentOf, targetAncestorDepth);
-                                console.log(`[DEBUG RENEST] -> Flattened strategy: targetAncestorDepth ${targetAncestorDepth}, ancestorIdx ${ancestorIdx}`);
                                 if (ancestorIdx !== -1 && ancestorIdx !== parentOf[i]) {
                                     const newRel = findNestingRelationship(body[ancestorIdx].selector, body[i].selector);
                                     if (newRel) {
-                                        console.log(`[DEBUG RENEST] -> Reparenting node ${i} to ancestor ${ancestorIdx}`);
                                         parentOf[i] = ancestorIdx;
                                         rels[i] = newRel;
                                         depthChanged = true;
                                         continue;
-                                    } else {
-                                        console.log(`[DEBUG RENEST] -> Could not find valid nesting relationship for reparenting.`);
                                     }
                                 }
                             }
                         }
 
-                        console.log(`[DEBUG RENEST] -> Cutting node ${i} from parent ${parentOf[i]}`);
                         parentOf[i] = -1;
                         rels[i] = null;
                         depthChanged = true;
                     }
                 }
             }
-            console.log(`[DEBUG RENEST] End of Pass ${passCounter}. depthChanged = ${depthChanged}`);
         }
-        console.log(`[DEBUG RENEST] Depth adjustment complete.`);
 
         const newBody = [];
         for (let i = 0; i < n; i++) {

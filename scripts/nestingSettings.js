@@ -128,12 +128,8 @@
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
       deduplicate: (value) => {
-        console.log('[NESTING_SETTINGS_SUB] deduplicate subscription fired with value:', value);
-        console.log('[NESTING_SETTINGS_SUB] Calling configureEngine({ deduplicate:', value, '})');
         configureEngine({ deduplicate: value });
-        console.log('[NESTING_SETTINGS_SUB] window.processAuto:', window.processAuto, 'nestCode exists:', typeof nestCode === 'function');
         if (window.processAuto && typeof nestCode === 'function') {
-          console.log('[NESTING_SETTINGS_SUB] Calling nestCode()');
           nestCode();
         }
       },
@@ -149,6 +145,11 @@
         if (stepper) stepper.disabled = value || window.processMode !== 3;
         configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      showMinimap: (value) => {
+        [window.inputEditorInstance, window.outputEditorInstance].filter(Boolean).forEach(ed => {
+          if (ed._minimap) ed._minimap.el.style.display = value ? '' : 'none';
+        });
       },
       showFileSize: (value) => {
         const editors = [window.inputEditorInstance, window.outputEditorInstance].filter(Boolean);

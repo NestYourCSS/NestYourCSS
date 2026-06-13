@@ -99,7 +99,6 @@ function nestCode(onClick = false) {
         if (typeof window.announce === 'function') window.announce(window.i18n.conversionComplete);
 	} else {  
 		window.outputEditorInstance.getSession().setValue(window.i18n.cssContainsErrors);  
-		console.log('Code Errors:', annotations);  
 		  
         updateAccessibleErrorTable(  
           annotations,  

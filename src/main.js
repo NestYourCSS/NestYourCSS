@@ -21,6 +21,7 @@ const settingsConfig = {
   nestingDepthInfinite: { defaultValue: true },
   nestingStrategy: { defaultValue: 'balanced' },
   deduplicate: { defaultValue: false },
+  showMinimap: { defaultValue: true },
 };
 
 const defaults = {};
@@ -38,10 +39,7 @@ const store = createStore(defaults, {
     mode: (value) => { window.processMode = value; },
     auto: (value) => { window.processAuto = value; },
     deduplicate: (value) => {
-      console.log('[MAIN_ONSET] deduplicate handler called with value:', value);
-      console.log('[MAIN_ONSET] Setting window.deduplicate =', value);
       window.deduplicate = value;
-      console.log('[MAIN_ONSET] Calling configureEngine({ deduplicate:', value, '})');
       configureEngine({ deduplicate: value });
     },
     indentationSize: () => {

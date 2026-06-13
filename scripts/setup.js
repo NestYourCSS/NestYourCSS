@@ -242,6 +242,97 @@ function initializeAceEditors() {
       wrapEditorWithGroup(editor, editorTab);
       window.updateCoordinateDisplay(ace.edit(editor));
     });
+
+    [window.inputEditorInstance, window.outputEditorInstance].forEach(ed => {
+      if (ed) setupMinimap(ed);
+    });
+
+    function setupMinimap(editor) {
+      const container = editor.container;
+      container.style.position = 'relative';
+
+      const minimapEl = document.createElement('div');
+      minimapEl.id = editor.container.id + 'Minimap';
+      minimapEl.className = 'ace-minimap';
+      container.appendChild(minimapEl);
+
+      const minimap = ace.edit(minimapEl);
+      minimap.session.setMode('ace/mode/css');
+      minimap.setFontSize(2.5);
+      minimap.setShowPrintMargin(false);
+      minimap.renderer.setShowGutter(false);
+      minimap.renderer.setOption('showLineNumbers', false);
+      minimap.setReadOnly(true);
+      minimap.setTheme('ace/theme/nycss');
+
+      minimap.setValue(editor.getValue(), -1);
+      minimap.selection.clearSelection();
+
+      let syncTimeout;
+      editor.session.on('change', () => {
+        clearTimeout(syncTimeout);
+        syncTimeout = setTimeout(() => {
+          minimap.setValue(editor.getValue(), -1);
+          minimap.selection.clearSelection();
+        }, 300);
+      });
+
+      const rangeIndicator = document.createElement('div');
+      rangeIndicator.className = 'ace-minimap-range-indicator';
+      minimapEl.appendChild(rangeIndicator);
+
+      const rangeOverlay = document.createElement('div');
+      rangeOverlay.className = 'ace-minimap-overlay';
+      minimapEl.appendChild(rangeOverlay);
+
+      function updateRangeIndicator() {
+        const total = editor.session.getLength();
+        if (total < 2) { rangeIndicator.style.top = '0%'; rangeIndicator.style.height = '100%'; return; }
+        const scrollTop = editor.session.getScrollTop();
+        const lineH = editor.renderer.lineHeight;
+        const visH = editor.renderer.$size.scrollerHeight;
+        const first = scrollTop / lineH;
+        const visLines = visH / lineH;
+        const topPct = Math.max(0, Math.min(100, (first / total) * 100));
+        const heightPct = Math.max(0.5, (visLines / total) * 100);
+        rangeIndicator.style.top = topPct + '%';
+        rangeIndicator.style.height = Math.min(heightPct, 100 - topPct) + '%';
+      }
+
+      updateRangeIndicator();
+      editor.session.on('changeScrollTop', updateRangeIndicator);
+      editor.selection.on('changeCursor', () => requestAnimationFrame(updateRangeIndicator));
+
+      let isDragging = false;
+
+      rangeOverlay.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        scrollEditorToY(e.clientY);
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        scrollEditorToY(e.clientY);
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          editor.focus();
+        }
+      });
+
+      function scrollEditorToY(clientY) {
+        const rect = minimapEl.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+        const totalLines = editor.session.getLength();
+        const targetLine = Math.round(Math.max(0, Math.min(ratio * totalLines, totalLines - 1)));
+        editor.scrollToLine(targetLine, true, false);
+      }
+
+      editor._minimap = { el: minimapEl, editor: minimap };
+    }
   
     const shadowWrapperElement = document.createElement("div");
     shadowWrapperElement.id = "shadowEditorsWrapper";
