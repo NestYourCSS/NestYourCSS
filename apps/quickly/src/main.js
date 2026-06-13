@@ -12,7 +12,7 @@ const store = createStore({
   indentationType: true,
   indentationSize: 4,
   wordWrap: false,
-  coordinates: 3,
+  coordinates: 2,
   mode: 3,
   auto: true,
   preserveComments: false,

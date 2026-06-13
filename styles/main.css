@@ -1272,7 +1272,7 @@
     top: 0;
     right: 0;
     translate: -2rem calc(96dvh - 6rem - 100%);
-    z-index: 10;
+    z-index: 100;
     background: none;
     border: none;
     border-radius: 50%;

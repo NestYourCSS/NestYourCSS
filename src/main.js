@@ -21,7 +21,7 @@ const settingsConfig = {
   nestingDepthInfinite: { defaultValue: true },
   nestingStrategy: { defaultValue: 'balanced' },
   deduplicate: { defaultValue: false },
-  showMinimap: { defaultValue: true },
+  showMinimap: { defaultValue: false },
 };
 
 const defaults = {};
