@@ -49,6 +49,7 @@ Nest Your CSS is a full suite of tools designed to bring native CSS nesting and 
 -   **Configurable Depth Limit:** Set a maximum depth of your choice to avoid overly specific selectors while maintaining readability (3-4 is industry standard).
 -   **Deduplication:** Automatically remove duplicate declarations from your output CSS.
 -   **File Size Display:** Toggle the display of file sizes in the editor tabs.
+-   **Minimap:** Toggle a code minimap in the editor for quick visual navigation of your stylesheets.
 -   **Batch Processing:** Watch and transform entire directories of stylesheets using the CLI.
 -   **Customizable Editor:** Adjust font, font size, indentation, and word wrap to your preference.
 -   **Load External CSS:** Fetch and convert stylesheets directly from a URL.
