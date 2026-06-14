@@ -10,12 +10,22 @@ function initializeSmoothScrollAndNestingController() {
 
   // --- Methods ---
   window.switchToNestingMode = () => {
-    if (mainElement.classList.contains('nesting')) return;
+    console.log('[switchToNestingMode] called');
+    if (mainElement.classList.contains('nesting')) {
+      console.log('[switchToNestingMode] already nesting, returning');
+      return;
+    }
+    console.log('[switchToNestingMode] adding nesting class');
     mainElement.classList.add('nesting');
   };
 
   window.switchToHomepage = () => {
-    if (!mainElement.classList.contains('nesting')) return;
+    console.log('[switchToHomepage] called');
+    if (!mainElement.classList.contains('nesting')) {
+      console.log('[switchToHomepage] not nesting, returning');
+      return;
+    }
+    console.log('[switchToHomepage] removing nesting class');
     mainElement.classList.remove('nesting');
   };
 
@@ -54,8 +64,10 @@ function initializeSmoothScrollAndNestingController() {
 
   // --- The Core Logic (Race-Condition Proof) ---
   async function handleNestingChange(isCurrentlyNesting) {
+    console.log('[handleNestingChange] called, isCurrentlyNesting:', isCurrentlyNesting, '| transitionId was:', transitionId);
     // 1. Increment sequence ID so older "ghost" calls know to stop
     const currentCallId = ++transitionId;
+    console.log('[handleNestingChange] transitionId now:', transitionId, '| currentCallId:', currentCallId);
     
     window.isNesting = isCurrentlyNesting;
 
@@ -89,6 +101,7 @@ function initializeSmoothScrollAndNestingController() {
     if (currentCallId !== transitionId) return;
 
     // 5. Finalize UI
+    console.log('[handleNestingChange] finalizing UI, isCurrentlyNesting:', window.isNesting);
     if (nestBtn) {
       nestBtn.disabled = false;
       nestBtn.setAttribute('aria-label', window.isNesting ? window.i18n.viewHomepage : window.i18n.startNesting);
@@ -105,8 +118,10 @@ function initializeSmoothScrollAndNestingController() {
   // --- Observer ---
   const observer = new MutationObserver(() => {
     const isCurrentlyNesting = mainElement.classList.contains('nesting');
+    console.log('[MutationObserver] class changed, isCurrentlyNesting:', isCurrentlyNesting, '| window.isNesting:', window.isNesting);
     if (isCurrentlyNesting !== window.isNesting) {
       if (window._nestingLocked && !isCurrentlyNesting) {
+        console.log('[MutationObserver] nesting locked, switching back');
         window.switchToNestingMode();
         return;
       }

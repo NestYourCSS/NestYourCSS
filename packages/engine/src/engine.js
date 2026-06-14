@@ -775,9 +775,9 @@ export function denestCSS(ast, preserveWrappers = false) {
                 const newContext = { ...context, selector: newSelector };
                 const childNodes = _denest(node.body, newContext);
                 
-                const hasChildRules = node.body.some(n => n.type === 'Rule' || n.type === 'AtRule');
+                const childRulesCount = node.body.filter(n => n.type === 'Rule' || n.type === 'AtRule').length;
                 
-                if (preserveWrappers && hasChildRules) {
+                if (preserveWrappers && childRulesCount > 1) {
                     const emptyRule = {
                         type: 'Rule',
                         selector: cloneASTNode(newSelector),
@@ -1240,5 +1240,31 @@ export function renestCSS(ast) {
     }
 
     _renest(ast, 0);
+
+    function removeEmptyRules(node) {
+        if (!node || !node.body) return;
+        
+        for (let i = node.body.length - 1; i >= 0; i--) {
+            const child = node.body[i];
+            
+            if (child.type === 'Rule' || child.type === 'AtRule') {
+                removeEmptyRules(child);
+                
+                const hasContent = child.body && child.body.some(n => 
+                    n.type === 'Declaration' || 
+                    n.type === 'Rule' || 
+                    n.type === 'AtRule' || 
+                    n.type === 'Comment'
+                );
+                
+                if (!hasContent) {
+                    node.body.splice(i, 1);
+                }
+            }
+        }
+    }
+    
+    removeEmptyRules(ast);
+
     return ast;
 }

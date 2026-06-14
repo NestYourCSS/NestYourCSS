@@ -25,35 +25,54 @@ function initializeAceEditors() {
     let isProcessing = false;
   
     window.inputEditorInstance.getSession().on('change', () => {
-      if (window.appIsInitializing) return;
+      console.log('[change] fired');
+      if (window.appIsInitializing) {
+        console.log('[change] SKIP: app is initializing');
+        return;
+      }
 
       const isUserAction = window.inputEditorInstance.isFocused() || window._userInitiatedEdit;
       window._userInitiatedEdit = false;
+      console.log('[change] isUserAction:', isUserAction, '| isFocused:', window.inputEditorInstance.isFocused(), '| nesting:', mainElement.classList.contains('nesting'), '| processAuto:', window.processAuto);
 
       if (isUserAction && !mainElement.classList.contains('nesting')) {
         if (window.processAuto ?? true) {
+          console.log('[change] Auto ON → calling nestCode(true)');
           window.nestCode(true);
         } else {
+          console.log('[change] Auto OFF → switching to nesting mode only');
           window.switchToNestingMode();
           scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });
         }
       } else if (window.processAuto ?? true) {
+        console.log('[change] setting codeChanged = true for changeAnnotation');
         codeChanged = true;
+      } else {
+        console.log('[change] no action taken');
       }
     });
 
     window.inputEditorInstance.getSession().on('changeAnnotation', () => {
+      console.log('[changeAnnotation] fired, appIsInitializing:', window.appIsInitializing, '| processAuto:', window.processAuto, '| isProcessing:', isProcessing, '| codeChanged:', codeChanged);
       if ((!window.appIsInitializing) && (window.processAuto ?? true) && !isProcessing) {
         isProcessing = true;
-  
+        console.log('[changeAnnotation] entering processing block');
+   
         setTimeout(() => {
+          console.log('[changeAnnotation] timeout fired, codeChanged:', codeChanged);
           if (codeChanged) {
+            console.log('[changeAnnotation] calling nestCode()');
             window.nestCode();
             codeChanged = false;
+            console.log('[changeAnnotation] codeChanged reset to false');
+          } else {
+            console.log('[changeAnnotation] codeChanged is false, skipping nestCode()');
           }
-  
+   
           isProcessing = false;
         }, 0);
+      } else {
+        console.log('[changeAnnotation] skipped (guards not met)');
       }
     });
   
@@ -206,6 +225,7 @@ function initializeAceEditors() {
           fileInput.addEventListener("change", (event) => {
             if (file = event.target.files[0]) {
               fileReader.onload = (e) => {
+                console.log('[fileInput] setting _userInitiatedEdit = true');
                 window._userInitiatedEdit = true;
                 window.inputEditorInstance.setValue(e.target.result);
               };
