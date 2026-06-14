@@ -31,10 +31,13 @@ function initializeAceEditors() {
       window._userInitiatedEdit = false;
 
       if (isUserAction && !mainElement.classList.contains('nesting')) {
-        window.nestCode(true);
-      }
-
-      if (window.processAuto ?? true) {
+        if (window.processAuto ?? true) {
+          window.nestCode(true);
+        } else {
+          window.switchToNestingMode();
+          scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } else if (window.processAuto ?? true) {
         codeChanged = true;
       }
     });
