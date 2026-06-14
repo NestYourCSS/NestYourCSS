@@ -24,7 +24,20 @@ function initializeAceEditors() {
     let codeChanged = false;
     let isProcessing = false;
   
-    window.inputEditorInstance.getSession().on('change', () => ((!window.appIsInitializing) && (window.processAuto ?? true)) && (codeChanged = true));
+    window.inputEditorInstance.getSession().on('change', () => {
+      if (window.appIsInitializing) return;
+
+      const isUserAction = window.inputEditorInstance.isFocused() || window._userInitiatedEdit;
+      window._userInitiatedEdit = false;
+
+      if (isUserAction && !mainElement.classList.contains('nesting')) {
+        window.nestCode(true);
+      }
+
+      if (window.processAuto ?? true) {
+        codeChanged = true;
+      }
+    });
 
     window.inputEditorInstance.getSession().on('changeAnnotation', () => {
       if ((!window.appIsInitializing) && (window.processAuto ?? true) && !isProcessing) {
@@ -189,7 +202,10 @@ function initializeAceEditors() {
   
           fileInput.addEventListener("change", (event) => {
             if (file = event.target.files[0]) {
-              fileReader.onload = (e) => window.inputEditorInstance.setValue(e.target.result);
+              fileReader.onload = (e) => {
+                window._userInitiatedEdit = true;
+                window.inputEditorInstance.setValue(e.target.result);
+              };
               fileReader.readAsText(file);
             };
           });

@@ -137,6 +137,7 @@ window.tabButtonHandler = (e) => {
       break;
     case "tabDeleteAll":
       if (confirm(window.i18n.confirmDeleteAll)) {
+        window._userInitiatedEdit = true;
         editor.setValue("");
         announce(window.i18n.contentDeleted);
       }
@@ -171,6 +172,7 @@ window.setupDragAndDrop = (editor) => {
       if (file && (file.type === "text/css" || file.name.endsWith('.css'))) { // css file
           const reader = new FileReader();
           reader.onload = (event) => {
+            window._userInitiatedEdit = true;
             window.inputEditorInstance.setValue(event.target.result);
             announce(window.i18n.fileImported + ": " + file.name);
           };
