@@ -50,25 +50,26 @@ function transformCSS(cssString, opts) {
   });
 
   const ast = parseCSS(cssString);
+  let finalAst = ast;
 
   switch (opts.mode) {
     case 'denest':
-      denestCSS(ast);
+      finalAst = denestCSS(ast);
       break;
     case 'minify':
     case 'beautify':
       break;
     case 'nest':
     default:
-      renestCSS(ast);
+      finalAst = renestCSS(ast);
       break;
   }
 
   switch (opts.mode) {
     case 'minify':
-      return minifyCSS(ast);
+      return minifyCSS(finalAst);
     default:
-      return beautifyCSS(ast) + '\n';
+      return beautifyCSS(finalAst) + '\n';
   }
 }
 

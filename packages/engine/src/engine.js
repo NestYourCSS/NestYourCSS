@@ -736,7 +736,7 @@ function combineSelectors(parentGroups, childGroups) {
     return newSelectorGroups;
 }
 
-export function denestCSS(ast) {
+export function denestCSS(ast, preserveWrappers = false) {
     function _denest(nodes, context) {
         if (!Array.isArray(nodes)) {
             return [];
@@ -775,6 +775,18 @@ export function denestCSS(ast) {
                 const newContext = { ...context, selector: newSelector };
                 const childNodes = _denest(node.body, newContext);
                 
+                const hasChildRules = node.body.some(n => n.type === 'Rule' || n.type === 'AtRule');
+                
+                if (preserveWrappers && hasChildRules) {
+                    const emptyRule = {
+                        type: 'Rule',
+                        selector: cloneASTNode(newSelector),
+                        body: [],
+                        spacesAbove: denestedNodes.length === 0 ? 0 : 1
+                    };
+                    denestedNodes.push(emptyRule);
+                }
+
                 if (childNodes.length > 0) {
                     if (denestedNodes.length > 0 && ['Rule', 'AtRule'].includes(denestedNodes.at(-1)?.type)) {
                         if (childNodes[0].spacesAbove === 0) childNodes[0].spacesAbove = 1;
@@ -977,6 +989,9 @@ function findSingleGroupNestingRelationship(parentGroup, childGroup) {
 }
 
 export function renestCSS(ast) {
+    const flatAst = denestCSS(ast, true);
+    ast.body = flatAst.body;
+    
     function scoreMatch(parentNode, relationship) {
         let score = 0;
         for (const group of parentNode.selector) {
