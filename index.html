@@ -162,6 +162,9 @@
   <link rel="preload" href="./assets/fonts/poppins-regular-latin.otf" as="font" type="font/otf" crossorigin>
   <link rel="preload" href="./assets/fonts/poppins-medium-latin.otf" as="font" type="font/otf" crossorigin>
   <link rel="preload" href="./assets/fonts/poppins-semibold-latin.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="./assets/fonts/poppins-black-latin.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="./assets/fonts/poppins-extralight-latin.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="./assets/fonts/poppins-light-latin.otf" as="font" type="font/otf" crossorigin>
   <link rel="preload" href="./assets/fonts/firacode-regular-latin.otf" as="font" type="font/otf" crossorigin>  
 </head>  
 <body itemscope itemtype="https://schema.org/WebPage">  
@@ -500,20 +503,20 @@
               </div>  
             </figure>  
           </section>  
-          <article id="editorSide" role="region" aria-label="CSS editor">
-            <button id="nestBtn" onclick="this.lastElementChild?.click()" aria-label="Start Nesting">  
-              <span class="orb1" aria-hidden="true"></span>  
-              <span class="orb2" aria-hidden="true"></span>  
-              <span class="orb3" aria-hidden="true"></span>  
-              
-              <div onclick="event.stopPropagation(); typeof nestCode !== 'undefined' && nestCode(true);"></div>  
-            </button>  
+          <article id="editorSide" role="region" aria-label="CSS editor"> 
             <div id="codeEditor">  
               <div class="editor" id="inputEditor"></div>  
               <div id="editorGap"></div>  
               <div class="editor" id="outputEditor"></div>  
             </div>  
           </article>  
+          <button id="nestBtn" onclick="this.lastElementChild?.click()" aria-label="Start Nesting">  
+            <span class="orb1" aria-hidden="true"></span>  
+            <span class="orb2" aria-hidden="true"></span>  
+            <span class="orb3" aria-hidden="true"></span>  
+            
+            <div onclick="event.stopPropagation(); typeof nestCode !== 'undefined' && nestCode(true);"></div>  
+          </button> 
         </section>
     </main>  
     <article>  

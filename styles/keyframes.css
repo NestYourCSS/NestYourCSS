@@ -173,6 +173,21 @@
 	to { width: calc(var(--single-editor-width)); }
 }
 
+/* Add to your keyframes.css */
+@keyframes slideEditor {
+  /* Starts at the far left edge of the container */
+  from { translate: calc(-100cqw + 100% + var(--padding)); }
+  to { translate: 0; }
+}
+
+@keyframes revealText {
+  /* Text is completely hidden/clipped from the right at the start */
+  from { clip-path: inset(0 100% 0 0); }
+  /* Fully revealed at the end */
+  to { clip-path: inset(0 0 0 0); }
+}
+
+
 @keyframes shadowRotate {
 	0% { translate: calc((4/3) * 0.5em) calc((4/3) * 2.5em * var(--nestBtn-shadow-direction)); }
 	33% { translate: calc((4/3) * 2.25em) calc((4/3) * 2.25em * var(--nestBtn-shadow-direction)); }

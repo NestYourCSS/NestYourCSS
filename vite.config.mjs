@@ -17,6 +17,15 @@ logger.warn = (msg, options) => {
 export default defineConfig({
   customLogger: logger,
 
+  optimizeDeps: {
+    include: [
+      '@nycss/ui',
+      '@nycss/engine',
+      '@nycss/state',
+      '@nycss/pwa',
+    ],
+  },
+
   resolve: {
     alias: {
       '@nycss/state': resolve(__dirname, 'packages/state/src/store.js'),

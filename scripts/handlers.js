@@ -14,36 +14,32 @@ document.body.addEventListener('pointermove', (e) => {
   window.cursorY = e.clientY;
   
   requestAnimationFrame(() => {
-    // 1. Handle the background motion
+    const clientWidth = document.body.clientWidth;
+    const st = scrollWrapper.scrollTop;
+    const mh = mainElement.offsetHeight;
+    const editorTop = editorSection.offsetTop;
+    const editorHeight = editorSection.offsetHeight;
+
     if (prefersReducedMotion) {
-      // Set a static "safe" value (e.g., 50%) so it doesn't move
       mainContent.style.background = mainContentBackgroundString("50%");
     } else {
-      const horizValue = roundNumber((e.clientX / document.body.clientWidth) * 100) + '%';
-      if (window.isNesting || scrollWrapper.scrollTop < mainElement.offsetHeight)
+      const horizValue = roundNumber((e.clientX / clientWidth) * 100) + '%';
+      if (window.isNesting || st < mh)
         mainContent.style.background = mainContentBackgroundString(horizValue);
     }
 
-    // 2. Handle nested nav buttons (Safe-ish, but good to check)
     if (window.isNesting && !prefersReducedMotion) {
-      // Offset is needed since containing box has been changed from root to mainSettings (or some other element)
-      const [ offsetX, offsetY ] = [(mainSettings.scrollLeft - mainSettings.lastElementChild.clientHeight / 2), (mainSettings.scrollTop - (mainSettings.lastElementChild.clientHeight / 2))];
-
+      const msl = mainSettings.scrollLeft;
+      const msLastChildH = mainSettings.lastElementChild.clientHeight;
+      const offsetX = msl - msLastChildH / 2;
+      const offsetY = mainSettings.scrollTop - msLastChildH / 2;
       const nestedNavButtons = mainSettings.lastElementChild;
       nestedNavButtons.style.setProperty('--cursor-x-pos', (e.clientX + offsetX) + 'px');
       nestedNavButtons.style.setProperty('--cursor-y-pos', (e.clientY + offsetY) + 'px');
     }
     else {
       if (e.target === splashTextElem) window.attemptSplashTextUpdate();
-      
-      const scrollTop = scrollWrapper.scrollTop;
-      const editorTop = editorSection.offsetTop;
-      const editorHeight = editorSection.offsetHeight;
-      
-      const isEditorTopScrolledPassed = scrollTop > editorTop;
-      const isEditorBottomNotScrolledPassed = (editorTop + editorHeight + window.innerHeight) > scrollTop;
-
-      const isEditorInView = isEditorTopScrolledPassed && isEditorBottomNotScrolledPassed;
+      const isEditorInView = st > editorTop && (editorTop + editorHeight + window.innerHeight) > st;
       if (isEditorInView) window.updateActiveLine(e.clientX, e.clientY);
     }
   });
@@ -68,7 +64,10 @@ const intersectionObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.01 });
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
-scrollWrapper.addEventListener('scroll', (e) => requestAnimationFrame(() => (typeof window.updateLogoState !== 'undefined' && window.updateLogoState())));
+scrollWrapper.addEventListener('scroll', () => {
+  const st = scrollWrapper.scrollTop, sh = scrollWrapper.scrollHeight, ch = scrollWrapper.clientHeight;
+  requestAnimationFrame(() => { if (typeof window.updateLogoState !== 'undefined') window.updateLogoState(st, sh, ch); });
+});
 
 function announce(message) {
     const liveRegion = document.getElementById('a11y-live-region');

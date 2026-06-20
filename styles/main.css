@@ -25,17 +25,13 @@
     }
 
     #inputEditorWrapper {
-      display: none;
-      background-color: transparent;
-    }
-
-    #outputEditorWrapper {
       opacity: 0;
       background-color: transparent;
     }
 
     #outputEditorWrapper {
       opacity: 0;
+      background-color: transparent;
     }
   }
 
@@ -217,6 +213,10 @@
       height: 96dvh;
       width: 100%;
       padding: var(--padding);
+      
+      @media not (prefers-reduced-motion: reduce) {
+        transition: height 1s;
+      }
       
       > #settingsBtn {
         display: none;
@@ -757,7 +757,7 @@
       font-size: 6em;
       
       @media not (prefers-reduced-motion: reduce) {
-        transition: opacity 3s 1.5s;
+        transition: opacity 3s;
       }
 
       &:hover {
@@ -771,7 +771,9 @@
       font-size: 3em;
       height: 2lh;
       width: 24ch;
-      transition: opacity 3s 3s;
+      @media not (prefers-reduced-motion: reduce) {
+        transition: opacity 3s;
+      }
       transform: translateZ(0);
     }
   }
@@ -848,7 +850,7 @@
                     
       @media not (prefers-reduced-motion: reduce) {
         transition:
-          opacity 3s 1s,
+          opacity 3s,
           --button-bg var(--anim-duration-bg-out) var(--delay-icon-out-bg);
       }
 
@@ -993,7 +995,7 @@
         animation: slideInLeft 0.5s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
         transition:
           0.25s,
-          opacity 3s 1s;
+          opacity 3s;
       }
 
       > picture {
@@ -1037,7 +1039,6 @@
 @scope (#editorSide) {
   & {
     container-type: inline-size;
-    flex: none;
     max-width: 100%;
 
     & {
@@ -1109,7 +1110,8 @@
           transition:
             opacity 1s,
             border-color 1s,
-            background-color 1s;
+            background-color 1s,
+            padding-right 1s;
 
           > #shadowEditorsWrapper {
             position: absolute;
@@ -1249,7 +1251,7 @@
   }
 }
 
-/* --- Editor Side Scope (#editorSide > #nestBtn) --- */
+/* --- Editor Side Scope (#editorSide + #nestBtn) --- */
 
 @scope (#nestBtn) {
   & {
@@ -1391,16 +1393,22 @@
   & #mainContent {
     gap: var(--padding);
 
-    > #editorSide {
-      width: calc(var(--single-editor-width));
+    > #textSide {
+      animation: revealText 2s cubic-bezier(1, 0, 0.5, 1) both;
+    }
 
-      animation: moveRight 2s cubic-bezier(1, 0, 0.5, 1) both;
+    > #editorSide {
+      flex-shrink: 0;
+      width: calc(var(--single-editor-width));
+      animation: slideEditor 2s cubic-bezier(1, 0, 0.5, 1) both;
 
       @media (prefers-reduced-motion: reduce) {
         animation: none;
       }
+    }
 
-      > #codeEditor > .editorWrapper {
+    > #editorSide > #codeEditor {
+     > .editorWrapper {
         /* &#inputEditorWrapper { */
         &:first-child {
           display: block;
@@ -1421,6 +1429,7 @@
 
         /* &#outputEditorWrapper { */
         &:last-child {
+          translate: var(--padding);
           padding-block: var(--padding);
           margin-right: -3.25rem;
           width: 0;
@@ -1428,7 +1437,7 @@
         }
       }
 
-      > #codeEditor > :last-child {
+      > :last-child {
         display: none;
       }
     }
@@ -1440,10 +1449,6 @@
 @scope (#siteWrapper:has(> main.nesting)) {
   & > main {
     height: 100dvh;
-    
-    @media not (prefers-reduced-motion: reduce) {
-      transition: height 1s;
-    }
 
     & + article,
     & + article section {
@@ -1480,7 +1485,7 @@
         width: 100%;
         align-content: center;
 
-        > #nestBtn {
+        + #nestBtn {
           font-size: 0.75rem;
           translate: 0% 0%;
           --nestBtn-shadow-direction: -1;
@@ -1511,6 +1516,10 @@
           #editorGap {
             height: 100%;
             aspect-ratio: var(--gutter-width) / 6.625;
+          }
+
+          .editorWrapper {
+              height: calc(100% - (2 * var(--padding)));
           }
 
           .editorWrapper#inputEditorWrapper > #shadowEditorsWrapper > .shadowEditorWrapper {
@@ -2456,7 +2465,7 @@ text-shadow: 0 0.5lh;
           align-items: center;
         }
         
-        #mainContent > #editorSide > #nestBtn {
+        #mainContent > #editorSide + #nestBtn {
           translate: 0% calc(-100% - 0.5rem);
         }
       }

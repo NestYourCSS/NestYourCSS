@@ -1,31 +1,55 @@
-# Nest Your CSS
+# NestYourCSS
 
-Nest Your CSS is a free online tool for formatting, nesting, denesting, beautifying, and minifying CSS stylesheets. It supports the latest CSS Nesting specification and provides a dual-editor interface with syntax highlighting, error checking, and multiple output strategies.
+> NestYourCSS is a free online tool and open-source monorepo for formatting CSS — supporting nesting, denesting, beautifying, and minifying stylesheets per the CSS Nesting spec. It provides a browser-based editor (Ace) with real-time conversion, sample snippets, and settings for indentation, strategy, and depth control.
 
-## Key Features
+Important notes:
 
-- **Nest CSS**: Convert flat CSS into nested CSS using the latest spec
-- **Denest CSS**: Expand nested CSS back to flat selectors
-- **Beautify/Minify**: Format or compress CSS output
-- **Multiple Strategies**: Balanced Split, Maximize Depth, Flattened Overflow
-- **Editor Features**: Syntax highlighting, minimap, word wrap, multiple indentation options
-- **External CSS**: Load and process remote stylesheets
-- **CLI Tool**: Command-line interface for batch processing
+- The main web app is deployed at https://nestyourcss.com/ and uses Vite as the build tool
+- The codebase is a pnpm monorepo with packages under `packages/`: `ui` (web components), `engine` (CSS parser/transformer), `state` (proxy-based store), `pwa` (service worker), and `cli`
+- The editor uses Ace (Cloud9) with a custom dark theme; the engine is a custom CSS parser that handles the full nesting spec including `@nest`, `&`, `@layer`, and selector grouping
+- There is a secondary app at `apps/quickly/` deployed to https://quickly.nestyourcss.com/ for lightweight/quick conversions
+- All UI components (dropdown, combobox, toggle, stepper, radio-group) are vanilla custom elements — no React, Vue, or Svelte
+- Ad images are served from ucarecdn.com and loaded lazily
 
-## Pages
+## Docs
 
-- Homepage (Nesting Tool): https://nestyourcss.com/
-- Quick Editor: https://quickly.nestyourcss.com/
-- GitHub Repository: https://github.com/NestYourCSS/NestYourCSS
-- Bug Reports: https://github.com/NestYourCSS/NestYourCSS/issues
+- [index.html](https://nestyourcss.com/index.html.md): Main page with the CSS editor, settings panel, and documentation sections on nesting benefits, mechanics, and grouped styles
+- [package.json](https://github.com/NestYourCSS/NestYourCSS/blob/main/package.json.md): Root monorepo configuration with all scripts (dev, build, preview, lint, typecheck)
+- [vite.config.mjs](https://github.com/NestYourCSS/NestYourCSS/blob/main/vite.config.mjs.md): Vite configuration with aliases for `@nycss/*` packages and dev server on port 3000
+- [Engine tests](https://github.com/NestYourCSS/NestYourCSS/blob/main/packages/engine/test/engine.test.js.md): Test suite for the CSS engine covering nesting, denesting, deduplication, and complex selectors
 
-## CLI Usage
+## Packages
 
-The NestYourCSS CLI (`nycss`) provides the following commands:
+- [@nycss/engine](https://github.com/NestYourCSS/NestYourCSS/tree/main/packages/engine/src/engine.js.md): Core CSS parser and transformer — exports `parseCSS`, `minifyCSS`, `beautifyCSS`, `denestCSS`, `renestCSS`, `configureEngine`
+- [@nycss/ui](https://github.com/NestYourCSS/NestYourCSS/tree/main/packages/ui/src/index.js.md): Web component library — exports `NycssStepper`, `NycssDropdown`, `NycssToggle`, `NycssRadioGroup`, `NycssCombobox` plus `components.css`
+- [@nycss/state](https://github.com/NestYourCSS/NestYourCSS/tree/main/packages/state/src/store.js.md): Proxy-based reactive store with localStorage persistence and `onSet` callbacks
+- [@nycss/pwa](https://github.com/NestYourCSS/NestYourCSS/tree/main/packages/pwa/src/index.js.md): PWA service worker registration module
 
-- `nest`: Convert flat CSS to nested CSS
-- `denest`: Convert nested CSS to flat CSS
-- `beautify`: Format CSS with proper indentation
-- `minify`: Compress CSS by removing whitespace
+## Scripts
 
-Options include indentation size/type, nesting strategy, max depth, comment preservation, and deduplication.
+- [scripts/handlers.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/handlers.js.md): Event handlers for pointermove, scroll, drag-and-drop, tab buttons, and deferred initialization
+- [scripts/main.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/main.js.md): Application entry point — sets up editor state, sample data, and CSS processing pipeline
+- [scripts/setup.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/setup.js.md): Editor initialization, theme application, and DOM setup
+- [scripts/nesting.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/nesting.js.md): Core nesting/denesting orchestration, auto-processing, and error handling
+- [scripts/fallingbadge.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/fallingbadge.js.md): Scroll-driven badge animation manager
+- [scripts/smoothlyScroll.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/smoothlyScroll.js.md): Smooth scroll implementation via Lenis
+- [scripts/splashtexts.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/splashtexts.js.md): Rotating splash text animator for the tagline area
+- [scripts/minieditor.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/minieditor.js.md): Mini read-only Ace editor instance for code examples
+- [scripts/animateCursor.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/animateCursor.js.md): Custom smooth cursor follower
+- [scripts/nestingSettings.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/nestingSettings.js.md): Settings panel UI bindings and persistence
+- [scripts/debugging.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/debugging.js.md): Debugging utilities
+- [scripts/var.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/var.js.md): Global variable and element reference declarations
+- [scripts/sample.js](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/sample.js.md): Sample CSS snippet definitions
+
+## Styles
+
+- [styles/properties.css](https://github.com/NestYourCSS/NestYourCSS/blob/main/styles/properties.css.md): CSS custom properties (design tokens, colors, spacing, typography)
+- [styles/main.css](https://github.com/NestYourCSS/NestYourCSS/blob/main/styles/main.css.md): Application layout, editor chrome, settings panel, and responsive styles
+- [styles/fonts.css](https://github.com/NestYourCSS/NestYourCSS/blob/main/styles/fonts.css.md): `@font-face` declarations for Poppins and Fira Code
+- [styles/keyframes.css](https://github.com/NestYourCSS/NestYourCSS/blob/main/styles/keyframes.css.md): Animation keyframes for UI transitions and effects
+
+## Optional
+
+- [Ace editor custom theme](https://github.com/NestYourCSS/NestYourCSS/blob/main/lib/ace/styles/theme-nycss.css.md): Custom dark Ace editor theme matching the site design
+- [Post-build script](https://github.com/NestYourCSS/NestYourCSS/blob/main/scripts/postbuild.mjs.md): Post-build processing for sitemap, CSS inlining, and asset optimization
+- [Vercel config](https://github.com/NestYourCSS/NestYourCSS/blob/main/vercel.json.md): Vercel deployment configuration with headers and rewrites

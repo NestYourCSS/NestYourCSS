@@ -3,11 +3,15 @@ function initializeFallingBadgeManager() {
   let scrollTimer, hovered = false;
 
   // Event listener for scroll events
-  window.updateLogoState = () => {
+  window.updateLogoState = (scrollTop, scrollHeight, clientHeight) => {
     if (window.prefersReducedMotion) return;
     if (scrollTimer) clearTimeout(scrollTimer);
 
-    const { scrollTop, scrollHeight, clientHeight } = scrollWrapper;
+    if (scrollTop === undefined) {
+      scrollTop = scrollWrapper.scrollTop;
+      scrollHeight = scrollWrapper.scrollHeight;
+      clientHeight = scrollWrapper.clientHeight;
+    }
 
     // Check if user is at the bottom
     if ((scrollTop / scrollHeight) < 0.01) {
