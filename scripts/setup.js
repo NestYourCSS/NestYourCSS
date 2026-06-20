@@ -1,5 +1,12 @@
 function initializeAceEditors() {
   window.setupEditors = async () => {
+    if (typeof ace === 'undefined') {
+      if (window._loadAce) await window._loadAce();
+    }
+    try {
+      const CssMode = ace.require('ace/mode/css').Mode;
+      CssMode.prototype.createWorker = function () { return null; };
+    } catch (_) {}
   
     await waitForVar('cssSamples');
     let sample = cssSamples[window.cssSample] ?? cssSamples["denestedShowcase"];

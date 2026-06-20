@@ -180,7 +180,7 @@
         border: 0.2rem solid rgb(from var(--shades-darker) r g b / var(--opacity-medium));
         border-top: none;
         border-radius: 0 0 0.5rem 0.5rem;
-        font-family: "Poppins", "Calibri", sans-serif;
+        font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
         color: var(--shades-white);
         z-index: 9999;
         text-decoration: none;
@@ -202,9 +202,9 @@
     height: 100dvh;
     contain: paint;
     overflow: hidden auto;
-    animation: lightenBackgroundColour linear 1ms;
-    animation-timeline: scroll(self);
-
+          animation: lightenBackgroundColour linear 1ms;
+      animation-timeline: scroll(self);
+    
     &:has(> .nesting) {
       overflow: hidden;
     }
@@ -228,7 +228,7 @@
         text-align: center;
         align-content: center;
         border-radius: 1rem;
-        font-family: "Poppins", "Calibri", sans-serif;
+        font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
         font-size: 1.125rem;
         font-weight: 300;
         border: none;
@@ -353,7 +353,7 @@
       display: flex;
       flex-direction: column;
       gap: var(--padding);
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
 
       /* &:not(:nth-last-child(1)) { display: none; } */
 
@@ -743,7 +743,7 @@
     display: flex;
     flex-direction: column-reverse;
     color: rgb(from var(--shades-white) r g b / var(--opacity-high));
-    font-family: "Poppins", "Calibri", sans-serif;
+    font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
 
     > * {
       margin: 0;
@@ -827,7 +827,7 @@
 
       display: flex;
       font-size: inherit;
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       text-decoration: none;
       flex-direction: row;
       align-items: center;
@@ -966,7 +966,7 @@
       overflow: hidden;
       white-space: nowrap;
       color: rgb(from var(--shades-white) r g b / var(--opacity-high));
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       font-weight: 200;
       font-size: 1.25rem;
       height: 2rem;
@@ -1010,18 +1010,6 @@
           width: auto;
           aspect-ratio: 1 / 1;
           object-fit: contain;
-
-          &.adsbygoogle:not([data-ad-status="filled"]) {
-            display: none;
-
-            & ~ img {
-              display: block;
-            }
-          }
-
-          & ~ img {
-            display: none;
-          }
         }
       }
 
@@ -1312,7 +1300,7 @@
       border-radius: inherit;
       padding: 1.5em;
       aspect-ratio: 1 / 1;
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       font-weight: 500;
       text-align: center;
       align-content: center;
@@ -1552,7 +1540,7 @@
       text-decoration: none;
       text-transform: uppercase;
       line-height: 100%;
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       font-weight: 500;
       font-size: 2em;
       display: flex;
@@ -1575,7 +1563,7 @@
       left: 4em;
       cursor: text;
       color: var(--shades-white);
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       font-weight: 300;
       font-size: 2em;
       width: 52ch;
@@ -1697,10 +1685,10 @@
 
         @media not (prefers-reduced-motion: reduce) {
           @supports (animation-range: normal) {
-            padding-top: 1lh;
+padding-top: 1lh;
 
             &:first-child {
-              text-shadow: 0 0.5lh;
+text-shadow: 0 0.5lh;
               animation: showText linear forwards 1ms;
               animation-timeline: view();
               animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
@@ -1724,7 +1712,7 @@
       right: 5vw;
       bottom: 6em;
       color: var(--shades-white);
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       font-weight: 300;
       font-size: 2em;
       width: 56ch;
@@ -1882,7 +1870,7 @@
       right: 7.5vw;
       bottom: 10em;
       color: var(--shades-white);
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       font-weight: 300;
       font-size: 2em;
       line-height: 1.5em;
@@ -2167,7 +2155,7 @@
       right: 8ch;
       user-select: none;
       color: transparent;
-      font-family: "Poppins", "Calibri", sans-serif;
+      font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
       font-weight: 300;
       font-size: 1.75rem;
       height: 4lh;
@@ -2283,7 +2271,7 @@
       > h3 {
         font-size: 1em;
         font-weight: 900;
-        font-family: "Poppins", "Calibri", sans-serif;
+        font-family: "Poppins", "Poppins Fallback", "Calibri", sans-serif;
         
         @media not (prefers-reduced-motion: reduce) {
           @supports (animation-range: normal) {

@@ -104,7 +104,7 @@ html {
     text-align: center;
     align-content: center;
     border-radius: 1rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Poppins Fallback', sans-serif;
     font-size: 1.125rem;
     font-weight: 300;
     border: none;
@@ -190,7 +190,7 @@ html {
 }
 
 #mainSettings {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Poppins Fallback', sans-serif;
 }
 
 #mainSettings > section {
@@ -495,7 +495,7 @@ main {
     padding: 1rem 2rem;
     background: var(--sec-colour-darkest);
     color: var(--shades-lightest);
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Poppins Fallback', sans-serif;
     font-size: 1rem;
     text-decoration: none;
 

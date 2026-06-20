@@ -26,6 +26,7 @@ export default defineConfig({
     },
   },
   build: {
+    sourcemap: 'hidden',
     outDir: 'dist',
     chunkSizeWarningLimit: 2000,
     rollupOptions: {

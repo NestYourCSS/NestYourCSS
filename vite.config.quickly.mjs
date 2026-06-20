@@ -30,6 +30,7 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, 'dist/apps/quickly'),
     emptyOutDir: true,
+    sourcemap: 'hidden',
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
       input: resolve(__dirname, 'apps/quickly/index.html'),

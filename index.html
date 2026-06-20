@@ -3,8 +3,7 @@
 <head>  
   <meta charset="UTF-8" />  
   <meta name="theme-color" content="#00272b" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
-  <meta name="google-adsense-account" content="ca-pub-9088468190661086">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Nest, denest, beautify and minify your CSS in seconds with our free tool. Makes maintenance a breeze and supports the latest spec for perfect code readability.">  
   <meta name="author" content="Tim Chinye">  
   <link rel="canonical" href="https://nestyourcss.com/">  
@@ -20,9 +19,7 @@
   <link rel="icon" type="image/png" href="./assets/images/nycss-logo.png" />  
   <link rel="manifest" href="./manifest.json" />
   <title>A CSS Formatting Tool | Nest, Denest, Beautify & Minify Stylesheets</title>  
-    
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-543TRXJR');</script>  
-  
+
   <script type="application/ld+json">  
     {  
       "@context": "https://schema.org",  
@@ -130,10 +127,16 @@
     Application Styles - To be bundled & minified  
   -->  
   <!-- build:css styles/app.min.css -->    
-  <link href="./styles/properties.css" rel="stylesheet">  
-  <link href="./styles/keyframes.css" rel="stylesheet">  
-  <link href="./styles/fonts.css" rel="stylesheet">  
-  <link href="./styles/main.css" rel="stylesheet">  
+  <link rel="preload" href="./styles/properties.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="./styles/keyframes.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="./styles/fonts.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="./styles/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link href="./styles/properties.css" rel="stylesheet">  
+    <link href="./styles/keyframes.css" rel="stylesheet">  
+    <link href="./styles/fonts.css" rel="stylesheet">  
+    <link href="./styles/main.css" rel="stylesheet">  
+  </noscript>
   <!-- endbuild -->  
     
   <!--  
@@ -155,12 +158,15 @@
   <!--  
     Preloading Fonts  
   -->  
-  <link rel="preload" href="./assets/fonts/poppins-medium-latin.otf" as="font" type="font/otf" crossorigin>  
+  <link rel="preconnect" href="https://ucarecdn.com" crossorigin>
+  <link rel="preload" href="./assets/fonts/poppins-regular-latin.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="./assets/fonts/poppins-medium-latin.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="./assets/fonts/poppins-semibold-latin.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="./assets/fonts/firacode-regular-latin.otf" as="font" type="font/otf" crossorigin>  
 </head>  
 <body itemscope itemtype="https://schema.org/WebPage">  
   <a class="skip-to-section" href="#reducingBoilerplateCode" onkeydown="if (event.key === ' ' || event.keyCode === 32) event.preventDefault() , this.click();">Learn why we should nest our code.</a>  
   <button class="skip-to-section" id="nestingToggleBtn">Start Nesting</button>  
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-543TRXJR" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>  
   <svg hidden xmlns="http://www.w3.org/2000/svg">
     <defs>
       <style>
@@ -488,9 +494,9 @@
             <figure>  
               <figcaption>Sorry about the ads...</figcaption>  
               <div>  
-                <picture><ins class="adsbygoogle" data-ad-client="ca-pub-9088468190661086" data-ad-slot="2515261006" alt="Google Adsense Advertisement"></ins><img alt="Advertisement" loading="lazy" fetchpriority="high" width="250" height="250" sizes="(max-height: 1600px) 26.455dvh, 425px" srcset="https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/160x/-/format/auto/-/quality/smart/ 160w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/240x/-/format/auto/-/quality/smart/ 240w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/320x/-/format/auto/-/quality/smart/ 320w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/425x/-/format/auto/-/quality/smart/ 425w" src="https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/preview/250x205/"></picture>  
-                <picture><ins class="adsbygoogle" data-ad-client="ca-pub-90a88468190661086" data-ad-slot="2575206141" alt="Google Adsense Advertisement"></ins><img alt="Advertisement" loading="lazy" fetchpriority="high" width="250" height="250" sizes="(max-height: 1600px) 26.455dvh, 425px" srcset="https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/160x/-/format/auto/-/quality/smart/ 160w, https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/240x/-/format/auto/-/quality/smart/ 240w, https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/320x/-/format/auto/-/quality/smart/ 320w, https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/425x/-/format/auto/-/quality/smart/ 425w" src="https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/preview/250x205/"></picture>  
-                <picture><ins class="adsbygoogle" data-ad-client="ca-pub-9088468190661086" data-ad-slot="3020545819" alt="Google Adsense Advertisement"></ins><img alt="Advertisement" loading="lazy" fetchpriority="high" width="250" height="250" sizes="(max-height: 1600px) 26.455dvh, 425px" srcset="https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/160x/-/format/auto/-/quality/smart/ 160w, https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/240x/-/format/auto/-/quality/smart/ 240w, https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/320x/-/format/auto/-/quality/smart/ 320w, https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/425x/-/format/auto/-/quality/smart/ 425w" src="https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/preview/250x205/"></picture>  
+                <picture><ins alt="Placeholder Advertisement Slot"></ins><img alt="Advertisement" loading="lazy" fetchpriority="high" width="250" height="250" sizes="(max-height: 1600px) 26.455dvh, 425px" srcset="https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/160x/-/format/auto/-/quality/smart/ 160w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/240x/-/format/auto/-/quality/smart/ 240w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/320x/-/format/auto/-/quality/smart/ 320w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/425x/-/format/auto/-/quality/smart/ 425w" src="https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/preview/250x205/"></picture>  
+                <picture><ins alt="Placeholder Advertisement Slot"></ins><img alt="Advertisement" loading="lazy" fetchpriority="high" width="250" height="250" sizes="(max-height: 1600px) 26.455dvh, 425px" srcset="https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/160x/-/format/auto/-/quality/smart/ 160w, https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/240x/-/format/auto/-/quality/smart/ 240w, https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/320x/-/format/auto/-/quality/smart/ 320w, https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/resize/425x/-/format/auto/-/quality/smart/ 425w" src="https://ucarecdn.com/3d9fcb4d-f9f6-47fd-80b3-5119744e8184/-/preview/250x205/"></picture>  
+                <picture><ins alt="Placeholder Advertisement Slot"></ins><img alt="Advertisement" loading="lazy" fetchpriority="high" width="250" height="250" sizes="(max-height: 1600px) 26.455dvh, 425px" srcset="https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/160x/-/format/auto/-/quality/smart/ 160w, https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/240x/-/format/auto/-/quality/smart/ 240w, https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/320x/-/format/auto/-/quality/smart/ 320w, https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/resize/425x/-/format/auto/-/quality/smart/ 425w" src="https://ucarecdn.com/a21d5d0e-e413-40e1-9833-ec38bb4a3eb7/-/preview/250x205/"></picture>  
               </div>  
             </figure>  
           </section>  
@@ -601,18 +607,20 @@
   -->  
   <script src="/lib/lenis/lenis.min.js" defer></script>  
     
-  <script src="/lib/ace/scripts/ace.min.js" defer></script>  
-  <script src="/lib/ace/scripts/mode-css.min.js" defer></script>  
-  <script src="/lib/ace/scripts/theme-nycss.min.js" defer></script>  
-  <script src="https://unpkg.com/@phosphor-icons/web" defer></script>  
-    
-  <script src="/lib/ace/scripts/ext-searchbox.min.js" defer></script>  
+  <link rel="preload" href="/lib/ace/scripts/ace.min.js" as="script" crossorigin>
+  <link rel="preload" href="/lib/ace/scripts/mode-css.min.js" as="script" crossorigin>
+  <link rel="preload" href="/lib/ace/scripts/theme-nycss.min.js" as="script" crossorigin>
+  <link rel="preload" href="https://unpkg.com/@phosphor-icons/web" as="script" crossorigin>
+  
+  <link rel="preload" href="/lib/ace/scripts/ext-searchbox.min.js" as="script" crossorigin>
   <!-- <script src="./lib/ace/scripts/ext-diff.min.js"></script> -->  
   <!-- <script src="./lib/ace/scripts/ext-stickyscroll.js"></script> -->  
   <!-- <script src="./lib/ace/scripts/ext-language_tools.min.js"></script> -->  
-    
-  <script src="/lib/ace-linters/ace-linters.min.js" defer></script>  
-    
+  
+  <link rel="preload" href="/lib/ace-linters/ace-linters.min.js" as="script" crossorigin>
+  
+  <script>window._aceScripts=[{src:"/lib/ace/scripts/ace.min.js"},{src:"/lib/ace/scripts/mode-css.min.js"},{src:"/lib/ace/scripts/theme-nycss.min.js"},{src:"/lib/ace/scripts/ext-searchbox.min.js"},{src:"/lib/ace-linters/ace-linters.min.js"},{src:"https://unpkg.com/@phosphor-icons/web"}];window._loadAce=function(){window._aceLoading=!0;var p=[];window._aceScripts.forEach(function(s){p.push(new Promise(function(r){var e=document.createElement('script');e.src=s.src;e.async=!1;e.crossOrigin='anonymous';e.onload=r;document.body.appendChild(e)}))});return Promise.all(p)};</script>
+  
   <!--  
     Application Scripts - Monorepo build
   -->  
@@ -629,17 +637,6 @@
   <script src="./scripts/fallingbadge.js" defer></script>  
   <script src="./scripts/animateCursor.js" defer></script>  
   <script src="./scripts/smoothlyScroll.js" defer></script>  
-  <script src="./scripts/nestingSettings.js" defer></script>  
-  
-    
-  <!--  
-    PWA Service Worker  
-  -->  
-
-  <!--  
-    Ad Scripts  
-  -->  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9088468190661086" crossorigin="anonymous"></script>  
-  <script>document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status="processed"])').forEach(() => (window.adsbygoogle = window.window.adsbygoogle || []).push({}));</script>  
+  <script src="./scripts/nestingSettings.js" defer></script> 
 </body>  
 </html> 

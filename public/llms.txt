@@ -1,0 +1,31 @@
+# Nest Your CSS
+
+Nest Your CSS is a free online tool for formatting, nesting, denesting, beautifying, and minifying CSS stylesheets. It supports the latest CSS Nesting specification and provides a dual-editor interface with syntax highlighting, error checking, and multiple output strategies.
+
+## Key Features
+
+- **Nest CSS**: Convert flat CSS into nested CSS using the latest spec
+- **Denest CSS**: Expand nested CSS back to flat selectors
+- **Beautify/Minify**: Format or compress CSS output
+- **Multiple Strategies**: Balanced Split, Maximize Depth, Flattened Overflow
+- **Editor Features**: Syntax highlighting, minimap, word wrap, multiple indentation options
+- **External CSS**: Load and process remote stylesheets
+- **CLI Tool**: Command-line interface for batch processing
+
+## Pages
+
+- Homepage (Nesting Tool): https://nestyourcss.com/
+- Quick Editor: https://quickly.nestyourcss.com/
+- GitHub Repository: https://github.com/NestYourCSS/NestYourCSS
+- Bug Reports: https://github.com/NestYourCSS/NestYourCSS/issues
+
+## CLI Usage
+
+The NestYourCSS CLI (`nycss`) provides the following commands:
+
+- `nest`: Convert flat CSS to nested CSS
+- `denest`: Convert nested CSS to flat CSS
+- `beautify`: Format CSS with proper indentation
+- `minify`: Compress CSS by removing whitespace
+
+Options include indentation size/type, nesting strategy, max depth, comment preservation, and deduplication.

@@ -276,7 +276,7 @@
 }
 
 .ace-nycss.ace_tooltip p {
-  font-family: 'Poppins', 'Calibri', sans-serif;
+  font-family: 'Poppins', 'Poppins Fallback', 'Calibri', sans-serif;
   color: var(--shades-lighter);
 }
 

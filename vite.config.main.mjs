@@ -32,6 +32,7 @@ export default defineConfig({
     target: 'esnext',
     cssTarget: 'chrome120',
     outDir: 'dist',
+    sourcemap: 'hidden',
     chunkSizeWarningLimit: 2000, 
     rollupOptions: {
       input: resolve(__dirname, 'index.html'),
