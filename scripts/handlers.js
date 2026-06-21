@@ -8,10 +8,15 @@ var(--shades-black)
 document.body.addEventListener('pointermove', (e) => {
   if (typeof window.splashTextElem === 'undefined' || window.splashTextElem === null || !window.mainElement) return;
 
-  const prefersReducedMotion = window.prefersReducedMotion;
+  var prefersReducedMotion = window.prefersReducedMotion;
 
   window.cursorX = e.clientX;
   window.cursorY = e.clientY;
+
+  if (typeof window.animateCursor === 'function' && !window.cursorIsAnimating) {
+    window.cursorIsAnimating = true;
+    window.animateCursor();
+  }
   
   requestAnimationFrame(() => {
     const clientWidth = document.body.clientWidth;
@@ -64,10 +69,27 @@ const intersectionObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.01 });
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
-window.scrollWrapper.addEventListener('scroll', () => {
-  const st = window.scrollWrapper.scrollTop, sh = window.scrollWrapper.scrollHeight, ch = window.scrollWrapper.clientHeight;
-  requestAnimationFrame(() => { if (typeof window.updateLogoState !== 'undefined') window.updateLogoState(st, sh, ch); });
-});
+var badgeSentinelBottom = document.createElement('div');
+badgeSentinelBottom.style.cssText = 'position:absolute;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none';
+var badgeSentinelTop = document.createElement('div');
+badgeSentinelTop.style.cssText = 'position:absolute;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+window.scrollWrapper.appendChild(badgeSentinelBottom);
+window.scrollWrapper.appendChild(badgeSentinelTop);
+var badgeObserver = new IntersectionObserver(function (entries) {
+  if (typeof window.updateLogoState === 'undefined') return;
+  var atBottom = false, atTop = false;
+  entries.forEach(function (entry) {
+    if (entry.target === badgeSentinelBottom && entry.isIntersecting) atBottom = true;
+    if (entry.target === badgeSentinelTop && entry.isIntersecting) atTop = true;
+  });
+  if (atTop && !atBottom) {
+    window.updateLogoState(null, null, null, false, true);
+  } else {
+    window.updateLogoState(null, null, null, atBottom, false);
+  }
+}, { threshold: 0 });
+badgeObserver.observe(badgeSentinelBottom);
+badgeObserver.observe(badgeSentinelTop);
 
 function announce(message) {
     const liveRegion = document.getElementById('a11y-live-region');

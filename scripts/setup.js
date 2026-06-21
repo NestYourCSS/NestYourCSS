@@ -11,8 +11,33 @@ function initializeAceEditors() {
     await window.waitForVar('cssSampleDefault');
     let sample = window.cssSampleDefault;
    
-    await window.waitForVar('LanguageProvider');
-    const languageProvider = window.LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
+    var linterWorker, lintSessions = {}, lintTimeouts = {}, lintId = 0;
+    try { linterWorker = new Worker('/lib/ace-linters/linter.worker.js'); } catch (_) {}
+    if (linterWorker) {
+      linterWorker.onmessage = function (e) {
+        if (e.data.type === 'lintResult') {
+          var s = lintSessions[e.data.sessionId];
+          if (s) s.setAnnotations(e.data.annotations);
+        }
+      };
+    }
+    function createLinterProxy() {
+      return {
+        registerEditor: function (editor) {
+          if (!linterWorker) return;
+          var es = editor.getSession();
+          var sid = 'ed_' + (++lintId);
+          lintSessions[sid] = es;
+          es.on('change', function () {
+            clearTimeout(lintTimeouts[sid]);
+            lintTimeouts[sid] = setTimeout(function () {
+              linterWorker.postMessage({ type: 'lint', sessionId: sid, code: es.getValue() });
+            }, 400);
+          });
+        }
+      };
+    }
+    var languageProvider = createLinterProxy();
   
     window.inputEditorInstance = initEditor("inputEditor", window.i18n.inputEditorLabel, sample || window.i18n.inputPlaceholder);
     window.outputEditorInstance = initEditor("outputEditor", window.i18n.outputEditorLabel, window.i18n.outputPlaceholder);
@@ -404,45 +429,45 @@ function initializeAceEditors() {
     });
   
     function styleShadowEditors() {
-      // Ensure the elements (including shadow editors are visible / not in mobile view) are available before proceeding
       if (!window.mainContent || !window.codeEditorElem || !inputEditorElem || window.matchMedia('(max-aspect-ratio: 1.097 / 1)').matches) return;
 
       const remInPixels = parseFloat(getComputedStyle(document.documentElement).fontSize);
       const totalAvailableSpace = window.mainContent.offsetWidth - window.codeEditorElem.offsetWidth - (2 * remInPixels);
       const convertPxToRem = (px) => px / remInPixels;
       
-      const shadowHeightDiff = inputEditorElem.offsetHeight / 10;
+      const editorHeight = inputEditorElem.offsetHeight;
+      const editorWidth = inputEditorElem.offsetWidth;
+      const shadowHeightDiff = editorHeight / 10;
       const baseShadowOpacity = 0.5;
       const baseShadowBlur = 2;
-      const maxWidth = Math.min(inputEditorElem.offsetWidth * 2, totalAvailableSpace);
+      const maxWidth = Math.min(editorWidth * 2, totalAvailableSpace);
       
-      let baseShadowWidth = inputEditorElem.offsetWidth / 3;
+      let baseShadowWidth = editorWidth / 3;
       let shadowWidthDiff = baseShadowWidth / 15;
       let previousShadowTranslation = 0;
-  
+
       if (((32 / 15) * baseShadowWidth) > maxWidth) {
         baseShadowWidth = maxWidth * (5/12);
         shadowWidthDiff = baseShadowWidth / 15;
       }
-  
+
       shadowEditors.forEach((shadowEditor, index) => {
-        // Only wrap if you haven't wrapped already
         const shadowEditorWrapper = shadowEditor.closest('.shadowEditorWrapper') || document.createElement("div");
         if (!shadowEditorWrapper.classList.contains('shadowEditorWrapper')) {
             shadowEditorWrapper.classList.add("shadowEditorWrapper", "editorWrapper");
             shadowEditor.parentElement.replaceWith(shadowEditorWrapper);
             shadowEditorWrapper.appendChild(shadowEditor.parentElement);
         }
-  
-        let scaleValue = ((inputEditorElem.offsetHeight * 0.8) - (shadowHeightDiff * (index + 1))) / inputEditorElem.offsetHeight;
+
+        let scaleValue = ((editorHeight * 0.8) - (shadowHeightDiff * (index + 1))) / editorHeight;
         shadowEditor.parentElement.style.transform = `scale(${scaleValue})`;
-  
+
         let shadowWidth = baseShadowWidth - ((shadowWidthDiff * 2.5) * (index + 1));
         shadowEditorWrapper.style.width = `${convertPxToRem(shadowWidth)}rem`;
         
         previousShadowTranslation += shadowWidth + (2 * shadowWidthDiff);
         shadowEditorWrapper.style.translate = `-${convertPxToRem(previousShadowTranslation)}rem`;
-  
+
         shadowEditorWrapper.style.opacity = baseShadowOpacity - index / 10;
         shadowEditor.parentElement.style.filter = `blur(${Math.pow(baseShadowBlur, index + 1) / 16}rem)`;
         shadowEditorWrapper.style.backgroundColor = `rgb(from white r g b / ${(2 - index)}%)`;
@@ -514,7 +539,6 @@ function initializeAceEditors() {
       if (entries[0].isIntersecting) initAce();
     }, { threshold: 0 });
     observer.observe(editorSide);
-    setTimeout(initAce, 1500);
   } else {
     window.setupEditors();
   }

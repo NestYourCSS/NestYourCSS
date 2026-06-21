@@ -1,34 +1,34 @@
 function initializeFallingBadgeManager() {
-  // Variable to keep track of the timer
-  let scrollTimer, hovered = false;
+  var idleTimer, hovered = false;
 
-  // Event listener for scroll events
-  window.updateLogoState = (scrollTop, scrollHeight, clientHeight) => {
+  window.updateLogoState = function (_, __, ___, isAtBottom, isAtTop) {
     if (window.prefersReducedMotion) return;
-    if (scrollTimer) clearTimeout(scrollTimer);
+    clearTimeout(idleTimer);
 
-    if (scrollTop === undefined) {
-      scrollTop = window.scrollWrapper.scrollTop;
-      scrollHeight = window.scrollWrapper.scrollHeight;
-      clientHeight = window.scrollWrapper.clientHeight;
-    }
-
-    // Check if user is at the bottom
-    if ((scrollTop / scrollHeight) < 0.01) {
+    if (isAtTop) {
       window.cssBadge.className = '';
-    } else if (((scrollTop + clientHeight) / scrollHeight) >= 0.9995) {
+    } else if (isAtBottom) {
       window.cssBadge.className = 'hover-animation';
-      if (!hovered) hovered ^= 1;
+      if (!hovered) hovered = !hovered;
     } else if (window.cssBadge.className != 'main-animation') {
       window.cssBadge.className = 'main-animation';
-      if (hovered) hovered ^= 1;
+      if (hovered) hovered = !hovered;
     } else {
-      scrollTimer = setTimeout(() => {
+      idleTimer = setTimeout(function () {
         if (window.cssBadge.className == 'main-animation') window.cssBadge.className = 'idle-animation';
       }, 1000);
     }
   };
-  window.updateLogoState();
+  window.updateLogoState(null, null, null, false, true);
+
+  window.scrollWrapper.addEventListener('scroll', function () {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () {
+      if (window.cssBadge && window.cssBadge.className === 'main-animation') {
+        window.cssBadge.className = 'idle-animation';
+      }
+    }, 1000);
+  }, { passive: true });
 };
 
 window.initializeFallingBadgeManager = initializeFallingBadgeManager;

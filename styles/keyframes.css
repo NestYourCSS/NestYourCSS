@@ -80,13 +80,13 @@
 	to { translate: 0 -1lh; }
 }
 
-@keyframes swapText { /* May be translatable - but will likely require a HTML restructuring */
-	from, to { padding-top: 0lh; }
-	30%, 70% { padding-top: 1lh; }
+@keyframes swapText {
+	from, to { translate: 0 -1lh; }
+	30%, 70% { translate: 0 0; }
 }
 
 @keyframes showText {
-	to { text-shadow: 0 -1lh; }
+	to { translate: 0 calc(-1 * 1lh); }
 }
 
 @keyframes strikethrough {
@@ -101,9 +101,9 @@
 }
 
 @keyframes slideIn {
-	0% { color: transparent; }
+	0% { opacity: 0; }
 	50%, 75% { translate: 0; }
-	62.5% { color: revert-layer; }
+	62.5% { opacity: 1; }
 }
 
 @keyframes boostUp {
