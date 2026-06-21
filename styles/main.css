@@ -1261,7 +1261,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    translate: -2rem calc(96dvh - 6rem - 100%);
+    transform: translate(-2rem, calc(96dvh - 6rem - 100%));
     z-index: 100;
     background: none;
     border: none;
@@ -1275,7 +1275,7 @@
       transition:
         opacity 1s,
         font-size 1s,
-        translate 1s,
+        transform 1s,
         --nestBtn-shadow-direction 1s;
     }
 
@@ -1487,7 +1487,7 @@
 
         + #nestBtn {
           font-size: 0.75rem;
-          translate: 0% 0%;
+          transform: translate(0%, 0%);
           --nestBtn-shadow-direction: -1;
 
           > div {
@@ -1621,31 +1621,34 @@
         height: 1lh;
         overflow: hidden;
         line-height: 100%;
-        text-shadow: 0 1lh;
+        position: relative;
+        color: transparent;
 
-        > p {
-          margin: 0;
-          display: inline-block;
-          vertical-align: middle;
-          translate: 0 -1lh;
+        &::before,
+        &::after {
+          content: attr(data-word);
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          color: var(--shades-white);
+          line-height: 100%;
+          will-change: transform;
         }
 
         @media not (prefers-reduced-motion: reduce) {
           @supports (animation-range: normal) {
-            animation: swapText linear 1ms;
-            animation-timeline: view();
-            animation-range-start: cover -0.5lh;
-
             &:nth-child(1) {
-              animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
+              view-timeline: --word-1 block;
             }
 
             &:nth-child(2) {
-              animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
+              view-timeline: --word-2 block;
             }
 
             &:nth-child(3) {
-              animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+              view-timeline: --word-3 block;
             }
           }
         }
@@ -1662,6 +1665,78 @@
         &:nth-child(3) {
           margin-right: 0.5ch;
           text-align: right;
+        }
+      }
+
+      > span:nth-child(1)::before {
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0 0;
+            animation: wordSlideOut linear both;
+            animation-timeline: --word-1;
+            animation-range-start: cover -0.5lh;
+            animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
+          }
+        }
+      }
+
+      > span:nth-child(1)::after {
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0 -100%;
+            animation: wordSlideIn linear both;
+            animation-timeline: --word-1;
+            animation-range-start: cover -0.5lh;
+            animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
+          }
+        }
+      }
+
+      > span:nth-child(2)::before {
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0 0;
+            animation: wordSlideOut linear both;
+            animation-timeline: --word-2;
+            animation-range-start: cover -0.5lh;
+            animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
+          }
+        }
+      }
+
+      > span:nth-child(2)::after {
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0 -100%;
+            animation: wordSlideIn linear both;
+            animation-timeline: --word-2;
+            animation-range-start: cover -0.5lh;
+            animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
+          }
+        }
+      }
+
+      > span:nth-child(3)::before {
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0 0;
+            animation: wordSlideOut linear both;
+            animation-timeline: --word-3;
+            animation-range-start: cover -0.5lh;
+            animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+          }
+        }
+      }
+
+      > span:nth-child(3)::after {
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            translate: 0 -100%;
+            animation: wordSlideIn linear both;
+            animation-timeline: --word-3;
+            animation-range-start: cover -0.5lh;
+            animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+          }
         }
       }
     }
@@ -1691,25 +1766,45 @@
         line-height: 100%;
         overflow: hidden;
         position: relative;
+        color: transparent;
+
+        &::before {
+          content: attr(data-word);
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          color: var(--shades-white);
+          display: block;
+          line-height: inherit;
+          will-change: transform;
+        }
 
         @media not (prefers-reduced-motion: reduce) {
           @supports (animation-range: normal) {
-            padding-top: 1lh;
-
             &:first-child {
-              text-shadow: 0 0.5lh;
-              animation: showText linear forwards 1ms;
-              animation-timeline: view();
-              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
-              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+              view-timeline: --first-word block;
+
+              &::before {
+                translate: 0 100%;
+                animation: mergeFromBottom linear forwards 1ms;
+                animation-timeline: --first-word;
+                animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+                animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+              }
             }
 
             &:last-child {
-              text-shadow: 0 -2lh;
-              animation: showText linear forwards 1ms;
-              animation-timeline: view();
-              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
-              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+              view-timeline: --last-word block;
+
+              &::before {
+                translate: 0 -100%;
+                animation: mergeFromTop linear forwards 1ms;
+                animation-timeline: --last-word;
+                animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+                animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+              }
             }
           }
         }
@@ -2466,7 +2561,7 @@
         }
         
         #mainContent > #editorSide + #nestBtn {
-          translate: 0% calc(-100% - 0.5rem);
+          transform: translate(0%, calc(-100% - 0.5rem));
         }
       }
 

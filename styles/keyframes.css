@@ -80,13 +80,22 @@
 	to { translate: 0 -1lh; }
 }
 
-@keyframes swapText { /* May be translatable - but will likely require a HTML restructuring */
-	from, to { padding-top: 0lh; }
-	30%, 70% { padding-top: 1lh; }
+@keyframes wordSlideOut {
+	from, to { translate: 0 0; }
+	30%, 70% { translate: 0 100%; }
 }
 
-@keyframes showText {
-	to { text-shadow: 0 -1lh; }
+@keyframes wordSlideIn {
+	from, to { translate: 0 -100%; }
+	30%, 70% { translate: 0 0; }
+}
+
+@keyframes mergeFromBottom {
+	to { translate: 0 0; }
+}
+
+@keyframes mergeFromTop {
+	to { translate: 0 0; }
 }
 
 @keyframes strikethrough {
@@ -237,48 +246,48 @@
 @keyframes bounceInTop {
 	0% {
 		filter: opacity(0);
-		transform: translateY(-500px);
+		translate: 0 -500px;
 		animation-timing-function: ease-in;
 	}
 
 	38% {
 		filter: opacity(1);
-		transform: translateY(0);
+		translate: 0 0;
 		animation-timing-function: ease-out;
 	}
 
 	55% {
-		transform: translateY(-65px);
+		translate: 0 -65px;
 		animation-timing-function: ease-in;
 	}
 
 	72% {
-		transform: translateY(0);
+		translate: 0 0;
 		animation-timing-function: ease-out;
 	}
 
 	81% {
-		transform: translateY(-28px);
+		translate: 0 -28px;
 		animation-timing-function: ease-in;
 	}
 
 	90% {
-		transform: translateY(0);
+		translate: 0 0;
 		animation-timing-function: ease-out;
 	}
 
 	95% {
-		transform: translateY(-8px);
+		translate: 0 -8px;
 		animation-timing-function: ease-in;
 	}
 
 	100% {
-		transform: translateY(0);
+		translate: 0 0;
 		animation-timing-function: ease-out;
 	}
 }
   
 @keyframes slideInLeft {
-	0% { transform: translateX(-64rem); }
-	100% { transform: translateX(0); }
+	0% { translate: -64rem; }
+	100% { translate: 0; }
 }
