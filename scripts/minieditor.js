@@ -1,6 +1,6 @@
 function initializeMiniEditor() {
-  let lineNumbers = miniEditor.querySelector('#lineNumbers');
-  let nycssCodeExample = miniEditor.querySelector('#nycssCodeExample');
+  let lineNumbers = window.miniEditor.querySelector('#lineNumbers');
+  let nycssCodeExample = window.miniEditor.querySelector('#nycssCodeExample');
   
   let lines = nycssCodeExample.textContent.trim().split("\n").concat('\n');
   lineNumbers.innerHTML = [...lines].fill().map((_, i) => `<div>${i + 1}</div>`).join("");
@@ -22,13 +22,13 @@ function initializeMiniEditor() {
   /* Set active line */
   
   window.updateActiveLine = (cursorX, cursorY) => {
-    let lineNumbers = miniEditor.querySelector('#lineNumbers');
-    let nycssCodeExample = miniEditor.querySelector('#nycssCodeExample');
+    let lineNumbers = window.miniEditor.querySelector('#lineNumbers');
+    let nycssCodeExample = window.miniEditor.querySelector('#nycssCodeExample');
   
     /* Vertical */
     
     window.debounce(() => {
-      const segmentHeight = miniEditor.parentElement.offsetHeight / lines.length;
+      const segmentHeight = window.miniEditor.parentElement.offsetHeight / lines.length;
       
       const activeLine = Math.ceil(cursorY / segmentHeight);
       
@@ -40,9 +40,11 @@ function initializeMiniEditor() {
   
     if (!window.prefersReducedMotion) {
       let horizontalPos = cursorX / document.body.clientWidth;
-      let padding = nycssCodeExample.parentElement.offsetLeft / miniEditor.offsetWidth;
+      let padding = nycssCodeExample.parentElement.offsetLeft / window.miniEditor.offsetWidth;
       let horizontalRePos = ((1 - (padding * 2)) * horizontalPos) + padding;
       nycssCodeExample.parentElement.style.setProperty('--intensityPos', window.roundNumber(horizontalRePos * 100) + '%');
     }
   };
 };
+
+window.initializeMiniEditor = initializeMiniEditor;

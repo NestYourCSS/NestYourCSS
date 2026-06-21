@@ -71,7 +71,7 @@
 	font-family: 'Poppins';
 	font-weight: 200;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-extralight-devanagari.otf") format("opentype");
+	src: url("../assets/fonts/poppins-extralight-devanagari.woff2") format("woff2");
 	unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 
@@ -79,7 +79,7 @@
 	font-family: 'Poppins';
 	font-weight: 200;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-extralight-latinext.otf") format("opentype");
+	src: url("../assets/fonts/poppins-extralight-latinext.woff2") format("woff2");
 	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -87,7 +87,7 @@
 	font-family: 'Poppins';
 	font-weight: 200;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-extralight-latin.otf") format("opentype");
+	src: url("../assets/fonts/poppins-extralight-latin.woff2") format("woff2");
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 	ascent-override: 88%;
 	descent-override: 24%;
@@ -98,7 +98,7 @@
 	font-family: 'Poppins';
 	font-weight: 300;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-light-devanagari.otf") format("opentype");
+	src: url("../assets/fonts/poppins-light-devanagari.woff2") format("woff2");
 	unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 
@@ -106,7 +106,7 @@
 	font-family: 'Poppins';
 	font-weight: 300;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-light-latinext.otf") format("opentype");
+	src: url("../assets/fonts/poppins-light-latinext.woff2") format("woff2");
 	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -114,7 +114,7 @@
 	font-family: 'Poppins';
 	font-weight: 300;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-light-latin.otf") format("opentype");
+	src: url("../assets/fonts/poppins-light-latin.woff2") format("woff2");
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 	ascent-override: 88%;
 	descent-override: 24%;
@@ -125,7 +125,7 @@
 	font-family: 'Poppins';
 	font-weight: 400;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-regular-devanagari.otf") format("opentype");
+	src: url("../assets/fonts/poppins-regular-devanagari.woff2") format("woff2");
 	unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 
@@ -133,7 +133,7 @@
 	font-family: 'Poppins';
 	font-weight: 400;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-regular-latinext.otf") format("opentype");
+	src: url("../assets/fonts/poppins-regular-latinext.woff2") format("woff2");
 	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -141,7 +141,7 @@
 	font-family: 'Poppins';
 	font-weight: 400;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-regular-latin.otf") format("opentype");
+	src: url("../assets/fonts/poppins-regular-latin.woff2") format("woff2");
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 	ascent-override: 88%;
 	descent-override: 24%;
@@ -152,7 +152,7 @@
 	font-family: 'Poppins';
 	font-weight: 500;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-medium-devanagari.otf") format("opentype");
+	src: url("../assets/fonts/poppins-medium-devanagari.woff2") format("woff2");
 	unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 
@@ -160,7 +160,7 @@
 	font-family: 'Poppins';
 	font-weight: 500;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-medium-latinext.otf") format("opentype");
+	src: url("../assets/fonts/poppins-medium-latinext.woff2") format("woff2");
 	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -168,7 +168,7 @@
 	font-family: 'Poppins';
 	font-weight: 500;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-medium-latin.otf") format("opentype");
+	src: url("../assets/fonts/poppins-medium-latin.woff2") format("woff2");
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 	ascent-override: 88%;
 	descent-override: 24%;
@@ -179,7 +179,7 @@
 	font-family: 'Poppins';
 	font-weight: 600;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-semibold-devanagari.otf") format("opentype");
+	src: url("../assets/fonts/poppins-semibold-devanagari.woff2") format("woff2");
 	unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 
@@ -187,7 +187,7 @@
 	font-family: 'Poppins';
 	font-weight: 600;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-semibold-latinext.otf") format("opentype");
+	src: url("../assets/fonts/poppins-semibold-latinext.woff2") format("woff2");
 	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -195,7 +195,7 @@
 	font-family: 'Poppins';
 	font-weight: 600;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-semibold-latin.otf") format("opentype");
+	src: url("../assets/fonts/poppins-semibold-latin.woff2") format("woff2");
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 	ascent-override: 88%;
 	descent-override: 24%;
@@ -206,7 +206,7 @@
 	font-family: 'Poppins';
 	font-weight: 900;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-black-devanagari.otf") format("opentype");
+	src: url("../assets/fonts/poppins-black-devanagari.woff2") format("woff2");
 	unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
 }
 
@@ -214,7 +214,7 @@
 	font-family: 'Poppins';
 	font-weight: 900;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-black-latinext.otf") format("opentype");
+	src: url("../assets/fonts/poppins-black-latinext.woff2") format("woff2");
 	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -222,7 +222,7 @@
 	font-family: 'Poppins';
 	font-weight: 900;
 	font-display: swap;
-	src: url("../assets/fonts/poppins-black-latin.otf") format("opentype");
+	src: url("../assets/fonts/poppins-black-latin.woff2") format("woff2");
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 	ascent-override: 88%;
 	descent-override: 24%;
@@ -238,7 +238,7 @@
   src:
     local("Orelo SemiCondensed DemiBold Regular"),
     local("Orelo SemiCondensed DemiBold"),
-    url("../assets/fonts/orelo-semicondensed-demibold.otf") format("opentype");
+    url("../assets/fonts/orelo-semicondensed-demibold.woff2") format("woff2");
 }
 
 @font-face {
@@ -248,7 +248,7 @@
   src:
     local("Orelo SemiCondensed Bold Regular"),
     local("Orelo SemiCondensed Bold"),
-    url("../assets/fonts/orelo-semicondensed-bold.otf") format("opentype");
+    url("../assets/fonts/orelo-semicondensed-bold.woff2") format("woff2");
 }
 
 @font-face {
@@ -258,7 +258,7 @@
   src:
     local("Orelo SemiWide Regular"),
     local("Orelo SemiWide"),
-    url("../assets/fonts/orelo-semiwide.otf") format("opentype");
+    url("../assets/fonts/orelo-semiwide.woff2") format("woff2");
 }
 
 @font-face {
@@ -268,7 +268,7 @@
   src:
     local("Orelo Wide DemiBold Regular"),
     local("Orelo Wide DemiBold"),
-    url("../assets/fonts/orelo-wide-demibold.otf") format("opentype");
+    url("../assets/fonts/orelo-wide-demibold.woff2") format("woff2");
 }
 
 /* Fira Code */
@@ -277,7 +277,7 @@
   font-family: 'Fira Code';
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/firacode-regular-cyrillicext.otf") format("opentype");
+  src: url("../assets/fonts/firacode-regular-cyrillicext.woff2") format("woff2");
   unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
@@ -285,7 +285,7 @@
   font-family: 'Fira Code';
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/firacode-regular-cyrillic.otf") format("opentype");
+  src: url("../assets/fonts/firacode-regular-cyrillic.woff2") format("woff2");
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
   
@@ -293,7 +293,7 @@
   font-family: 'Fira Code';
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/firacode-regular-greek.otf") format("opentype");
+  src: url("../assets/fonts/firacode-regular-greek.woff2") format("woff2");
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 
@@ -301,7 +301,7 @@
   font-family: 'Fira Code';
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/firacode-regular-greekext.otf") format("opentype");
+  src: url("../assets/fonts/firacode-regular-greekext.woff2") format("woff2");
   unicode-range: U+1F00-1FFF;
 }
 
@@ -309,7 +309,7 @@
   font-family: 'Fira Code';
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/firacode-regular-latinext.otf") format("opentype");
+  src: url("../assets/fonts/firacode-regular-latinext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
   
@@ -317,7 +317,55 @@
   font-family: 'Fira Code';
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/firacode-regular-latin.otf") format("opentype");
+  src: url("../assets/fonts/firacode-regular-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/firacode-bold-cyrillicext.woff2") format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/firacode-bold-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/firacode-bold-greek.woff2") format("woff2");
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/firacode-bold-greekext.woff2") format("woff2");
+  unicode-range: U+1F00-1FFF;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/firacode-bold-latinext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/firacode-bold-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
@@ -328,7 +376,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/dejavu-mono-regular-latin.otf") format("opentype");
+  src: url("../assets/fonts/dejavu-mono-regular-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
@@ -339,7 +387,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/ia-writer-mono-regular-latin.otf") format("opentype");
+  src: url("../assets/fonts/ia-writer-mono-regular-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
@@ -350,7 +398,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-regular-cyrillicext.otf") format("opentype");
+  src: url("../assets/fonts/jetbrains-mono-regular-cyrillicext.woff2") format("woff2");
   unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
@@ -359,7 +407,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-regular-cyrillic.otf") format("opentype");
+  src: url("../assets/fonts/jetbrains-mono-regular-cyrillic.woff2") format("woff2");
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
@@ -368,7 +416,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-regular-greek.otf") format("opentype");
+  src: url("../assets/fonts/jetbrains-mono-regular-greek.woff2") format("woff2");
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }
 
@@ -377,7 +425,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-regular-vietnamese.otf") format("opentype");
+  src: url("../assets/fonts/jetbrains-mono-regular-vietnamese.woff2") format("woff2");
   unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
 }
 
@@ -386,7 +434,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-regular-latinext.otf") format("opentype");
+  src: url("../assets/fonts/jetbrains-mono-regular-latinext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -395,7 +443,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-regular-latin.otf") format("opentype");
+  src: url("../assets/fonts/jetbrains-mono-regular-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
@@ -406,7 +454,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/pt-mono-regular-cyrillicext.otf") format("opentype");
+  src: url("../assets/fonts/pt-mono-regular-cyrillicext.woff2") format("woff2");
   unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
@@ -415,7 +463,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/pt-mono-regular-cyrillic.otf") format("opentype");
+  src: url("../assets/fonts/pt-mono-regular-cyrillic.woff2") format("woff2");
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
@@ -424,7 +472,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/pt-mono-regular-latinext.otf") format("opentype");
+  src: url("../assets/fonts/pt-mono-regular-latinext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -433,6 +481,6 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../assets/fonts/pt-mono-regular-latin.otf") format("opentype");
+  src: url("../assets/fonts/pt-mono-regular-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }

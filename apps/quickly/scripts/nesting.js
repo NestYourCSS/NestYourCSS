@@ -1,4 +1,16 @@
-function nestCode(e) {
+const editorSide = document.getElementById('code-editor');
+if (editorSide && typeof IntersectionObserver !== 'undefined') {
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      if (typeof window.preloadEngine === 'function') window.preloadEngine();
+      observer.disconnect();
+    }
+  }, { rootMargin: '200px' });
+  observer.observe(editorSide);
+}
+
+async function nestCode(e) {
+    if (typeof window.preloadEngine === 'function') await window.preloadEngine();
     if (e && e.currentTarget && e.currentTarget.disabled) return;
 
     const wrapper = document.getElementById('code-editor-wrapper');

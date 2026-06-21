@@ -1,7 +1,7 @@
 function initializeSmoothScrollAndNestingController() {
   // --- State Tracking ---
   let transitionId = 0; // The "Sequence Counter" to prevent race conditions
-  window.isNesting = mainElement.classList.contains('nesting');
+  window.isNesting = window.mainElement.classList.contains('nesting');
   window.currentLenis = null;
 
   // Helper to check if we should skip animations
@@ -11,49 +11,49 @@ function initializeSmoothScrollAndNestingController() {
   // --- Methods ---
   window.switchToNestingMode = () => {
     console.log('[switchToNestingMode] called');
-    if (mainElement.classList.contains('nesting')) {
+    if (window.mainElement.classList.contains('nesting')) {
       console.log('[switchToNestingMode] already nesting, returning');
       return;
     }
     console.log('[switchToNestingMode] adding nesting class');
-    mainElement.classList.add('nesting');
+    window.mainElement.classList.add('nesting');
   };
 
   window.switchToHomepage = () => {
     console.log('[switchToHomepage] called');
-    if (!mainElement.classList.contains('nesting')) {
+    if (!window.mainElement.classList.contains('nesting')) {
       console.log('[switchToHomepage] not nesting, returning');
       return;
     }
     console.log('[switchToHomepage] removing nesting class');
-    mainElement.classList.remove('nesting');
+    window.mainElement.classList.remove('nesting');
   };
 
   window.lockToNestingMode = () => {
     window._nestingLocked = true;
     window.switchToNestingMode();
-    if (nestBtn) nestBtn.style.display = 'none';
+    if (window.nestBtn) window.nestBtn.style.display = 'none';
   };
 
   window.unlockNestingMode = () => {
     window._nestingLocked = false;
-    if (nestBtn) nestBtn.style.display = '';
+    if (window.nestBtn) window.nestBtn.style.display = '';
   };
 
   const updateLenisTarget = async () => {
-    const target = window.isNesting ? mainSettings : scrollWrapper;
+    const target = window.isNesting ? window.mainSettings : window.scrollWrapper;
     if (window.currentLenis) window.currentLenis.destroy();
 
-    await waitForVar('Lenis');
+    await window.waitForVar('Lenis');
     const lenisOpts = { wrapper: target, autoResize: true };
     if (shouldSkipMotion()) lenisOpts.lerp = 1;
     
-    const newLenis = new Lenis(lenisOpts);
+    const newLenis = new window.Lenis(lenisOpts);
 
     // Clamping logic for homepage
-    if (newLenis.dimensions.wrapper == scrollWrapper) {
+    if (newLenis.dimensions.wrapper == window.scrollWrapper) {
       newLenis.on('scroll', (e) => {
-        const maxScrollTop = mainElement.nextElementSibling?.offsetHeight || 0;
+        const maxScrollTop = window.mainElement.nextElementSibling?.offsetHeight || 0;
         if (e.scroll > maxScrollTop) {
           newLenis.scrollTo(maxScrollTop, { immediate: true, force: true });
         }
@@ -72,11 +72,11 @@ function initializeSmoothScrollAndNestingController() {
     window.isNesting = isCurrentlyNesting;
 
     // 2. Immediate UI Feedback (Disable both buttons)
-    if (nestBtn) nestBtn.disabled = true;
-    if (window.toggleBtn) window.toggleBtn.style.pointerEvents = 'none'; // Guard the skip link
+    if (window.nestBtn) window.nestBtn.disabled = true;
+    if (window.toggleBtn) window.toggleBtn.style.pointerEvents = 'none';
 
     // Update 'inert' immediately for accessibility
-    [mainSettings, mainElement.nextElementSibling, textSideElem].forEach((elem, i) => {
+    [window.mainSettings, window.mainElement.nextElementSibling, window.textSideElem].forEach((elem, i) => {
       if (elem) elem.toggleAttribute('inert', i ? window.isNesting : !window.isNesting);
     });
 
@@ -85,7 +85,7 @@ function initializeSmoothScrollAndNestingController() {
 
     // 3. Wait for Transition (Smart Guard)
     if (!shouldSkipMotion()) {
-      const animatingElem = window.isNesting ? codeEditorElem : editorSideElem;
+      const animatingElem = window.isNesting ? window.codeEditorElem : window.editorSideElem;
       const isSmallScreen = window.matchMedia('(max-aspect-ratio: 1.097 / 1)').matches;
       
       const target = isSmallScreen ? document.querySelector('#outputEditorWrapper') : animatingElem;
@@ -102,9 +102,9 @@ function initializeSmoothScrollAndNestingController() {
 
     // 5. Finalize UI
     console.log('[handleNestingChange] finalizing UI, isCurrentlyNesting:', window.isNesting);
-    if (nestBtn) {
-      nestBtn.disabled = false;
-      nestBtn.setAttribute('aria-label', window.isNesting ? window.i18n.viewHomepage : window.i18n.startNesting);
+    if (window.nestBtn) {
+      window.nestBtn.disabled = false;
+      window.nestBtn.setAttribute('aria-label', window.isNesting ? window.i18n.viewHomepage : window.i18n.startNesting);
     }
     
     if (window.toggleBtn) {
@@ -117,7 +117,7 @@ function initializeSmoothScrollAndNestingController() {
 
   // --- Observer ---
   const observer = new MutationObserver(() => {
-    const isCurrentlyNesting = mainElement.classList.contains('nesting');
+    const isCurrentlyNesting = window.mainElement.classList.contains('nesting');
     console.log('[MutationObserver] class changed, isCurrentlyNesting:', isCurrentlyNesting, '| window.isNesting:', window.isNesting);
     if (isCurrentlyNesting !== window.isNesting) {
       if (window._nestingLocked && !isCurrentlyNesting) {
@@ -130,7 +130,7 @@ function initializeSmoothScrollAndNestingController() {
   });
 
   updateLenisTarget();
-  observer.observe(mainElement, { attributes: true, attributeFilter: ['class'] });
+  observer.observe(window.mainElement, { attributes: true, attributeFilter: ['class'] });
 
   // --- RAF & Events ---
   function raf(time) {
@@ -146,16 +146,16 @@ function initializeSmoothScrollAndNestingController() {
       const targetSelector = this.getAttribute('href');
       let targetElement;
   
-      if (targetSelector == '#') targetElement = scrollWrapper.firstElementChild;
+      if (targetSelector == '#') targetElement = window.scrollWrapper.firstElementChild;
       else targetElement = document.getElementById(targetSelector.slice(1));
       
       if (window.prefersReducedMotion) {
         if (window.currentLenis) window.currentLenis.scrollTo(targetElement, { immediate: true, force: true });
-        else scrollWrapper.scrollTo({ top: targetElement.offsetTop });
+        else window.scrollWrapper.scrollTo({ top: targetElement.offsetTop });
       } else if (window.currentLenis) {
         window.currentLenis.scrollTo(targetElement, { duration: 1.5, lock: true });
       } else {
-        scrollWrapper.scrollTo({ top: targetElement.offsetTop, behavior: 'smooth' });
+        window.scrollWrapper.scrollTo({ top: targetElement.offsetTop, behavior: 'smooth' });
       }
     });
   });
@@ -168,3 +168,5 @@ function initializeSmoothScrollAndNestingController() {
     updateLenisTarget();
   });
 };
+
+window.initializeSmoothScrollAndNestingController = initializeSmoothScrollAndNestingController;

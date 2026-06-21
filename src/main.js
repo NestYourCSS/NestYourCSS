@@ -1,5 +1,5 @@
 import { createStore } from '@nycss/state';
-import { configureEngine, parseCSS, minifyCSS, beautifyCSS, denestCSS, renestCSS } from '@nycss/engine';
+import { configureEngine } from '@nycss/engine/config';
 import '@nycss/ui';
 import { registerSW } from '@nycss/pwa';
 
@@ -56,12 +56,6 @@ configureEngine({
   indentChar: '\t',
 });
 
-// Make converter functions available as window globals for legacy scripts
-window.parseCSS = parseCSS;
-window.minifyCSS = minifyCSS;
-window.beautifyCSS = beautifyCSS;
-window.denestCSS = denestCSS;
-window.renestCSS = renestCSS;
 window.configureEngine = configureEngine;
 
 // Initialize window globals used by legacy scripts
@@ -77,3 +71,18 @@ registerSW();
 
 // Export for use in legacy scripts
 window.__store = store;
+
+// Legacy scripts - imported sequentially to preserve dependency order
+import '../scripts/var.js';
+import '../scripts/main.js';
+import '../scripts/setup.js';
+import '../scripts/sample.js';
+import '../scripts/nesting.js';
+import '../scripts/debugging.js';
+import '../scripts/nestingSettings.js';
+import '../scripts/minieditor.js';
+import '../scripts/splashtexts.js';
+import '../scripts/fallingbadge.js';
+import '../scripts/animateCursor.js';
+import '../scripts/smoothlyScroll.js';
+import '../scripts/handlers.js';

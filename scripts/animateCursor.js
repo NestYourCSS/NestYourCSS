@@ -12,13 +12,13 @@ function initializeSmoothCursor() {
             cursorPosition.x += dx * smoothing;
             cursorPosition.y += dy * smoothing;
         
-            if (cssBadge.classList.contains('hover-animation')) {
+            if (window.cssBadge.classList.contains('hover-animation')) {
                 const x = Math.round(cursorPosition.x);
                 const y = Math.round(cursorPosition.y);
-                if (cursor._lx !== x || cursor._ly !== y) {
-                    cursor._lx = x;
-                    cursor._ly = y;
-                    cursor.style.translate = `calc(${x}px - 50%) calc(${y}px - 50%)`;
+                if (window.cursor._lx !== x || window.cursor._ly !== y) {
+                    window.cursor._lx = x;
+                    window.cursor._ly = y;
+                    window.cursor.style.translate = `calc(${x}px - 50%) calc(${y}px - 50%)`;
                 }
             }
         }
@@ -27,3 +27,5 @@ function initializeSmoothCursor() {
     };
     animateCursor();
 };
+
+window.initializeSmoothCursor = initializeSmoothCursor;

@@ -1,3 +1,33 @@
+let engineLoadPromise = null;
+
+function preloadEngine() {
+  if (!engineLoadPromise) {
+    engineLoadPromise = import('@nycss/engine').then(mod => {
+      window.parseCSS = mod.parseCSS;
+      window.minifyCSS = mod.minifyCSS;
+      window.beautifyCSS = mod.beautifyCSS;
+      window.denestCSS = mod.denestCSS;
+      window.renestCSS = mod.renestCSS;
+      return mod;
+    });
+  }
+  return engineLoadPromise;
+}
+
+// Predictive loading: start loading engine when editor section enters viewport
+if (typeof IntersectionObserver !== 'undefined') {
+  const editorSide = document.getElementById('editorSide');
+  if (editorSide) {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        preloadEngine();
+        observer.disconnect();
+      }
+    }, { rootMargin: '200px' });
+    observer.observe(editorSide);
+  }
+}
+
 /**  
  * Updates the error table based on Ace Editor annotations.  
  * This function is accessible to screen reader and keyboard users.  
@@ -70,27 +100,28 @@ function updateAccessibleErrorTable(annotations, tableBodyElem, inputEditorInsta
     });  
 };  
     
-function nestCode(onClick = false) {  
-    console.log('[nestCode] called, onClick:', onClick, '| window.isNesting:', window.isNesting, '| nestBtn disabled:', nestBtn?.disabled);
+async function nestCode(onClick = false) {  
+    await preloadEngine();
+    console.log('[nestCode] called, onClick:', onClick, '| window.isNesting:', window.isNesting, '| nestBtn disabled:', window.nestBtn?.disabled);
 
     if (onClick) {
-        if (nestBtn?.hasAttribute('disabled')) {
+        if (window.nestBtn?.hasAttribute('disabled')) {
           console.log('[nestCode] onClick EARLY RETURN: nestBtn is disabled');
           return;
         }
         console.log('[nestCode] onClick block: disabling buttons, toggling nesting class');
-        if (nestBtn) nestBtn.disabled = true;
-        if (typeof toggleBtn !== 'undefined' && toggleBtn) {
-            toggleBtn.style.pointerEvents = 'none';
+        if (window.nestBtn) window.nestBtn.disabled = true;
+        if (typeof window.toggleBtn !== 'undefined' && window.toggleBtn) {
+            window.toggleBtn.style.pointerEvents = 'none';
         }
 
-        mainElement.classList.toggle('nesting', !window.isNesting);
-        console.log('[nestCode] nesting class toggled, is now:', mainElement.classList.contains('nesting'), '| window.isNesting still:', window.isNesting);
+        window.mainElement.classList.toggle('nesting', !window.isNesting);
+        console.log('[nestCode] nesting class toggled, is now:', window.mainElement.classList.contains('nesting'), '| window.isNesting still:', window.isNesting);
         if (window.isNesting) {
           console.log('[nestCode] EARLY RETURN: was already nesting');
           return;
         }
-        scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
+        window.scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });  
     }  
    
     if (typeof window.outputEditorInstance === 'undefined' || !window.inputEditorInstance) {
@@ -103,7 +134,7 @@ function nestCode(onClick = false) {
     const wrapper = document.getElementById('codeEditor') || document.getElementById('siteWrapper');
     if (wrapper) wrapper.setAttribute('aria-busy', 'true');
     
-    let tableBodyElem = errorTable.tBodies[0];  
+    let tableBodyElem = window.errorTable.tBodies[0];  
 	const annotations = window.inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
 	if (annotations.length == 0) {  
 	    console.log('[nestCode] no errors, converting to nested CSS');
@@ -132,20 +163,20 @@ function convertToNestedCSS(cssProvided, htmlString) {
 	window.processMode ??= 3; // 0: Minify, 1: Beautify, 2: Denest, 3: Nest  
 	window.preserveComments ??= true;  
 
-    cssProvided = parseCSS(cssProvided);  
-    if (window.processMode == 0) return minifyCSS(cssProvided);  
-    if (window.processMode == 1) return beautifyCSS(cssProvided);  
-    if (window.processMode == 2) cssProvided = denestCSS(cssProvided);  
-    if (window.processMode == 3) cssProvided = renestCSS(cssProvided);  
-    return beautifyCSS(cssProvided);  
+    cssProvided = window.parseCSS(cssProvided);  
+    if (window.processMode == 0) return window.minifyCSS(cssProvided);  
+    if (window.processMode == 1) return window.beautifyCSS(cssProvided);  
+    if (window.processMode == 2) cssProvided = window.denestCSS(cssProvided);  
+    if (window.processMode == 3) cssProvided = window.renestCSS(cssProvided);  
+    return window.beautifyCSS(cssProvided);  
 };
   
 document.addEventListener('DOMContentLoaded', () => {  
     const settingsToggle = document.getElementById('settingsBtn');  
     const mainSettings = document.getElementById('mainSettings');  
-    const mainElement = document.querySelector('main');  
+    const mainElement = document.querySelector('main');
 
-    if (!settingsToggle || !mainSettings) return;  
+    if (!settingsToggle || !mainSettings) return; 
 
     function openSettingsPanel() {
         mainSettings.classList.add('mobile-open');  
@@ -185,4 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }  
     });  
 });
+
+window.nestCode = nestCode;
+window.convertToNestedCSS = convertToNestedCSS;
 

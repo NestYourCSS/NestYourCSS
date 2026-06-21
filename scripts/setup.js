@@ -1,18 +1,18 @@
 function initializeAceEditors() {
   window.setupEditors = async () => {
-    if (typeof ace === 'undefined') {
+    if (typeof window.ace === 'undefined') {
       if (window._loadAce) await window._loadAce();
     }
     try {
-      const CssMode = ace.require('ace/mode/css').Mode;
+      const CssMode = window.ace.require('ace/mode/css').Mode;
       CssMode.prototype.createWorker = function () { return null; };
     } catch (_) {}
   
-    await waitForVar('cssSamples');
-    let sample = cssSamples[window.cssSample] ?? cssSamples["denestedShowcase"];
-  
-    await waitForVar('LanguageProvider');
-    const languageProvider = LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
+    await window.waitForVar('cssSampleDefault');
+    let sample = window.cssSampleDefault;
+   
+    await window.waitForVar('LanguageProvider');
+    const languageProvider = window.LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
   
     window.inputEditorInstance = initEditor("inputEditor", window.i18n.inputEditorLabel, sample || window.i18n.inputPlaceholder);
     window.outputEditorInstance = initEditor("outputEditor", window.i18n.outputEditorLabel, window.i18n.outputPlaceholder);
@@ -40,16 +40,16 @@ function initializeAceEditors() {
 
       const isUserAction = window.inputEditorInstance.isFocused() || window._userInitiatedEdit;
       window._userInitiatedEdit = false;
-      console.log('[change] isUserAction:', isUserAction, '| isFocused:', window.inputEditorInstance.isFocused(), '| nesting:', mainElement.classList.contains('nesting'), '| processAuto:', window.processAuto);
+      console.log('[change] isUserAction:', isUserAction, '| isFocused:', window.inputEditorInstance.isFocused(), '| nesting:', window.mainElement.classList.contains('nesting'), '| processAuto:', window.processAuto);
 
-      if (isUserAction && !mainElement.classList.contains('nesting')) {
+      if (isUserAction && !window.mainElement.classList.contains('nesting')) {
         if (window.processAuto ?? true) {
           console.log('[change] Auto ON → calling nestCode(true)');
           window.nestCode(true);
         } else {
           console.log('[change] Auto OFF → switching to nesting mode only');
           window.switchToNestingMode();
-          scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollWrapper.scrollTo({ top: 0, behavior: 'smooth' });
         }
       } else if (window.processAuto ?? true) {
         console.log('[change] setting codeChanged = true for changeAnnotation');
@@ -95,7 +95,7 @@ function initializeAceEditors() {
     function initEditor(editorId, labelDescription, value, readyPromise = false) {
       if (!document.getElementById(editorId)) return;
   
-      const editor = ace.edit(editorId, {
+      const editor = window.ace.edit(editorId, {
         mode: "ace/mode/css",
         theme: "ace/theme/nycss"
       });
@@ -171,7 +171,7 @@ function initializeAceEditors() {
           return { top: top, left: left };
       }
   
-      ace.require('ace/tooltip').Tooltip.prototype.setPosition = function (x, y) {
+      window.ace.require('ace/tooltip').Tooltip.prototype.setPosition = function (x, y) {
           y -= getElementOffset(this.$parentNode).top;
           x -= getElementOffset(this.$parentNode).left;
           this.getElement().style.position = "absolute";
@@ -286,7 +286,7 @@ function initializeAceEditors() {
     [inputEditorElem, outputEditorElem].forEach((editor) => {
       const editorTab = createEditorTab(editor, editor === inputEditorElem, false);
       wrapEditorWithGroup(editor, editorTab);
-      window.updateCoordinateDisplay(ace.edit(editor));
+      window.updateCoordinateDisplay(window.ace.edit(editor));
     });
 
     [window.inputEditorInstance, window.outputEditorInstance].forEach(ed => {
@@ -300,9 +300,10 @@ function initializeAceEditors() {
       const minimapEl = document.createElement('div');
       minimapEl.id = editor.container.id + 'Minimap';
       minimapEl.className = 'ace-minimap';
+      if (!window.__store.showMinimap) minimapEl.style.display = 'none';
       container.appendChild(minimapEl);
 
-      const minimap = ace.edit(minimapEl);
+      const minimap = window.ace.edit(minimapEl);
       minimap.session.setMode('ace/mode/css');
       minimap.setFontSize(2.5);
       minimap.setShowPrintMargin(false);
@@ -404,10 +405,10 @@ function initializeAceEditors() {
   
     function styleShadowEditors() {
       // Ensure the elements (including shadow editors are visible / not in mobile view) are available before proceeding
-      if (!mainContent || !codeEditorElem || !inputEditorElem || window.matchMedia('(max-aspect-ratio: 1.097 / 1)').matches) return;
+      if (!window.mainContent || !window.codeEditorElem || !inputEditorElem || window.matchMedia('(max-aspect-ratio: 1.097 / 1)').matches) return;
 
       const remInPixels = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const totalAvailableSpace = mainContent.offsetWidth - codeEditorElem.offsetWidth - (2 * remInPixels);
+      const totalAvailableSpace = window.mainContent.offsetWidth - window.codeEditorElem.offsetWidth - (2 * remInPixels);
       const convertPxToRem = (px) => px / remInPixels;
       
       const shadowHeightDiff = inputEditorElem.offsetHeight / 10;
@@ -449,7 +450,7 @@ function initializeAceEditors() {
     }
   
     // Recalculate shadow editor styles on window resize/zoom
-    window.addEventListener('resize', debounce(styleShadowEditors, 250));
+    window.addEventListener('resize', window.debounce(styleShadowEditors, 250));
 
     styleShadowEditors();
 
@@ -465,7 +466,7 @@ function initializeAceEditors() {
           shadowEditor.innerHTML = inputEditorElem.innerHTML;
         });
   
-        const isHidden = mainElement.classList.contains('nesting') && parseInt(window.getComputedStyle(shadowEditorsWrapper.parentElement.parentElement).opacity) == 0;
+        const isHidden = window.mainElement.classList.contains('nesting') && parseInt(window.getComputedStyle(shadowEditorsWrapper.parentElement.parentElement).opacity) == 0;
   
         if (isHidden) {
           contentObserver.disconnect();
@@ -476,7 +477,7 @@ function initializeAceEditors() {
   
     const visibilityObserver = new MutationObserver(() => {
       if (!isContentObserverPaused) return;
-      const isVisible = !mainElement.classList.contains('nesting') || parseInt(window.getComputedStyle(shadowEditorsWrapper.parentElement.parentElement).opacity) > 0;
+      const isVisible = !window.mainElement.classList.contains('nesting') || parseInt(window.getComputedStyle(shadowEditorsWrapper.parentElement.parentElement).opacity) > 0;
   
       if (isVisible) {
         contentObserver.observe(inputEditorElem, {
@@ -494,13 +495,29 @@ function initializeAceEditors() {
       characterData: true
     });
   
-    visibilityObserver.observe(mainElement, {
+    visibilityObserver.observe(window.mainElement, {
       attributes: true,
       attributeFilter: ['class']
     });
   };
   
-  window.setupEditors();
+  const editorSide = document.getElementById('editorSide');
+  if (editorSide && typeof IntersectionObserver !== 'undefined') {
+    let aceInitialized = false;
+    const initAce = () => {
+      if (aceInitialized) return;
+      aceInitialized = true;
+      observer?.disconnect();
+      window.setupEditors();
+    };
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) initAce();
+    }, { threshold: 0 });
+    observer.observe(editorSide);
+    setTimeout(initAce, 1500);
+  } else {
+    window.setupEditors();
+  }
   
   /**
    * Splits the text content of elements into individual <span>s for animation.
@@ -522,7 +539,7 @@ function initializeAceEditors() {
       });
   };
   
-  toggleBtn.addEventListener('click', () => {
+  window.toggleBtn.addEventListener('click', () => {
     if (typeof window.nestCode === 'undefined') return;
 
     window.nestCode(true);
@@ -711,3 +728,5 @@ function initializeAceEditors() {
     allFocusable[nextIndex].focus();
   };
 };
+
+window.initializeAceEditors = initializeAceEditors;

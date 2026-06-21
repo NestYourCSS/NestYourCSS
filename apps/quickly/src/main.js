@@ -1,5 +1,5 @@
 import { createStore } from '@nycss/state';
-import { configureEngine, parseCSS, minifyCSS, beautifyCSS, denestCSS, renestCSS } from '@nycss/engine';
+import { configureEngine } from '@nycss/engine/config';
 import '@nycss/ui';
 import { registerSW } from '@nycss/pwa';
 
@@ -44,13 +44,25 @@ const store = createStore({
 // Configure engine
 configureEngine({ preserveComments: true, indentChar: '\t' });
 
-// Make converter functions available as window globals for legacy scripts
-window.parseCSS = parseCSS;
-window.minifyCSS = minifyCSS;
-window.beautifyCSS = beautifyCSS;
-window.denestCSS = denestCSS;
-window.renestCSS = renestCSS;
 window.configureEngine = configureEngine;
+
+// Lazy engine preloader - only loads @nycss/engine when first needed
+window.preloadEngine = (() => {
+  let engineLoadPromise = null;
+  return function preloadEngine() {
+    if (!engineLoadPromise) {
+      engineLoadPromise = import('@nycss/engine').then(mod => {
+        window.parseCSS = mod.parseCSS;
+        window.minifyCSS = mod.minifyCSS;
+        window.beautifyCSS = mod.beautifyCSS;
+        window.denestCSS = mod.denestCSS;
+        window.renestCSS = mod.renestCSS;
+        return mod;
+      });
+    }
+    return engineLoadPromise;
+  };
+})();
 
 // Initialize window globals for legacy scripts
 window.processMode = store.mode;

@@ -266,4 +266,20 @@ h1 {
   }
 };
 
-setupEditors();
+const editorSide = document.getElementById('code-editor');
+if (editorSide && typeof IntersectionObserver !== 'undefined') {
+  let aceInitialized = false;
+  const initAce = () => {
+    if (aceInitialized) return;
+    aceInitialized = true;
+    observer?.disconnect();
+    setupEditors();
+  };
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) initAce();
+  }, { threshold: 0 });
+  observer.observe(editorSide);
+  setTimeout(initAce, 1500);
+} else {
+  setupEditors();
+}

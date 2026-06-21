@@ -6,7 +6,7 @@ var(--shades-black)
 `;
 
 document.body.addEventListener('pointermove', (e) => {
-  if (typeof splashTextElem === 'undefined' || splashTextElem === null || !mainElement) return;
+  if (typeof window.splashTextElem === 'undefined' || window.splashTextElem === null || !window.mainElement) return;
 
   const prefersReducedMotion = window.prefersReducedMotion;
 
@@ -15,30 +15,30 @@ document.body.addEventListener('pointermove', (e) => {
   
   requestAnimationFrame(() => {
     const clientWidth = document.body.clientWidth;
-    const st = scrollWrapper.scrollTop;
-    const mh = mainElement.offsetHeight;
-    const editorTop = editorSection.offsetTop;
-    const editorHeight = editorSection.offsetHeight;
+    const st = window.scrollWrapper.scrollTop;
+    const mh = window.mainElement.offsetHeight;
+    const editorTop = window.editorSection.offsetTop;
+    const editorHeight = window.editorSection.offsetHeight;
 
     if (prefersReducedMotion) {
-      mainContent.style.background = mainContentBackgroundString("50%");
+      window.mainContent.style.background = mainContentBackgroundString("50%");
     } else {
-      const horizValue = roundNumber((e.clientX / clientWidth) * 100) + '%';
+      const horizValue = window.roundNumber((e.clientX / clientWidth) * 100) + '%';
       if (window.isNesting || st < mh)
-        mainContent.style.background = mainContentBackgroundString(horizValue);
+        window.mainContent.style.background = mainContentBackgroundString(horizValue);
     }
 
     if (window.isNesting && !prefersReducedMotion) {
-      const msl = mainSettings.scrollLeft;
-      const msLastChildH = mainSettings.lastElementChild.clientHeight;
+      const msl = window.mainSettings.scrollLeft;
+      const msLastChildH = window.mainSettings.lastElementChild.clientHeight;
       const offsetX = msl - msLastChildH / 2;
-      const offsetY = mainSettings.scrollTop - msLastChildH / 2;
-      const nestedNavButtons = mainSettings.lastElementChild;
+      const offsetY = window.mainSettings.scrollTop - msLastChildH / 2;
+      const nestedNavButtons = window.mainSettings.lastElementChild;
       nestedNavButtons.style.setProperty('--cursor-x-pos', (e.clientX + offsetX) + 'px');
       nestedNavButtons.style.setProperty('--cursor-y-pos', (e.clientY + offsetY) + 'px');
     }
     else {
-      if (e.target === splashTextElem) window.attemptSplashTextUpdate();
+      if (e.target === window.splashTextElem) window.attemptSplashTextUpdate();
       const isEditorInView = st > editorTop && (editorTop + editorHeight + window.innerHeight) > st;
       if (isEditorInView) window.updateActiveLine(e.clientX, e.clientY);
     }
@@ -64,8 +64,8 @@ const intersectionObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.01 });
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
-scrollWrapper.addEventListener('scroll', () => {
-  const st = scrollWrapper.scrollTop, sh = scrollWrapper.scrollHeight, ch = scrollWrapper.clientHeight;
+window.scrollWrapper.addEventListener('scroll', () => {
+  const st = window.scrollWrapper.scrollTop, sh = window.scrollWrapper.scrollHeight, ch = window.scrollWrapper.clientHeight;
   requestAnimationFrame(() => { if (typeof window.updateLogoState !== 'undefined') window.updateLogoState(st, sh, ch); });
 });
 
@@ -191,13 +191,13 @@ window.setupDragAndDrop = (editor) => {
 window.addEventListener('load', () => {
   setTimeout(() => {
     const deferredScripts = [
-      initializeAceEditors,
-      initializeMiniEditor,
-      initializeSplashTextAnimator,
-      initializeFallingBadgeManager,
-      initializeSmoothCursor,
-      initializeSmoothScrollAndNestingController,
-      initializeDebuggingTools
+      window.initializeAceEditors,
+      window.initializeMiniEditor,
+      window.initializeSplashTextAnimator,
+      window.initializeFallingBadgeManager,
+      window.initializeSmoothCursor,
+      window.initializeSmoothScrollAndNestingController,
+      window.initializeDebuggingTools
     ];
     deferredScripts.forEach((dScript) => dScript());
 

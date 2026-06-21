@@ -1,0 +1,36 @@
+
+/* Using escaped characters in selectors */
+#\\31 \\32 \\33 {
+    background-color: #456;
+}
+
+.\\41 \\42 \\43 {
+    color: #456;
+}
+
+[data-\\61 ttribute="\\76 alue"] {
+    font-family: "Times New Roman", \\73 erif;
+}
+
+/* Using escaped characters in property names and values */
+body:has(:active) {
+    \\62 ackground-\\63 olor: #FFFFFF;
+    \\66 ont-\\73 ize: 16\\70 x;
+}
+
+h1 {
+    \\6d argin-\\74 op: 20\\70 x;
+    \\70 adding-\\62 ottom: 10\\70 x;
+}
+
+/* Using @at-rules with escaped characters */
+@\\6d edia screen and (max-width: 600\\70 x) {
+    body {
+        \\62 ackground-\\63 olor: #eee;
+    }
+}
+
+@\\66 ont-face {
+    \\66 ont-\\66 amily: 'MyFont';
+    src: url('myfont.woff2') format('woff2');
+}

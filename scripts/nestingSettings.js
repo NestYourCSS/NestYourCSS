@@ -19,15 +19,24 @@
 
   function initSettings(store) {
     function runNestCode() {
-      if (typeof nestCode === 'function' && (window.processAuto ?? true)) nestCode();
+      if (typeof window.nestCode === 'function' && (window.processAuto ?? true)) window.nestCode();
     }
 
     /* Subscribe to store changes */
     store._subscribe({
       samples: (value) => {
-        if (typeof cssSamples === 'undefined' || typeof window.inputEditorInstance === 'undefined') return;
+        if (typeof window.inputEditorInstance === 'undefined') return;
         window.cssSample = value;
-        window.inputEditorInstance.setValue(cssSamples[window.cssSample] || '', -1);
+        fetch(`samples/${value}.css`)
+          .then(r => {
+            if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`);
+            return r.text();
+          })
+          .then(css => window.inputEditorInstance.setValue(css, -1))
+          .catch(() => {
+            const fallback = window.cssSampleDefault || '';
+            window.inputEditorInstance.setValue(fallback, -1);
+          });
       },
       externalCss: (value) => {
         if (!value || window.appIsInitializing) return;
@@ -73,8 +82,8 @@
           if (ed) ed.getSession().setUseSoftTabs(useSoft);
         });
         window.editorIndentChar = useSoft ? ' '.repeat(window.inputEditorInstance.getSession().getTabSize()) : '\t';
-        configureEngine({ indentChar: window.editorIndentChar });
-        if (window.processAuto && typeof nestCode === 'function') nestCode();
+        window.configureEngine({ indentChar: window.editorIndentChar });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       indentationSize: (value) => {
         if (typeof window.inputEditorInstance === 'undefined') return;
@@ -84,8 +93,8 @@
         });
         if ((window.editorIndentChar?.startsWith(' ') || window.editorIndentChar === '')) {
           window.editorIndentChar = ' '.repeat(size);
-          configureEngine({ indentChar: window.editorIndentChar });
-          if (window.processAuto && typeof nestCode === 'function') nestCode();
+          window.configureEngine({ indentChar: window.editorIndentChar });
+          if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
         }
       },
       wordWrap: (value) => {
@@ -108,43 +117,43 @@
         const infiniteToggle = document.getElementById('nestingDepthInfinite');
         if (infiniteToggle) infiniteToggle.disabled = value !== 3;
         document.getElementById('nestingStrategy').disabled = value !== 3;
-        if (window.processAuto && typeof nestCode === 'function') nestCode();
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       auto: (value) => {
         window.processAuto = value;
         const modeLabel = document.querySelector('#mode');
         if (modeLabel) modeLabel.classList.toggle('button', !value);
-        if (value && typeof nestCode === 'function') nestCode();
+        if (value && typeof window.nestCode === 'function') window.nestCode();
       },
       preserveComments: (value) => {
         window.preserveComments = !value;
-        configureEngine({ preserveComments: !value, indentChar: window.editorIndentChar || '\t' });
+        window.configureEngine({ preserveComments: !value, indentChar: window.editorIndentChar || '\t' });
         const label = document.querySelector('#preserveComments');
         if (label) label.classList.toggle('button', !window.preserveComments);
-        if (window.processAuto && typeof nestCode === 'function') nestCode();
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       nestingStrategy: (value) => {
-        configureEngine({ strategy: value });
-        if (window.processAuto && typeof nestCode === 'function') nestCode();
+        window.configureEngine({ strategy: value });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       deduplicate: (value) => {
-        configureEngine({ deduplicate: value });
-        if (window.processAuto && typeof nestCode === 'function') {
-          nestCode();
+        window.configureEngine({ deduplicate: value });
+        if (window.processAuto && typeof window.nestCode === 'function') {
+          window.nestCode();
         }
       },
       nestingDepth: (value) => {
         const infinite = store.nestingDepthInfinite;
         const stepper = document.getElementById('nestingDepth');
         if (stepper) stepper.disabled = infinite || window.processMode !== 3;
-        configureEngine({ maxDepth: infinite ? Infinity : value, indentChar: window.editorIndentChar || '\t' });
-        if (window.processAuto && typeof nestCode === 'function') nestCode();
+        window.configureEngine({ maxDepth: infinite ? Infinity : value, indentChar: window.editorIndentChar || '\t' });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       nestingDepthInfinite: (value) => {
         const stepper = document.getElementById('nestingDepth');
         if (stepper) stepper.disabled = value || window.processMode !== 3;
-        configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
-        if (window.processAuto && typeof nestCode === 'function') nestCode();
+        window.configureEngine({ maxDepth: value ? Infinity : store.nestingDepth, indentChar: window.editorIndentChar || '\t' });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       showMinimap: (value) => {
         [window.inputEditorInstance, window.outputEditorInstance].filter(Boolean).forEach(ed => {
@@ -222,8 +231,8 @@
         if (!label) return;
         const labels = modeRadio.querySelectorAll(':scope > label');
         const idx = Array.from(labels).indexOf(label);
-        if (idx >= 0 && idx === modeRadio.value && !window.processAuto && typeof nestCode === 'function') {
-          nestCode();
+        if (idx >= 0 && idx === modeRadio.value && !window.processAuto && typeof window.nestCode === 'function') {
+          window.nestCode();
         }
       });
     }

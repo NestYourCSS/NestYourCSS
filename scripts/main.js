@@ -113,14 +113,14 @@ const cssLogo = document.getElementById('nycssLogo');
 const cssNest = document.getElementById('nycssNest');
 
 function updateLogoVisibility() {
-  cssBadge?.toggleAttribute('hidden', window.prefersReducedMotion);
+  window.cssBadge?.toggleAttribute('hidden', window.prefersReducedMotion);
   cssNest?.toggleAttribute('hidden', window.prefersReducedMotion);
   cssLogo?.toggleAttribute('hidden', !window.prefersReducedMotion);
-  cursor?.toggleAttribute('hidden', window.prefersReducedMotion);
+  window.cursor?.toggleAttribute('hidden', window.prefersReducedMotion);
 
-  if (cursor) {
-    cursor.style.opacity = window.prefersReducedMotion ? '0' : '';
-    cursor.style.pointerEvents = window.prefersReducedMotion ? 'none' : '';
+  if (window.cursor) {
+    window.cursor.style.opacity = window.prefersReducedMotion ? '0' : '';
+    window.cursor.style.pointerEvents = window.prefersReducedMotion ? 'none' : '';
   }
 }
 

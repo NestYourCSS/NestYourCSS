@@ -1,6 +1,5 @@
 function initializeSplashTextAnimator() {
-    // --- Existing Global Variables (ensure these are defined in your script) ---
-    let isUpdating = false; // Your global flag to prevent overlapping animations
+    let isUpdating = false;
     const splashTexts = [
     "Is fine-tuning your site's look too fiddly?",
     "Need to keep your rules in order?",
@@ -103,7 +102,7 @@ function initializeSplashTextAnimator() {
                     let partToScramble = staticPart.substring(staticPart.length - scrambleLength);
 
                     animationState.currentDisplaySring = partToKeepStaticInThisStep + _scrambleSingleText(partToScramble);
-                    splashTextElem.textContent = animationState.currentDisplaySring;
+                    window.splashTextElem.textContent = animationState.currentDisplaySring;
                     
                     animationState.currentIndex++;
 
@@ -130,7 +129,7 @@ function initializeSplashTextAnimator() {
                     let partToScramble = animationState.newText.substring(animationState.currentIndex, animationState.currentIndex + scrambleLength);
 
                     animationState.currentDisplaySring = staticPart + _scrambleSingleText(partToScramble);
-                    splashTextElem.textContent = animationState.currentDisplaySring;
+                    window.splashTextElem.textContent = animationState.currentDisplaySring;
 
                     animationState.currentIndex++;
 
@@ -143,7 +142,7 @@ function initializeSplashTextAnimator() {
             }
 
             if (animationFinishedThisStep) {
-                splashTextElem.textContent = animationState.newText;
+                window.splashTextElem.textContent = animationState.newText;
                 
                 if (animationState.onCompleteCallback) {
                     animationState.onCompleteCallback();
@@ -173,7 +172,7 @@ function initializeSplashTextAnimator() {
         // 1. Check for reduced motion preference
         // 2. If they want reduced motion, just "snap" the text and skip the logic
         if (window.prefersReducedMotion) {
-            splashTextElem.textContent = newText;
+            window.splashTextElem.textContent = newText;
             // Trigger the "cooldown" immediately so the next update can happen later
             isUpdating = true;
             setTimeout(() => { isUpdating = false; }, 1000); 
@@ -184,8 +183,8 @@ function initializeSplashTextAnimator() {
         
         isUpdating = true;
 
-        splashTextElem.style.willChange = "contents";
-        splashTextElem.ariaBusy = "true";
+        window.splashTextElem.style.willChange = "contents";
+        window.splashTextElem.ariaBusy = "true";
 
         // Cancel any lingering animation frame from a previous, possibly aborted, run
         if (animationState.animationFrameId) {
@@ -210,8 +209,8 @@ function initializeSplashTextAnimator() {
             accumulatedTime: 0,
 
             onCompleteCallback: () => { // Cooldown after animation finishes
-                splashTextElem.style.willChange = "auto";
-                splashTextElem.ariaBusy = "false";
+                window.splashTextElem.style.willChange = "auto";
+                window.splashTextElem.ariaBusy = "false";
 
                 setTimeout(() => {
                     isUpdating = false;
@@ -219,7 +218,7 @@ function initializeSplashTextAnimator() {
             }
         };
         
-        splashTextElem.textContent = originalText; // Set initial text immediately
+        window.splashTextElem.textContent = originalText; // Set initial text immediately
 
         // Start the animation loop
         animationState.animationFrameId = requestAnimationFrame(animationLoop);
@@ -228,8 +227,8 @@ function initializeSplashTextAnimator() {
     // --- Event Listener ---
     window.attemptSplashTextUpdate = () => {
     if (!isUpdating) { // Check global flag
-        let currentSplashText = splashTextElem.textContent;
-        let tempSplashTexts = clone(splashTexts).toSpliced(splashTexts.findIndex((text) => text === currentSplashText), 1);
+        let currentSplashText = window.splashTextElem.textContent;
+        let tempSplashTexts = window.clone(splashTexts).toSpliced(splashTexts.findIndex((text) => text === currentSplashText), 1);
         let newSplashText = tempSplashTexts[Math.floor(Math.random() * tempSplashTexts.length)];
 
         startSplashTextAnimation(currentSplashText, newSplashText);
@@ -239,3 +238,5 @@ function initializeSplashTextAnimator() {
     // --- Initial Animation Call ---
     setTimeout(() => startSplashTextAnimation("", splashTexts[Math.floor(Math.random() * splashTexts.length)]), 2000);
 };
+
+window.initializeSplashTextAnimator = initializeSplashTextAnimator;

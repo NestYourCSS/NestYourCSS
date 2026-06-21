@@ -8,25 +8,27 @@ function initializeFallingBadgeManager() {
     if (scrollTimer) clearTimeout(scrollTimer);
 
     if (scrollTop === undefined) {
-      scrollTop = scrollWrapper.scrollTop;
-      scrollHeight = scrollWrapper.scrollHeight;
-      clientHeight = scrollWrapper.clientHeight;
+      scrollTop = window.scrollWrapper.scrollTop;
+      scrollHeight = window.scrollWrapper.scrollHeight;
+      clientHeight = window.scrollWrapper.clientHeight;
     }
 
     // Check if user is at the bottom
     if ((scrollTop / scrollHeight) < 0.01) {
-      cssBadge.className = '';
+      window.cssBadge.className = '';
     } else if (((scrollTop + clientHeight) / scrollHeight) >= 0.9995) {
-      cssBadge.className = 'hover-animation';
+      window.cssBadge.className = 'hover-animation';
       if (!hovered) hovered ^= 1;
-    } else if (cssBadge.className != 'main-animation') {
-      cssBadge.className = 'main-animation';
+    } else if (window.cssBadge.className != 'main-animation') {
+      window.cssBadge.className = 'main-animation';
       if (hovered) hovered ^= 1;
     } else {
       scrollTimer = setTimeout(() => {
-        if (cssBadge.className == 'main-animation') cssBadge.className = 'idle-animation';
+        if (window.cssBadge.className == 'main-animation') window.cssBadge.className = 'idle-animation';
       }, 1000);
     }
   };
   window.updateLogoState();
 };
+
+window.initializeFallingBadgeManager = initializeFallingBadgeManager;

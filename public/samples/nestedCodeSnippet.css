@@ -1,0 +1,12 @@
+
+.nesting {
+  color: hotpink;
+
+  > .is {
+    color: rebeccapurple;
+
+    > .awesome {
+      color: deeppink;
+    }
+  }
+}

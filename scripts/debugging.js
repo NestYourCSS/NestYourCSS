@@ -79,7 +79,7 @@ function initializeDebuggingTools() {
 
             let nestedCss;
             try {
-                nestedCss = convertToNestedCSS(currentCss);
+                nestedCss = window.convertToNestedCSS(currentCss);
             } catch (e) {
                 if (!mute) console.error(`[${sampleKey}] convertToNestedCSS threw an exception on iteration ${i + 1}:`, e);
                 issues.converterThrewError = true;
@@ -131,21 +131,21 @@ function initializeDebuggingTools() {
     };
 
     /**
-     * Processes a specific CSS sample from cssSamples by its name.
+     * Processes a specific CSS sample from window.cssSamples by its name.
      *
-     * @param {string} sampleName The name of the sample in cssSamples.
+     * @param {string} sampleName The name of the sample in window.cssSamples.
      * @param {number} [iterations=5] The number of nesting iterations to perform.
      * @returns {Promise<void>}
      */
     async function processAndShowSampleByName(sampleKey, iterations = 5, mute = false) {
-        if (!cssSamples.hasOwnProperty(sampleKey)) {
-            if (!mute) console.error(`Sample key "${sampleKey}" not found in cssSamples.`);
+        if (!window.cssSamples.hasOwnProperty(sampleKey)) {
+            if (!mute) console.error(`Sample key "${sampleKey}" not found in window.cssSamples.`);
             window.outputEditorInstance.getSession().setValue(`/* Sample key "${sampleKey}" not found. */`);
             return;
         }
 
         if (!mute) console.log(`\n--- Processing specific sample: ${sampleKey} for ${iterations} iterations ---`);
-        const initialCss = cssSamples[sampleKey];
+        const initialCss = window.cssSamples[sampleKey];
 
         if (typeof initialCss !== 'string') {
             if (!mute) console.error(`[${sampleKey}] The sample CSS is not a string. Skipping.`);
@@ -180,14 +180,14 @@ function initializeDebuggingTools() {
     };
 
     /**
-     * Processes a specific CSS sample from cssSamples by its numerical index.
+     * Processes a specific CSS sample from window.cssSamples by its numerical index.
      *
-     * @param {number} sampleIndex The numerical index of the sample in cssSamples.
+     * @param {number} sampleIndex The numerical index of the sample in window.cssSamples.
      * @param {number} [iterations=5] The number of nesting iterations to perform.
      * @returns {Promise<void>}
      */
     async function processAndShowSampleByIndex(sampleIndex, iterations = 5, mute = false) {
-        const keys = Object.keys(cssSamples);
+        const keys = Object.keys(window.cssSamples);
         if (sampleIndex < 0 || sampleIndex >= keys.length) {
             if (!mute) console.error(`Sample index ${sampleIndex} is out of bounds. Valid range: 0 to ${keys.length - 1}.`);
             window.outputEditorInstance.getSession().setValue(`/* Sample index ${sampleIndex} is out of bounds. */`);
@@ -198,7 +198,7 @@ function initializeDebuggingTools() {
     };
 
     /**
-     * Processes all CSS samples in the cssSamples object sequentially.
+     * Processes all CSS samples in the window.cssSamples object sequentially.
      * Each sample (including all its iterations) completes before the next sample begins.
      *
      * @param {number} [iterations=5] The number of nesting iterations to perform for each sample.
@@ -210,7 +210,7 @@ function initializeDebuggingTools() {
         let lastProcessedKey = null;
         const samplesToReview = [];
 
-        const sampleKeys = Object.keys(cssSamples); // Get keys to iterate in a defined order.
+        const sampleKeys = Object.keys(window.cssSamples); // Get keys to iterate in a defined order.
 
         // This for...of loop iterates over the sampleKeys.
         // The `await` keyword before `runNestingIterations` is crucial:
@@ -220,7 +220,7 @@ function initializeDebuggingTools() {
         // This achieves the desired sequential execution: sample by sample.
         for (const sampleKey of sampleKeys) {
             if (!mute) console.log(`\n--- Batch processing: ${sampleKey} ---`);
-            const initialCss = cssSamples[sampleKey];
+            const initialCss = window.cssSamples[sampleKey];
             let result;
 
             if (typeof initialCss !== 'string') {
@@ -310,10 +310,10 @@ function initializeDebuggingTools() {
             }
             window.outputEditorInstance.getSession().setValue(prefix + (lastOutput || `/* [${lastProcessedKey}] Final output is empty/undefined. (Last processed in batch) */`));
             if (!mute) console.log(`Output editor updated with the result of the last processed sample: ${lastProcessedKey}`);
-        } else if (Object.keys(cssSamples).length > 0) {
+        } else if (Object.keys(window.cssSamples).length > 0) {
             window.outputEditorInstance.getSession().setValue("/* All samples processed. Check console for details. The last processed sample might have had issues or was empty. */");
         } else {
-            window.outputEditorInstance.getSession().setValue("/* No samples found in cssSamples or all processing failed. Check console. */");
+            window.outputEditorInstance.getSession().setValue("/* No samples found in window.cssSamples or all processing failed. Check console. */");
         }
 
         console.log("Detailed results for all samples:", allResults);
@@ -336,3 +336,5 @@ function initializeDebuggingTools() {
 
     window.Debugger = { processAndShowSampleByName, processAndShowSampleByIndex, processAllSamplesIteratively };
 };
+
+window.initializeDebuggingTools = initializeDebuggingTools;
