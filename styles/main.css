@@ -1621,30 +1621,33 @@
         height: 1lh;
         overflow: hidden;
         line-height: 100%;
-        position: relative;
+        text-shadow: 0 1lh;
 
         > p {
           margin: 0;
           display: inline-block;
           vertical-align: middle;
-          width: 100%;
+          translate: 0 -1lh;
+        }
 
-          @media not (prefers-reduced-motion: reduce) {
-            @supports (animation-range: normal) {
-              animation: swapText linear 1ms;
-              animation-timeline: view();
-              animation-range-start: cover -0.5lh;
+        @media not (prefers-reduced-motion: reduce) {
+          @supports (animation-range: normal) {
+            animation: swapText linear 1ms;
+            animation-timeline: view();
+            animation-range-start: cover -0.5lh;
+
+            &:nth-child(1) {
               animation-range-end: contain calc(min(100dvh, 1600px) - 1lh);
             }
+
+            &:nth-child(2) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
+            }
+
+            &:nth-child(3) {
+              animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
+            }
           }
-        }
-
-        &:nth-child(2) > p {
-          animation-range-end: contain calc(min(100dvh, 1600px) - 0.5lh);
-        }
-
-        &:nth-child(3) > p {
-          animation-range-end: contain calc(min(100dvh, 1600px) - 0lh);
         }
 
         &:nth-child(1) {
@@ -1691,10 +1694,23 @@
 
         @media not (prefers-reduced-motion: reduce) {
           @supports (animation-range: normal) {
-            animation: showText linear forwards 1ms;
-            animation-timeline: view();
-            animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
-            animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            padding-top: 1lh;
+
+            &:first-child {
+              text-shadow: 0 0.5lh;
+              animation: showText linear forwards 1ms;
+              animation-timeline: view();
+              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            }
+
+            &:last-child {
+              text-shadow: 0 -2lh;
+              animation: showText linear forwards 1ms;
+              animation-timeline: view();
+              animation-range-start: cover calc(min(50dvh, 800px) - 1lh);
+              animation-range-end: cover calc(min(100dvh, 1600px) - 3.15lh);
+            }
           }
         }
       }

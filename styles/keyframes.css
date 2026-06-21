@@ -80,13 +80,13 @@
 	to { translate: 0 -1lh; }
 }
 
-@keyframes swapText {
-	from, to { translate: 0 -1lh; }
-	30%, 70% { translate: 0 0; }
+@keyframes swapText { /* May be translatable - but will likely require a HTML restructuring */
+	from, to { padding-top: 0lh; }
+	30%, 70% { padding-top: 1lh; }
 }
 
 @keyframes showText {
-	to { translate: 0 calc(-1 * 1lh); }
+	to { text-shadow: 0 -1lh; }
 }
 
 @keyframes strikethrough {
@@ -168,22 +168,14 @@
 	to { translate: calc(0% - var(--padding)); }
 }
 
-@keyframes moveRight {
-	from { width: calc(var(--code-editor-width) - var(--padding)); }
-	to { width: calc(var(--single-editor-width)); }
-}
-
 /* Add to your keyframes.css */
 @keyframes slideEditor {
-  /* Starts at the far left edge of the container */
   from { translate: calc(-100cqw + 100% + var(--padding)); }
   to { translate: 0; }
 }
 
 @keyframes revealText {
-  /* Text is completely hidden/clipped from the right at the start */
   from { clip-path: inset(0 100% 0 0); }
-  /* Fully revealed at the end */
   to { clip-path: inset(0 0 0 0); }
 }
 
