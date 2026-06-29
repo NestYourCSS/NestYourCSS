@@ -70,11 +70,11 @@ const intersectionObserver = new IntersectionObserver((entries) => {
 elements.flatMap(s => [...document.querySelectorAll(s)]).filter(Boolean).forEach(el => intersectionObserver.observe(el));
 
 var badgeSentinelBottom = document.createElement('div');
-badgeSentinelBottom.style.cssText = 'position:absolute;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none';
+badgeSentinelBottom.style.cssText = 'width:1px;height:1px;opacity:0;pointer-events:none';
 var badgeSentinelTop = document.createElement('div');
-badgeSentinelTop.style.cssText = 'position:absolute;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+badgeSentinelTop.style.cssText = 'width:1px;height:1px;opacity:0;pointer-events:none';
+window.scrollWrapper.prepend(badgeSentinelTop);
 window.scrollWrapper.appendChild(badgeSentinelBottom);
-window.scrollWrapper.appendChild(badgeSentinelTop);
 var badgeObserver = new IntersectionObserver(function (entries) {
   if (typeof window.updateLogoState === 'undefined') return;
   var atBottom = false, atTop = false;
