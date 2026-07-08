@@ -1038,7 +1038,6 @@
 
 @scope (#editorSide) {
   & {
-    container-type: inline-size;
     max-width: 100%;
 
     & {
@@ -1430,11 +1429,13 @@
 
         /* &#outputEditorWrapper { */
         &:last-child {
-          translate: var(--padding);
           padding-block: var(--padding);
           margin-right: -3.25rem;
           width: 0;
           opacity: 0;
+          --solo-width: calc((var(--code-editor-height) - var(--vertical-padding)) * (var(--editor-width) / 7));
+          --tight-width: calc((100cqw - (2 * var(--padding))) * (var(--editor-width) / var(--total-width)));
+          translate: calc((var(--tight-width) - var(--solo-width)) + var(--padding));
         }
       }
 

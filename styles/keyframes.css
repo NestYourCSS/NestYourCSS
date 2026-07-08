@@ -179,7 +179,7 @@
 
 /* Add to your keyframes.css */
 @keyframes slideEditor {
-  from { translate: calc(-100cqw + 100% + var(--padding)); }
+  from { translate: calc(-100cqw + 100%); }
   to { translate: 0; }
 }
 
