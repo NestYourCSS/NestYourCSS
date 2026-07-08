@@ -1069,7 +1069,7 @@
         (var(--code-editor-height) - var(--vertical-padding)) *
           (var(--editor-width) / 7)
       );
-      transition: opacity 0.5s ease-out;
+      transition: opacity 0.5s ease-out, height 2s;
 
       /* moveLeft Animation Variables */
       & {
@@ -1401,6 +1401,7 @@
       flex-shrink: 0;
       width: calc(var(--single-editor-width));
       animation: slideEditor 2s cubic-bezier(1, 0, 0.5, 1) both;
+      align-content: center;
 
       @media (prefers-reduced-motion: reduce) {
         animation: none;
@@ -1503,6 +1504,7 @@
           align-items: center;
           margin-left: auto;
           width: calc(100vw - (5 * var(--padding)) - (58.441558ch * 1.232));
+          height: calc(96vh - (5 * var(--padding)));
           max-width: 100%;
           max-height: 100%;
           aspect-ratio: var(--total-width) / 7;
