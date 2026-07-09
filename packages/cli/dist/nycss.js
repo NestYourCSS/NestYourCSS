@@ -43,26 +43,28 @@ function transformCSS(cssString, opts) {
   configureEngine({
     preserveComments: opts.comments !== false,
     indentChar: opts._indentChar,
-    maxDepth: opts.depth !== void 0 ? parseInt(opts.depth, 10) : void 0
+    maxDepth: opts.depth !== void 0 ? parseInt(opts.depth, 10) || Infinity : void 0,
+    deduplicate: opts.dedupe
   });
   const ast = parseCSS(cssString);
+  let finalAst = ast;
   switch (opts.mode) {
     case "denest":
-      denestCSS(ast);
+      finalAst = denestCSS(ast);
       break;
     case "minify":
     case "beautify":
       break;
     case "nest":
     default:
-      renestCSS(ast);
+      finalAst = renestCSS(ast);
       break;
   }
   switch (opts.mode) {
     case "minify":
-      return minifyCSS(ast);
+      return minifyCSS(finalAst);
     default:
-      return beautifyCSS(ast) + "\n";
+      return beautifyCSS(finalAst) + "\n";
   }
 }
 async function processFile(filePath, opts) {
@@ -107,7 +109,7 @@ async function runPipeline(files, opts) {
 }
 async function main() {
   const cli = cac("nycss");
-  cli.command("[...files]", "CSS input file(s) or glob pattern(s)").option("-o, --out <path>", "Output destination (file or directory)").option("--out-dir <dir>", "Output directory").option("-m, --mode <mode>", "Processing mode: nest, denest, minify, beautify", { default: "nest" }).option("-d, --depth <level>", "Max nesting depth (0 for infinite)").option("-i, --indent <size>", 'Indent size (number or "tab")', { default: "4" }).option("--no-comments", "Strip comments from output").option("--base <dir>", "Base directory for preserving output structure").option("-w, --watch", "Watch input files for changes").action(async (files, options) => {
+  cli.command("[...files]", "CSS input file(s) or glob pattern(s)").option("-o, --out <path>", "Output destination (file or directory)").option("--out-dir <dir>", "Output directory").option("-m, --mode <mode>", "Processing mode: nest, denest, minify, beautify", { default: "nest" }).option("-d, --depth <level>", "Max nesting depth (0 for infinite)").option("-i, --indent <size>", 'Indent size (number or "tab")', { default: "4" }).option("--no-comments", "Strip comments from output").option("--base <dir>", "Base directory for preserving output structure").option("-w, --watch", "Watch input files for changes").option("--dedupe", "Remove duplicate rules and declarations", { default: false }).action(async (files, options) => {
     if (!files || files.length === 0) {
       if (!process.stdin.isTTY) {
         let inputCSS = "";
