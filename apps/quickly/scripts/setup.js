@@ -1,4 +1,10 @@
 async function setupEditors() {
+  await waitForVar('ace');
+  try {
+    const CssMode = window.ace.require('ace/mode/css').Mode;
+    CssMode.prototype.createWorker = function () { return null; };
+  } catch (_) {}
+
   await waitForVar('LanguageProvider');
   let provider = LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
       
@@ -111,7 +117,7 @@ h1 {
     minimap.setFontSize(2.5);
     minimap.setShowPrintMargin(false);
     minimap.renderer.setShowGutter(false);
-    minimap.renderer.setOption('showLineNumbers', false);
+    minimap.setOption('showLineNumbers', false);
     minimap.setReadOnly(true);
     minimap.setTheme('ace/theme/nycss');
     if (!window.__store.showMinimap) minimapEl.style.display = 'none';
@@ -266,20 +272,22 @@ h1 {
   }
 };
 
-const editorSide = document.getElementById('code-editor');
-if (editorSide && typeof IntersectionObserver !== 'undefined') {
-  let aceInitialized = false;
-  const initAce = () => {
-    if (aceInitialized) return;
-    aceInitialized = true;
-    observer?.disconnect();
+{
+  const editorSide = document.getElementById('code-editor');
+  if (editorSide && typeof IntersectionObserver !== 'undefined') {
+    let aceInitialized = false;
+    const initAce = () => {
+      if (aceInitialized) return;
+      aceInitialized = true;
+      observer?.disconnect();
+      setupEditors();
+    };
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) initAce();
+    }, { threshold: 0 });
+    observer.observe(editorSide);
+    setTimeout(initAce, 1500);
+  } else {
     setupEditors();
-  };
-  const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) initAce();
-  }, { threshold: 0 });
-  observer.observe(editorSide);
-  setTimeout(initAce, 1500);
-} else {
-  setupEditors();
+  }
 }

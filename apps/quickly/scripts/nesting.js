@@ -1,12 +1,14 @@
-const editorSide = document.getElementById('code-editor');
-if (editorSide && typeof IntersectionObserver !== 'undefined') {
-  const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      if (typeof window.preloadEngine === 'function') window.preloadEngine();
-      observer.disconnect();
-    }
-  }, { rootMargin: '200px' });
-  observer.observe(editorSide);
+{
+  const editorSide = document.getElementById('code-editor');
+  if (editorSide && typeof IntersectionObserver !== 'undefined') {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        if (typeof window.preloadEngine === 'function') window.preloadEngine();
+        observer.disconnect();
+      }
+    }, { rootMargin: '200px' });
+    observer.observe(editorSide);
+  }
 }
 
 async function nestCode(e) {
