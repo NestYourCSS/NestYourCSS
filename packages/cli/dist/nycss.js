@@ -109,7 +109,7 @@ async function runPipeline(files, opts) {
 }
 async function main() {
   const cli = cac("nycss");
-  cli.command("[...files]", "CSS input file(s) or glob pattern(s)").option("-o, --out <path>", "Output destination (file or directory)").option("--out-dir <dir>", "Output directory").option("-m, --mode <mode>", "Processing mode: nest, denest, minify, beautify", { default: "nest" }).option("-d, --depth <level>", "Max nesting depth (0 for infinite)").option("-i, --indent <size>", 'Indent size (number or "tab")', { default: "4" }).option("--no-comments", "Strip comments from output").option("--base <dir>", "Base directory for preserving output structure").option("-w, --watch", "Watch input files for changes").option("--dedupe", "Remove duplicate rules and declarations", { default: false }).action(async (files, options) => {
+  cli.command("[...files]", "CSS input file(s) or glob pattern(s)").option("-o, --out <path>", "Output destination (file or directory)").option("--out-dir <dir>", "Output directory").option("-m, --mode <mode>", "Processing mode: nest, denest, minify, beautify", { default: "nest" }).option("-d, --depth <level>", "Max nesting depth (0 for infinite)").option("-i, --indent <size>", 'Indent size (number or "tab")', { default: "4" }).option("-c, --comments", "Preserve comments in output (default: stripped in minify mode)").option("--base <dir>", "Base directory for preserving output structure").option("-w, --watch", "Watch input files for changes").option("--dedupe", "Remove duplicate rules and declarations", { default: false }).action(async (files, options) => {
     if (!files || files.length === 0) {
       if (!process.stdin.isTTY) {
         let inputCSS = "";

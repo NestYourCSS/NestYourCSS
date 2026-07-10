@@ -104,7 +104,7 @@ cat input.css | nycss --mode minify > output.min.css
 | `-m, --mode <mode>` | The processing mode. Valid options: `nest`, `denest`, `minify`, `beautify`. | `nest` |
 | `-d, --depth <level>` | Max nesting depth. Limits how deep selectors can nest (use `0` for infinite). | Infinite |
 | `-i, --indent <size>` | Indent size. Use a number (e.g; `2`, `4`) or `tab`. | `4` |
-| `--no-comments` | Strips all comments from the output CSS. | `false` (keeps comments) |
+| `-c, --comments` | Preserve comments in output. Negate with `--no-comments` to strip them. | Stripped in minify, kept otherwise |
 | `--dedupe` | Removes duplicate rules and declarations from the output. | `false` |
 | `-o, --out <path>` | Output destination (file or directory). | N/A |
 | `--out-dir <dir>` | Output directory for batch processing. | N/A |

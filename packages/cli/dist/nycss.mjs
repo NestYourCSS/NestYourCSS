@@ -9749,7 +9749,7 @@ async function runPipeline(files, opts) {
 }
 async function main() {
   const cli = cac("nycss");
-  cli.command("[...files]", "CSS input file(s) or glob pattern(s)").option("-o, --out <file>", "Output file (single input only)").option("--out-dir <dir>", "Output directory (for multiple inputs)").option("-m, --mode <mode>", "Processing mode: nest, denest, minify, beautify", { default: "nest" }).option("-i, --indent <size>", 'Indent size (number or "tab")', { default: "4" }).option("--no-comments", "Strip comments from output").option("-w, --watch", "Watch input files for changes").action(async (files, options) => {
+  cli.command("[...files]", "CSS input file(s) or glob pattern(s)").option("-o, --out <file>", "Output file (single input only)").option("--out-dir <dir>", "Output directory (for multiple inputs)").option("-m, --mode <mode>", "Processing mode: nest, denest, minify, beautify", { default: "nest" }).option("-i, --indent <size>", 'Indent size (number or "tab")', { default: "4" }).option("-c, --comments", "Preserve comments in output (default: stripped in minify mode)").option("-w, --watch", "Watch input files for changes").action(async (files, options) => {
     if (!files || files.length === 0) {
       console.error(import_picocolors.default.red("Error:") + " No input files specified");
       process.exit(1);

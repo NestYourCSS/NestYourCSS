@@ -42,8 +42,23 @@ async function resolveOutPath(out, filePaths) {
 }
 
 function transformCSS(cssString, opts) {
+  let preserveComments;
+  if (opts.comments === true) {
+    preserveComments = true;
+  } else if (opts.comments === false) {
+    preserveComments = false;
+  } else {
+    preserveComments = opts.mode !== 'minify';
+
+    /* In preparation for the multi-modes feature.
+      const modes = typeof opts.mode === 'string' ? opts.mode.split(',') : [];
+      const finalMode = modes[modes.length - 1]?.trim();
+      preserveComments = finalMode !== 'minify';
+    */
+  }
+
   configureEngine({
-    preserveComments: opts.comments !== false,
+    preserveComments,
     indentChar: opts._indentChar,
     maxDepth: opts.depth !== undefined ? (parseInt(opts.depth, 10) || Infinity) : undefined,
     deduplicate: opts.dedupe,
@@ -127,7 +142,7 @@ export async function main() {
     .option('-m, --mode <mode>', 'Processing mode: nest, denest, minify, beautify', { default: 'nest' })
     .option('-d, --depth <level>', 'Max nesting depth (0 for infinite)')
     .option('-i, --indent <size>', 'Indent size (number or "tab")', { default: '4' })
-    .option('--no-comments', 'Strip comments from output')
+    .option('-c, --comments', 'Preserve comments in output (default: stripped in minify mode)')
     .option('--base <dir>', 'Base directory for preserving output structure')
     .option('-w, --watch', 'Watch input files for changes')
     .option('--dedupe', 'Remove duplicate rules and declarations', { default: false })

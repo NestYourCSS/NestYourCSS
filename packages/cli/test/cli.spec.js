@@ -120,12 +120,51 @@ describe('@nycss/cli', () => {
     assert(output.includes('  color:'));
   });
 
-  it('should support --no-comments', () => {
-    const inputFile = join(tmpDir, 'comments.css');
-    const outputFile = join(tmpDir, 'comments-out.css');
+  it('should support --comments (--no-comments strips comments)', () => {
+    const inputFile = join(tmpDir, 'comments-strip.css');
+    const outputFile = join(tmpDir, 'comments-strip-out.css');
     writeFileSync(inputFile, '/* a comment */\na { color: red; }');
 
     const result = runCli([inputFile, '-o', outputFile, '--no-comments']);
+    assert.strictEqual(result.status, 0);
+
+    const output = readFileSync(outputFile, 'utf-8');
+    assert(!output.includes('comment'));
+    assert(output.includes('color: red'));
+  });
+
+  it('should strip comments by default in minify mode', () => {
+    const inputFile = join(tmpDir, 'minify-comments-default.css');
+    const outputFile = join(tmpDir, 'minify-comments-default-out.css');
+    writeFileSync(inputFile, '/* copyright */ a { color: red; }');
+
+    const result = runCli([inputFile, '-o', outputFile, '-m', 'minify']);
+    assert.strictEqual(result.status, 0);
+
+    const output = readFileSync(outputFile, 'utf-8');
+    assert(!output.includes('copyright'), 'Comments should be stripped by default in minify mode');
+    assert(output.includes('color:red'));
+  });
+
+  it('should support --comments to preserve comments in minify mode', () => {
+    const inputFile = join(tmpDir, 'preserve-comments.css');
+    const outputFile = join(tmpDir, 'preserve-comments-out.css');
+    writeFileSync(inputFile, '/* copyright */ a { color: red; }');
+
+    const result = runCli([inputFile, '-o', outputFile, '-m', 'minify', '--comments']);
+    assert.strictEqual(result.status, 0);
+
+    const output = readFileSync(outputFile, 'utf-8');
+    assert(output.includes('copyright'), 'Comments should be preserved with --comments in minify mode');
+    assert(output.includes('color:red'));
+  });
+
+  it('should not preserve comments in non-minify modes with --no-comments (negation of --comments)', () => {
+    const inputFile = join(tmpDir, 'nest-strip-comments.css');
+    const outputFile = join(tmpDir, 'nest-strip-comments-out.css');
+    writeFileSync(inputFile, '/* a comment */\na { color: red; }');
+
+    const result = runCli([inputFile, '-o', outputFile, '-m', 'nest', '--no-comments']);
     assert.strictEqual(result.status, 0);
 
     const output = readFileSync(outputFile, 'utf-8');
