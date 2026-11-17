@@ -1138,6 +1138,40 @@ function groupIsComplex(parts) {
     return parts.some(part => part === ' ' || NESTING_COMBINATORS.includes(part));
 }
 
+/**
+ * Extracts the scope root selector from an `@scope` prelude, e.g.
+ * `(#siteWrapper)` or `(#siteWrapper) to (.foo)`. Returns null for a
+ * global scope (`@scope { … }`).
+ */
+function getScopeRoot(params) {
+    if (!params) return null;
+    const trimmed = params.trim();
+    if (!trimmed.startsWith('(')) return null;
+    let depth = 0;
+    let inString = null;
+    let start = -1;
+    let end = -1;
+    for (let i = 0; i < trimmed.length; i++) {
+        const ch = trimmed[i];
+        if (inString) {
+            if (ch === '\\') { i++; continue; }
+            if (ch === inString) inString = null;
+            continue;
+        }
+        if (ch === '"' || ch === "'") { inString = ch; continue; }
+        if (ch === '(') {
+            if (depth === 0) start = i + 1;
+            depth++;
+        } else if (ch === ')') {
+            depth--;
+            if (depth === 0) { end = i; break; }
+        }
+    }
+    if (start === -1 || end === -1) return null;
+    const root = trimmed.slice(start, end).trim();
+    return root.length > 0 ? root : null;
+}
+
 function combineSelectors(parentGroups, childGroups) {
     const combinators = NESTING_COMBINATORS;
 
@@ -1286,9 +1320,19 @@ export function denestCSS(ast, preserveWrappers = false) {
                 }
                 
                 const newAtRuleContext = { name: node.name, params: combinedAtRuleParams };
-                
+
+                let childSelector = context.selector;
+                if (node.name === 'scope') {
+                    const scopeRoot = getScopeRoot(combinedAtRuleParams);
+                    if (scopeRoot) {
+                        try { childSelector = parseSelector(scopeRoot); } catch (e) { childSelector = context.selector; }
+                    } else {
+                        childSelector = null;
+                    }
+                }
+
                 const childContext = {
-                    selector: context.selector,
+                    selector: childSelector,
                     atRule: newAtRuleContext,
                 };
                 
