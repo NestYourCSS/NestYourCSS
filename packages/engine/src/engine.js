@@ -1,23 +1,196 @@
 import { _preserveComments, _indentChar, _maxDepth, _strategy, _deduplicate, configureEngine } from './config.js';
 export { configureEngine } from './config.js';
 
+const NESTING_COMBINATORS = ['>', '+', '~'];
+
+/**
+ * Returns the index just past the CSS escape sequence that starts at `pos`
+ * (which must point at a backslash). Handles hex escapes with an optional
+ * trailing whitespace terminator, escaped newlines, and single-character
+ * escapes, including surrogate pairs.
+ */
+function consumeEscape(text, pos) {
+    let i = pos + 1;
+    if (i >= text.length) return i;
+
+    const char = text[i];
+
+    if (char === '\n' || char === '\f') return i + 1;
+    if (char === '\r') return text[i + 1] === '\n' ? i + 2 : i + 1;
+
+    if (/[0-9a-fA-F]/.test(char)) {
+        let digits = 0;
+        while (i < text.length && digits < 6 && /[0-9a-fA-F]/.test(text[i])) {
+            i++;
+            digits++;
+        }
+        if (i < text.length && (text[i] === ' ' || text[i] === '\t' || text[i] === '\r' || text[i] === '\n' || text[i] === '\f')) {
+            if (text[i] === '\r' && text[i + 1] === '\n') i += 2;
+            else i++;
+        }
+        return i;
+    }
+
+    const codePoint = text.codePointAt(i);
+    return i + (codePoint > 0xFFFF ? 2 : 1);
+}
+
+/**
+ * Rebuilds a single selector part while replacing every real nesting selector
+ * (`&`) with the result of `replace`. Literal ampersands inside strings,
+ * attribute selectors, comments, and escape sequences are left untouched.
+ *
+ * `replace` receives whether the `&` starts a new compound selector, which
+ * lets callers use a plain parent selector where concatenation is safe and an
+ * `:is(...)` wrapper where it is not.
+ */
+function transformNestingSelectors(part, replace) {
+    let result = '';
+    let pos = 0;
+    let compoundStart = true;
+    let attributeDepth = 0;
+    let inString = null;
+
+    while (pos < part.length) {
+        const char = part[pos];
+
+        if (inString) {
+            if (char === '\\' && pos + 1 < part.length) {
+                const end = consumeEscape(part, pos);
+                result += part.slice(pos, end);
+                pos = end;
+                continue;
+            }
+            result += char;
+            if (char === inString) inString = null;
+            pos++;
+            continue;
+        }
+
+        if (char === '/' && part[pos + 1] === '*') {
+            const commentEnd = part.indexOf('*/', pos + 2);
+            const end = commentEnd === -1 ? part.length : commentEnd + 2;
+            result += part.slice(pos, end);
+            pos = end;
+            continue;
+        }
+
+        if (char === '\\') {
+            const end = consumeEscape(part, pos);
+            result += part.slice(pos, end);
+            pos = end;
+            compoundStart = false;
+            continue;
+        }
+
+        if (char === '"' || char === "'") {
+            inString = char;
+            result += char;
+            pos++;
+            compoundStart = false;
+            continue;
+        }
+
+        if (char === '[') {
+            attributeDepth++;
+            result += char;
+            pos++;
+            compoundStart = false;
+            continue;
+        }
+
+        if (char === ']') {
+            if (attributeDepth > 0) attributeDepth--;
+            result += char;
+            pos++;
+            compoundStart = false;
+            continue;
+        }
+
+        if (char === '&' && attributeDepth === 0) {
+            result += replace(compoundStart);
+            pos++;
+            compoundStart = false;
+            continue;
+        }
+
+        result += char;
+
+        if (char === ' ' || char === '\t' || char === '\r' || char === '\n'
+            || NESTING_COMBINATORS.includes(char) || char === ',' || char === '(') {
+            compoundStart = true;
+        } else {
+            compoundStart = false;
+        }
+
+        pos++;
+    }
+
+    return result;
+}
+
+function partHasNestingSelector(part) {
+    let found = false;
+    transformNestingSelectors(part, () => {
+        found = true;
+        return '&';
+    });
+    return found;
+}
+
 function parseSelector(selectorText) {
     const groups = [{ parts: [], newlinesBefore: 0 }];
     let buffer = '';
     let pos = 0;
     const len = selectorText.length;
-    const combinators = ['>', '+', '~'];
+    const combinators = NESTING_COMBINATORS;
 
     let parenDepth = 0;
     let attributeDepth = 0;
+    let inString = null;
 
     while (pos < len) {
         const char = selectorText[pos];
 
+        if (inString) {
+            if (char === '\\' && pos + 1 < len) {
+                const end = consumeEscape(selectorText, pos);
+                buffer += selectorText.slice(pos, end);
+                pos = end;
+                continue;
+            }
+            buffer += char;
+            if (char === inString) inString = null;
+            pos++;
+            continue;
+        }
+
+        if (char === '/' && selectorText[pos + 1] === '*') {
+            const commentEnd = selectorText.indexOf('*/', pos + 2);
+            const end = commentEnd === -1 ? len : commentEnd + 2;
+            buffer += selectorText.slice(pos, end);
+            pos = end;
+            continue;
+        }
+
+        if (char === '\\') {
+            const end = consumeEscape(selectorText, pos);
+            buffer += selectorText.slice(pos, end);
+            pos = end;
+            continue;
+        }
+
+        if (char === '"' || char === "'") {
+            inString = char;
+            buffer += char;
+            pos++;
+            continue;
+        }
+
         if (char === '(') parenDepth++;
-        else if (char === ')') parenDepth--;
+        else if (char === ')') parenDepth = Math.max(0, parenDepth - 1);
         else if (char === '[') attributeDepth++;
-        else if (char === ']') attributeDepth--;
+        else if (char === ']') attributeDepth = Math.max(0, attributeDepth - 1);
 
         if (parenDepth === 0 && attributeDepth === 0) {
             if (char === ' ' || char === '\t' || char === '\r' || char === '\n') {
@@ -123,7 +296,33 @@ function parseValue(valueText) {
 
     while (pos < len) {
         const char = valueText[pos];
-        const prevChar = pos > 0 ? valueText[pos - 1] : null;
+
+        if (inString) {
+            if (char === '\\' && pos + 1 < len) {
+                const end = consumeEscape(valueText, pos);
+                buffer += valueText.slice(pos, end);
+                pos = end;
+                continue;
+            }
+            buffer += char;
+            if (char === inString) inString = null;
+            pos++;
+            continue;
+        }
+
+        if (char === '"' || char === "'") {
+            buffer += char;
+            inString = char;
+            pos++;
+            continue;
+        }
+
+        if (char === '\\') {
+            const end = consumeEscape(valueText, pos);
+            buffer += valueText.slice(pos, end);
+            pos = end;
+            continue;
+        }
 
         if (char === '/' && valueText[pos + 1] === '*') {
             flushBuffer();
@@ -139,15 +338,7 @@ function parseValue(valueText) {
             continue;
         }
 
-        if (inString) {
-            buffer += char;
-            if (char === inString && prevChar !== '\\') {
-                inString = null;
-            }
-        } else if (char === '"' || char === "'") {
-            buffer += char;
-            inString = char;
-        } else if (char === '(') {
+        if (char === '(') {
             parenDepth++;
             buffer += char;
         } else if (char === ')') {
@@ -175,6 +366,68 @@ function parseValue(valueText) {
 
     flushBuffer();
     return tokens;
+}
+
+/**
+ * Finds the first top-level `:` in a declaration-like text, skipping strings,
+ * comments, escapes, parentheses and attribute brackets. Returns -1 when there
+ * is no such colon.
+ */
+function findTopLevelColon(text) {
+    let parenDepth = 0;
+    let attributeDepth = 0;
+    let inString = null;
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        if (inString) {
+            if (char === '\\' && i + 1 < text.length) {
+                i = consumeEscape(text, i) - 1;
+                continue;
+            }
+            if (char === inString) inString = null;
+            continue;
+        }
+
+        if (char === '"' || char === "'") {
+            inString = char;
+            continue;
+        }
+
+        if (char === '\\') {
+            i = consumeEscape(text, i) - 1;
+            continue;
+        }
+
+        if (char === '/' && text[i + 1] === '*') {
+            const end = text.indexOf('*/', i + 2);
+            i = end === -1 ? text.length : end + 1;
+            continue;
+        }
+
+        if (char === '(') parenDepth++;
+        else if (char === ')') parenDepth = Math.max(0, parenDepth - 1);
+        else if (char === '[') attributeDepth++;
+        else if (char === ']') attributeDepth = Math.max(0, attributeDepth - 1);
+        else if (char === ':' && parenDepth === 0 && attributeDepth === 0) return i;
+    }
+
+    return -1;
+}
+
+/**
+ * True when the text collected so far is a custom property whose value starts
+ * with a `{}` block, e.g. `--x: { color: red }`. Custom properties are the only
+ * declarations whose values may contain curly blocks, so those braces belong to
+ * the value instead of starting a nested rule.
+ */
+function startsCustomPropertyBlock(text) {
+    const colonIndex = findTopLevelColon(text);
+    if (colonIndex === -1) return false;
+    const property = text.slice(0, colonIndex).trim();
+    const rest = text.slice(colonIndex + 1).trim();
+    return property.startsWith('--') && rest === '';
 }
 
 export function parseCSS(cssString) {
@@ -247,12 +500,33 @@ export function parseCSS(cssString) {
             const char = cssString[pos];
 
             if (inString) {
-                if (char === inString && cssString[pos - 1] !== '\\') {
-                    inString = null;
+                if (char === '\\' && pos + 1 < len) {
+                    const end = consumeEscape(cssString, pos);
+                    segmentBuilder += cssString.slice(pos, end);
+                    pos = end;
+                    continue;
                 }
-            } else if (char === '"' || char === "'") {
+                segmentBuilder += char;
+                if (char === inString) inString = null;
+                pos++;
+                continue;
+            }
+
+            if (char === '"' || char === "'") {
                 inString = char;
-            } else if (char === '/' && cssString[pos + 1] === '*') {
+                segmentBuilder += char;
+                pos++;
+                continue;
+            }
+
+            if (char === '\\') {
+                const end = consumeEscape(cssString, pos);
+                segmentBuilder += cssString.slice(pos, end);
+                pos = end;
+                continue;
+            }
+
+            if (char === '/' && cssString[pos + 1] === '*') {
                 const commentStart = pos;
                 pos += 2; 
                 while (pos < len && (cssString[pos] !== '*' || cssString[pos + 1] !== '/')) {
@@ -267,9 +541,67 @@ export function parseCSS(cssString) {
             } else if (char === '(') {
                 parenDepth++;
             } else if (char === ')') {
-                parenDepth--;
+                parenDepth = Math.max(0, parenDepth - 1);
             } else if (parenDepth === 0) {
                 if (char === '{') {
+                    if (startsCustomPropertyBlock(segmentBuilder)) {
+                        // Custom property values may contain `{}` blocks; keep the
+                        // whole balanced block as part of the declaration value.
+                        segmentBuilder += char;
+                        pos++;
+                        let braceDepth = 1;
+                        while (pos < len && braceDepth > 0) {
+                            const blockChar = cssString[pos];
+
+                            if (inString) {
+                                segmentBuilder += blockChar;
+                                if (blockChar === '\\' && pos + 1 < len) {
+                                    const end = consumeEscape(cssString, pos);
+                                    segmentBuilder += cssString.slice(pos + 1, end);
+                                    pos = end;
+                                    continue;
+                                }
+                                if (blockChar === inString) inString = null;
+                                pos++;
+                                continue;
+                            }
+
+                            if (blockChar === '"' || blockChar === "'") {
+                                inString = blockChar;
+                                segmentBuilder += blockChar;
+                                pos++;
+                                continue;
+                            }
+
+                            if (blockChar === '\\') {
+                                const end = consumeEscape(cssString, pos);
+                                segmentBuilder += cssString.slice(pos, end);
+                                pos = end;
+                                continue;
+                            }
+
+                            if (blockChar === '/' && cssString[pos + 1] === '*') {
+                                const commentStart = pos;
+                                pos += 2;
+                                while (pos < len && (cssString[pos] !== '*' || cssString[pos + 1] !== '/')) {
+                                    pos++;
+                                }
+                                if (pos < len) pos += 2;
+                                if (_preserveComments) {
+                                    segmentBuilder += cssString.substring(commentStart, pos);
+                                }
+                                continue;
+                            }
+
+                            if (blockChar === '{') braceDepth++;
+                            else if (blockChar === '}') braceDepth--;
+
+                            segmentBuilder += blockChar;
+                            pos++;
+                        }
+                        continue;
+                    }
+
                     curlyFound = true;
                     break;
                 }
@@ -485,7 +817,7 @@ export function minifyCSS(ast) {
         }).join('');
     }
 
-    return _minify(ast);
+    return factorIsSelectors(_minify(ast));
 }
 
 function beautifyMathContent(content) {
@@ -654,7 +986,7 @@ export function beautifyCSS(ast, initialIndent = '') {
         return css;
     }
 
-    return _beautify(ast, initialIndent).trim();
+    return factorIsSelectors(_beautify(ast, initialIndent).trim());
 }
 
 function cloneASTNode(node) {
@@ -662,33 +994,186 @@ function cloneASTNode(node) {
 }
 
 function stringifySelectorForIs(groups) {
-    return groups.map(group => group.parts.join('')).join(',');
+    return groups.map(group => {
+        const text = group.parts.join('');
+        return group.commentAfter ? `${text} ${group.commentAfter}` : text;
+    }).join(', ');
+}
+
+function splitTopLevelCommas(text) {
+    const parts = [];
+    let depth = 0;
+    let inString = null;
+    let buffer = '';
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inString) {
+            buffer += ch;
+            if (ch === '\\') { buffer += text[i + 1] || ''; i++; continue; }
+            if (ch === inString) inString = null;
+            continue;
+        }
+        if (ch === '"' || ch === "'") { inString = ch; buffer += ch; continue; }
+        if (ch === '(') { depth++; buffer += ch; continue; }
+        if (ch === ')') { depth = Math.max(0, depth - 1); buffer += ch; continue; }
+        if (ch === ',' && depth === 0) { parts.push(buffer); buffer = ''; continue; }
+        buffer += ch;
+    }
+    if (buffer.trim() !== '' || parts.length > 0) parts.push(buffer);
+    return parts.map(p => p.trim()).filter(p => p.length > 0);
+}
+
+function factorIsContent(content) {
+    const args = splitTopLevelCommas(content);
+    if (args.length < 2) return null;
+
+    const minLen = Math.min(...args.map(a => a.length));
+    let common = '';
+    for (let i = 0; i < minLen; i++) {
+        const ch = args[0][i];
+        if (args.every(a => a[i] === ch)) common += ch;
+        else break;
+    }
+
+    let boundary = -1;
+    for (let i = common.length - 1; i >= 0; i--) {
+        const c = common[i];
+        if (c === ' ' || c === '>' || c === '+' || c === '~') { boundary = i; break; }
+    }
+    if (boundary < 0) return null;
+
+    const prefix = common.slice(0, boundary + 1).trimEnd();
+    const remainders = args.map(a => a.slice(common.slice(0, boundary + 1).length).trim());
+    if (remainders.some(r => r.length === 0)) return null;
+    if (remainders.some(r => /^[>+~]/.test(r))) return null;
+    if (remainders.some(r => /^::/.test(r))) return null;
+    if (prefix.includes(':is(') || prefix.includes(':not(') || prefix.includes(':has(')) return null;
+
+    return { prefix, remainders };
+}
+
+function factorIsSelectors(text) {
+    let result = '';
+    let i = 0;
+    while (i < text.length) {
+        if (text[i] === '/' && text[i + 1] === '*') {
+            const end = text.indexOf('*/', i + 2);
+            const j = end === -1 ? text.length : end + 2;
+            result += text.slice(i, j);
+            i = j;
+            continue;
+        }
+        const idx = text.indexOf(':is(', i);
+        if (idx === -1) { result += text.slice(i); break; }
+        result += text.slice(i, idx);
+        let depth = 1;
+        let inStr = null;
+        let k = idx + 4;
+        while (k < text.length && depth > 0) {
+            const ch = text[k];
+            if (inStr) {
+                if (ch === '\\') { k += 2; continue; }
+                if (ch === inStr) inStr = null;
+                k++;
+                continue;
+            }
+            if (ch === '"' || ch === "'") { inStr = ch; k++; continue; }
+            if (ch === '(') depth++;
+            else if (ch === ')') { depth--; if (depth === 0) break; }
+            k++;
+        }
+        if (depth !== 0) { result += text.slice(idx); break; }
+        const content = text.slice(idx + 4, k);
+        const factor = factorIsContent(content);
+        if (factor) {
+            result += `${factor.prefix} :is(${factor.remainders.join(', ')})`;
+        } else {
+            result += text.slice(idx, k + 1);
+        }
+        i = k + 1;
+    }
+    return result;
+}
+
+/**
+ * When a parent selector list shares a common prefix that ends at a
+ * combinator or whitespace boundary, factor it out so that
+ * `:is(a b, a c)` becomes `a :is(b, c)` instead of repeating `a`.
+ * Returns `{ prefix, remainders }` or null when factoring is not safe.
+ */
+function factorCommonPrefix(groups) {
+    if (!groups || groups.length < 2) return null;
+
+    const texts = groups.map(g => (g.parts || []).join(''));
+    const minLen = Math.min(...texts.map(t => t.length));
+    let common = '';
+    for (let i = 0; i < minLen; i++) {
+        const ch = texts[0][i];
+        if (texts.every(t => t[i] === ch)) common += ch;
+        else break;
+    }
+
+    // Only factor at a whitespace or combinator boundary.
+    let boundary = -1;
+    for (let i = common.length - 1; i >= 0; i--) {
+        const c = common[i];
+        if (c === ' ' || c === '>' || c === '+' || c === '~') { boundary = i; break; }
+    }
+    if (boundary < 0) return null;
+
+    const prefix = common.slice(0, boundary + 1);
+    const remainders = texts.map(t => t.slice(prefix.length));
+    if (remainders.some(r => r.trim().length === 0)) return null;
+    if (remainders.some(r => /^[>+~]/.test(r.trim()))) return null;
+
+    return { prefix, remainders };
+}
+
+function compoundStartsWithTypeSelector(parts) {
+    const firstPart = parts[0];
+    return /^[a-zA-Z*]/.test(firstPart) || firstPart.startsWith('|');
+}
+
+function groupIsComplex(parts) {
+    return parts.some(part => part === ' ' || NESTING_COMBINATORS.includes(part));
 }
 
 function combineSelectors(parentGroups, childGroups) {
-    const combinators = ['>', '+', '~'];
+    const combinators = NESTING_COMBINATORS;
 
     if (!parentGroups || parentGroups.length === 0) {
-        return childGroups.map(g => {
-            const newParts = g.parts.map(p => p.replace(/&/g, ':root'));
-            return { ...g, parts: newParts };
-        });
+        return childGroups.map(g => ({
+            ...g,
+            parts: g.parts.map(p => transformNestingSelectors(p, () => ':root'))
+        }));
     }
 
     const newSelectorGroups = [];
     const parentIsList = parentGroups.length > 1;
+    const parentGroup = parentGroups[0];
 
-    const parentReplacementStr = stringifySelectorForIs(parentGroups);
-    const parentHasTypeSelector = parentGroups.some(g => g.parts.some(p => /^[a-zA-Z]/.test(p) && p !== ' ' && p !== '>' && p !== '+' && p !== '~'));
-    
-    const subsequentWrapper = (str) => parentHasTypeSelector ? `:is(${str})` : str;
+    const parentText = parentIsList ? '' : parentGroup.parts.join('');
+    const parentListText = parentIsList ? stringifySelectorForIs(parentGroups) : parentText;
+
+    // Per the CSS Nesting spec, `&` is equivalent to the parent selector list
+    // wrapped in `:is()`. Wrapping is what keeps everything that follows an
+    // `&` attached to *every* parent selector instead of only the last one.
+    const nestingExpression = parentIsList ? `:is(${parentListText})` : parentText;
+
+    const parentIsComplex = !parentIsList && groupIsComplex(parentGroup.parts);
+    const parentStartsWithTypeSelector = !parentIsList && compoundStartsWithTypeSelector(parentGroup.parts);
+
+    // A parent that is a complex selector or starts with a type/universal
+    // selector cannot be concatenated into the middle of a compound, so those
+    // replacements are wrapped in `:is()` as well (e.g. `.foo&` under `body`).
+    const needsCompoundWrapper = parentIsComplex || parentStartsWithTypeSelector;
 
     for (const childGroup of childGroups) {
-        const hasAmpersand = childGroup.parts.some(p => p.includes('&'));
+        const hasAmpersand = childGroup.parts.some(partHasNestingSelector);
+        const childStartsWithCombinator = combinators.includes(childGroup.parts[0]);
 
         if (!hasAmpersand) {
-            const parentParts = parentIsList ? [`:is(${parentReplacementStr})`] : parentGroups[0].parts;
-            const childStartsWithCombinator = combinators.includes(childGroup.parts[0]);
+            const parentParts = parentIsList ? [`:is(${parentListText})`] : parentGroup.parts;
 
             const newGroup = {
                 parts: childStartsWithCombinator ? [...parentParts, ...childGroup.parts] : [...parentParts, ' ', ...childGroup.parts],
@@ -699,26 +1184,27 @@ function combineSelectors(parentGroups, childGroups) {
             continue;
         }
 
-        let combinedString = '';
-        for (const part of childGroup.parts) {
-            if (part.includes('&')) {
-                let isFirstAmpersand = true;
-                const replacedPart = part.replace(/&/g, () => {
-                    if (isFirstAmpersand) {
-                        isFirstAmpersand = false;
-                        return parentReplacementStr;
-                    }
-                    return subsequentWrapper(parentReplacementStr);
-                });
-                combinedString += replacedPart;
-            } else {
-                combinedString += part;
-            }
+        const replaceNestingSelector = (compoundStart) => {
+            if (parentIsList) return nestingExpression;
+            if (compoundStart) return parentText;
+            return needsCompoundWrapper ? `:is(${parentText})` : parentText;
+        };
+
+        let combinedString = childGroup.parts
+            .map(part => transformNestingSelectors(part, replaceNestingSelector))
+            .join('');
+
+        // A nested selector that starts with a combinator is relative and has
+        // an implied leading `&`, so the parent selector must be prepended.
+        if (childStartsWithCombinator) {
+            combinedString = nestingExpression + combinedString;
         }
-        
+
         const reparsedGroups = parseSelector(combinedString);
-        reparsedGroups.forEach(g => {
-            g.commentAfter = childGroup.commentAfter;
+        reparsedGroups.forEach((g, index) => {
+            if (index === reparsedGroups.length - 1) {
+                g.commentAfter = childGroup.commentAfter;
+            }
         });
         newSelectorGroups.push(...reparsedGroups);
     }
@@ -822,6 +1308,11 @@ export function denestCSS(ast, preserveWrappers = false) {
                     emptyAtRule.body = [];
                     if (denestedNodes.length > 0) emptyAtRule.spacesAbove = 1;
                     denestedNodes.push(emptyAtRule);
+                } else {
+                    // Preserve leaf at-rules whose bodies contain only declarations
+                    // (e.g. @font-face, @page, @property, @counter-style, @nest)
+                    // instead of dropping their declarations.
+                    denestedNodes.push(cloneASTNode(node));
                 }
             }
         }
@@ -845,12 +1336,113 @@ function stringifySelector(groups) {
     return groups._str;
 }
 
+function getIsSelectorPrefix(part) {
+    if (typeof part !== 'string' || !part.startsWith(':is(')) {
+        return null;
+    }
+
+    let depth = 1;
+    let pos = 4;
+    let inString = null;
+    let attributeDepth = 0;
+
+    while (pos < part.length) {
+        const char = part[pos];
+
+        if (inString) {
+            if (char === '\\' && pos + 1 < part.length) {
+                pos = consumeEscape(part, pos);
+                continue;
+            }
+            if (char === inString) inString = null;
+            pos++;
+            continue;
+        }
+
+        if (char === '\\') {
+            pos = consumeEscape(part, pos);
+            continue;
+        }
+
+        if (char === '"' || char === "'") {
+            inString = char;
+            pos++;
+            continue;
+        }
+
+        if (char === '[') {
+            attributeDepth++;
+            pos++;
+            continue;
+        }
+
+        if (char === ']') {
+            if (attributeDepth > 0) attributeDepth--;
+            pos++;
+            continue;
+        }
+
+        if (attributeDepth === 0) {
+            if (char === '(') depth++;
+            else if (char === ')') {
+                depth--;
+                if (depth === 0) return part.slice(0, pos + 1);
+            }
+        }
+
+        pos++;
+    }
+
+    return null;
+}
+
+function findIsListNestingRelationship(parentGroups, childGroups) {
+    if (!parentGroups || parentGroups.length < 2) {
+        return null;
+    }
+
+    const listExpression = `:is(${stringifySelectorForIs(parentGroups)})`;
+    const newSelector = [];
+
+    for (const childGroup of childGroups) {
+        const firstPart = childGroup.parts[0];
+
+        if (typeof firstPart !== 'string' || !firstPart.startsWith(listExpression)) {
+            return null;
+        }
+
+        const remainderFirst = firstPart.slice(listExpression.length);
+        const remainderParts = remainderFirst
+            ? [remainderFirst, ...childGroup.parts.slice(1)]
+            : childGroup.parts.slice(1);
+
+        if (remainderParts.length === 0) {
+            if (childGroups.length !== 1) return null;
+            return { type: 'MERGE', newSelector: parentGroups };
+        }
+
+        remainderParts.unshift('&');
+        newSelector.push({
+            parts: remainderParts,
+            newlinesBefore: 0,
+            commentAfter: childGroup.commentAfter
+        });
+    }
+
+    return newSelector.length > 0 ? { type: 'NEST', newSelector } : null;
+}
+
 function findNestingRelationship(parentGroups, childGroups) {
     const parentStr = stringifySelector(parentGroups);
     const childStr = stringifySelector(childGroups);
 
     if (parentStr === childStr) {
         return { type: 'MERGE', newSelector: parentGroups };
+    }
+
+    const isListRelationship = findIsListNestingRelationship(parentGroups, childGroups);
+    if (isListRelationship) {
+        return isListRelationship;
     }
 
     if (parentGroups.length > 1 && childGroups.length === 1) {
@@ -1013,6 +1605,7 @@ export function renestCSS(ast) {
 
         const firstTokenMap = new Map();
         const lastTokenMap = new Map();
+        const isPrefixMap = new Map();
         for (let i = 0; i < n; i++) {
             const rule = body[i];
             if (rule.type === 'Rule') {
@@ -1023,6 +1616,12 @@ export function renestCSS(ast) {
                     firstTokenMap.get(first).push(i);
                     if (!lastTokenMap.has(last)) lastTokenMap.set(last, []);
                     lastTokenMap.get(last).push(i);
+
+                    const isPrefix = getIsSelectorPrefix(first);
+                    if (isPrefix) {
+                        if (!isPrefixMap.has(isPrefix)) isPrefixMap.set(isPrefix, []);
+                        isPrefixMap.get(isPrefix).push(i);
+                    }
                 }
             }
         }
@@ -1070,6 +1669,20 @@ export function renestCSS(ast) {
                     if (reverseList) {
                         for (let k = 0; k < reverseList.length; k++) {
                             const idx = reverseList[k];
+                            if (idx !== i) candidateMarks[idx] = currentMark;
+                        }
+                    }
+                }
+
+                // Rules whose selector begins with `:is(parent selector list)`
+                // are the flattened form produced by denestCSS for a nested
+                // `&` under a selector list, so let them re-nest as well.
+                if (parentSelector.length > 1) {
+                    const listExpression = `:is(${stringifySelectorForIs(parentSelector)})`;
+                    const isList = isPrefixMap.get(listExpression);
+                    if (isList) {
+                        for (let k = 0; k < isList.length; k++) {
+                            const idx = isList[k];
                             if (idx !== i) candidateMarks[idx] = currentMark;
                         }
                     }

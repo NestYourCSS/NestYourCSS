@@ -40,8 +40,16 @@ async function resolveOutPath(out, filePaths) {
   return { type: "dir", path: resolved };
 }
 function transformCSS(cssString, opts) {
+  let preserveComments;
+  if (opts.comments === true) {
+    preserveComments = true;
+  } else if (opts.comments === false) {
+    preserveComments = false;
+  } else {
+    preserveComments = opts.mode !== "minify";
+  }
   configureEngine({
-    preserveComments: opts.comments !== false,
+    preserveComments,
     indentChar: opts._indentChar,
     maxDepth: opts.depth !== void 0 ? parseInt(opts.depth, 10) || Infinity : void 0,
     deduplicate: opts.dedupe
