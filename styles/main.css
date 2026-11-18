@@ -1157,16 +1157,12 @@
       }
     }
 
-    .editorTab {
+    .editorTab:not(#_) {
       line-height: 100%;
       color: rgb(from var(--shades-medium) r g b / 50%);
-      font-family: "Fira Code", monospace;
-      border: 0.125rem solid var(--window-text-colour);
+      font-size: 1rem;
       border-radius: 1rem 1rem 0 0;
       border-bottom: none;
-      background-color: var(--background-colour);
-      flex: 0;
-      width: 100%;
       display: flex;
       justify-content: space-between;
       padding: 0.75rem;

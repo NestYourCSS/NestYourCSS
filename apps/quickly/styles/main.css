@@ -90,7 +90,6 @@ html {
 .settings-container {
     position: relative;
     display: flex;
-    translate: 50%;
     z-index: 999;
 
     @media (width < 1024px) {
@@ -124,12 +123,8 @@ html {
         transition: background-position 0.125s ease-out, translate 0.2s, filter 0.2s;
     }
 
-    &#settings-toggle {
-        translate: -50%;
-
-        svg {
-            vertical-align: middle;
-        }
+    &#settings-toggle svg {
+        vertical-align: middle;
     }
 }
 
@@ -160,6 +155,7 @@ html {
 #mainSettings {
     position: absolute;
     z-index: 1001;
+    translate: 4rem;
     top: calc(100% + var(--header-top)); /* dynamic gap below the buttons */
     right: 0;
     width: max-content;
@@ -179,6 +175,7 @@ html {
         left: 0;
         right: 0;
         width: 100%;
+        translate: 0;
         top: calc(100% + var(--margin-gap));
         bottom: calc(100% + var(--header-top) + var(--margin-gap) - 100vh);
         max-height: none;
@@ -408,14 +405,11 @@ main {
             line-height: 100%;
             color: rgb(from var(--shades-medium) r g b / 50%);
             font-size: 1rem;
-            font-family: "Fira Code", monospace;
-            border: 0.25rch solid var(--window-text-colour);
             border-radius: 1rem 1rem 0 0;
             border-bottom: none;
-            background-color: var(--background-colour);
             display: flex;
             justify-content: space-between;
-            padding: 1rem !important;
+            padding: 0.75rem;
 
             > .fileName {
                 font-size: 1em;
