@@ -238,7 +238,7 @@ h1 {
     const editorName = editor.id.slice(0, -"Editor".length);
 
     const editorTab = document.createElement("div");
-    editorTab.classList.add('editorTab');
+    editorTab.classList.add('editorTab', 'ace_editor', 'ace-nycss');
 
     const fileName = document.createElement("div");
     fileName.classList.add('fileName');

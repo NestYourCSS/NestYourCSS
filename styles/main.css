@@ -1158,12 +1158,6 @@
     }
 
     .editorTab {
-      --background-colour: rgb(
-        from var(--shades-black) r g b / var(--opacity-low)
-      );
-      --window-text-colour: rgb(
-        from var(--shades-darker) r g b / var(--opacity-medium)
-      );
       line-height: 100%;
       color: rgb(from var(--shades-medium) r g b / 50%);
       font-family: "Fira Code", monospace;

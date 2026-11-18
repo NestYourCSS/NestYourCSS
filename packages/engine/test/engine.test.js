@@ -1,6 +1,20 @@
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { beforeEach, describe, it } from 'node:test';
 import { configureEngine, parseCSS, beautifyCSS, denestCSS, minifyCSS, renestCSS } from '../src/engine.js';
+
+const ENGINE_DEFAULTS = {
+  preserveComments: false,
+  indentChar: '\t',
+  maxDepth: Infinity,
+  strategy: 'balanced',
+  deduplicate: false,
+};
+
+function resetEngine(overrides = {}) {
+  configureEngine({ ...ENGINE_DEFAULTS, ...overrides });
+}
+
+beforeEach(() => resetEngine());
 
 function nest(input, maxDepth) {
   configureEngine({ maxDepth, indentChar: '\t' });
@@ -430,5 +444,1103 @@ describe('nest round-trip of generated :is() selectors', () => {
     const once = nestAfterDenest(input);
     const twice = nestAfterDenest(once);
     assert.equal(twice, once);
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+/* Broad engine coverage                                                       */
+/* -------------------------------------------------------------------------- */
+
+const ALL_MODES = ['beautify', 'minify', 'denest', 'denest-minify', 'nest', 'nest-minify'];
+const MINIFIED_MODES = new Set(['minify', 'denest-minify', 'nest-minify']);
+
+function renderMode(input, mode, overrides = {}) {
+  resetEngine(overrides);
+  const ast = parseCSS(input);
+
+  switch (mode) {
+    case 'beautify': return beautifyCSS(ast);
+    case 'minify': return minifyCSS(ast);
+    case 'denest': return beautifyCSS(denestCSS(ast));
+    case 'denest-minify': return minifyCSS(denestCSS(ast));
+    case 'nest': return beautifyCSS(renestCSS(ast));
+    case 'nest-minify': return minifyCSS(renestCSS(ast));
+    default: throw new Error(`Unknown mode: ${mode}`);
+  }
+}
+
+/**
+ * Visits only characters that are not inside a string or a comment.
+ * Used to reason about CSS structure without being fooled by `{` in
+ * `content: "}"` or `/* } *\/`.
+ */
+function scanCssStructure(text, visit) {
+  let inString = null;
+  let inComment = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (inComment) {
+      if (char === '*' && next === '/') {
+        inComment = false;
+        i++;
+      }
+      continue;
+    }
+
+    if (inString) {
+      if (char === '\\') {
+        i++;
+        continue;
+      }
+      if (char === inString) inString = null;
+      continue;
+    }
+
+    if (char === '/' && next === '*') {
+      inComment = true;
+      i++;
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      inString = char;
+      continue;
+    }
+
+    visit(char);
+  }
+}
+
+function assertBalancedBraces(text, label = '') {
+  let depth = 0;
+  scanCssStructure(text, (char) => {
+    if (char === '{') depth++;
+    else if (char === '}') {
+      depth--;
+      assert.ok(depth >= 0, `${label} has a closing brace without an opening brace`);
+    }
+  });
+  assert.equal(depth, 0, `${label} has unbalanced braces:\n${text}`);
+}
+
+/** Maximum number of nested Rule ancestors (top-level rules are depth 0). */
+function maxRuleNesting(node, depth = -1) {
+  let max = depth;
+  for (const child of node.body || []) {
+    if (child.type === 'Rule') {
+      max = Math.max(max, maxRuleNesting(child, depth + 1));
+    } else if (child.type === 'AtRule') {
+      max = Math.max(max, maxRuleNesting(child, depth));
+    }
+  }
+  return Math.max(0, max);
+}
+
+function mulberry32(seed) {
+  return function random() {
+    seed |= 0;
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function pick(random, items) {
+  return items[Math.floor(random() * items.length)];
+}
+
+const STATEMENT_AT_RULES = [
+  { name: '@import', css: '@import url("theme.css") screen and (max-width: 400px);', fragments: ['@import', 'url("theme.css")', 'screen and (max-width: 400px)'] },
+  { name: '@charset', css: '@charset "UTF-8";', fragments: ['@charset', '"UTF-8"'] },
+  { name: '@namespace', css: '@namespace svg url(http://www.w3.org/2000/svg);', fragments: ['@namespace', 'url(http://www.w3.org/2000/svg)'] },
+  { name: '@layer statement', css: '@layer base, components;', fragments: ['@layer', 'base, components'] },
+  { name: '@custom-media', css: '@custom-media --narrow (max-width: 30em);', fragments: ['@custom-media', '--narrow', '(max-width: 30em)'] },
+  { name: '@unknown statement', css: '@unknown foo bar;', fragments: ['@unknown', 'foo bar'] },
+];
+
+describe('statement at-rules', () => {
+  for (const mode of ALL_MODES) {
+    it(`preserves every statement at-rule in ${mode} mode`, () => {
+      for (const atRule of STATEMENT_AT_RULES) {
+        const output = renderMode(atRule.css, mode);
+        assert.equal(output, atRule.css, `${mode} mode lost or rewrote ${atRule.name}`);
+      }
+    });
+
+    it(`preserves statement at-rules mixed with rules in ${mode} mode`, () => {
+      const input = [
+        ...STATEMENT_AT_RULES.map(atRule => atRule.css),
+        '.a { color: red; }',
+      ].join('\n');
+
+      const output = renderMode(input, mode);
+
+      for (const atRule of STATEMENT_AT_RULES) {
+        for (const fragment of atRule.fragments) {
+          assert.ok(output.includes(fragment), `${mode} mode lost "${fragment}" from ${atRule.name}:\n${output}`);
+        }
+      }
+      assert.match(output, /color\s*:\s*red/);
+    });
+  }
+
+  it('regression: keeps the reported @import in nest mode with comments on', () => {
+    const input = `/* Statement at-rules */
+@import url("stylesheet.css") screen and (max-width: 400px);
+`;
+    const output = renderMode(input, 'nest', { preserveComments: true });
+    assert.equal(output, `/* Statement at-rules */\n@import url("stylesheet.css") screen and (max-width: 400px);`);
+  });
+
+  it('regression: keeps the reported @import in nest mode with comments off', () => {
+    const input = `/* Statement at-rules */
+@import url("stylesheet.css") screen and (max-width: 400px);
+`;
+    const output = renderMode(input, 'nest');
+    assert.equal(output, '@import url("stylesheet.css") screen and (max-width: 400px);');
+  });
+
+  it('keeps root statement at-rules in source order while nesting', () => {
+    const input = [
+      '@charset "UTF-8";',
+      '@import url("a.css");',
+      '@namespace svg url(http://www.w3.org/2000/svg);',
+      '@layer reset, base;',
+      '.a { color: red; }',
+    ].join('\n');
+
+    const output = renderMode(input, 'nest');
+    const positions = ['@charset', '@import', '@namespace', '@layer', '.a']
+      .map(token => output.indexOf(token));
+
+    assert.ok(positions.every(position => position >= 0), `one or more items disappeared:\n${output}`);
+    for (let i = 1; i < positions.length; i++) {
+      assert.ok(positions[i] > positions[i - 1], `source order changed:\n${output}`);
+    }
+  });
+
+  it('keeps statement at-rules inside block at-rules while nesting', () => {
+    const media = renderMode('@media (min-width: 1px) { @layer base; .a { color: red; } }', 'nest');
+    assert.match(media, /@layer base;/);
+    assert.match(media, /color\s*:\s*red/);
+
+    const layer = renderMode('@layer base { @layer x, y; .a { color: red; } }', 'nest');
+    assert.match(layer, /@layer x, y;/);
+    assert.match(layer, /color\s*:\s*red/);
+  });
+
+  it('keeps statement at-rules when deduplication is enabled', () => {
+    const output = renderMode('@import url("a.css"); .a { color: red; } .a { color: blue; }', 'nest-minify', { deduplicate: true });
+    assert.ok(output.includes('@import url("a.css");'));
+    assert.match(output, /color:blue/);
+  });
+});
+
+describe('block at-rules survive every mode', () => {
+  const cases = [
+    {
+      name: '@font-face',
+      css: '@font-face { font-family: Test; src: url(test.woff2); }',
+      fragments: [/@font-face/, /font-family\s*:\s*Test/, /url\(test\.woff2\)/],
+    },
+    {
+      name: '@keyframes',
+      css: '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }',
+      fragments: [/@keyframes spin/, /rotate\(0deg\)/, /rotate\(360deg\)/],
+    },
+    {
+      name: '@property',
+      css: '@property --brand { syntax: "<color>"; inherits: false; initial-value: red; }',
+      fragments: [/@property --brand/, /syntax\s*:\s*"<color>"/, /initial-value\s*:\s*red/],
+    },
+    {
+      name: '@page',
+      css: '@page { margin: 1cm; }',
+      fragments: [/@page/, /margin\s*:\s*1cm/],
+    },
+    {
+      name: '@supports',
+      css: '@supports (display: grid) { .a { display: grid; } }',
+      fragments: [/@supports \(display: grid\)/, /display\s*:\s*grid/],
+    },
+    {
+      name: '@layer block',
+      css: '@layer base { .a { color: red; } }',
+      fragments: [/@layer base/, /color\s*:\s*red/],
+    },
+    {
+      name: '@scope',
+      css: '@scope (.card) to (.content) { .title { color: red; } }',
+      fragments: [/@scope \(\.card\) to \(\.content\)/, /color\s*:\s*red/],
+    },
+  ];
+
+  for (const mode of ALL_MODES) {
+    it(`preserves block at-rules in ${mode} mode`, () => {
+      for (const testCase of cases) {
+        const output = renderMode(testCase.css, mode);
+        for (const fragment of testCase.fragments) {
+          assert.match(output, fragment, `${mode} mode lost ${testCase.name}:\n${output}`);
+        }
+      }
+    });
+  }
+});
+
+describe('parseCSS structure', () => {
+  it('returns an empty stylesheet for empty and whitespace-only input', () => {
+    assert.deepEqual(parseCSS('').body, []);
+    assert.deepEqual(parseCSS(' \n\t\r\n ').body, []);
+  });
+
+  it('parses statement at-rules with a null body', () => {
+    const ast = parseCSS('@import url("a.css") screen;');
+    assert.equal(ast.body.length, 1);
+    assert.equal(ast.body[0].type, 'AtRule');
+    assert.equal(ast.body[0].name, 'import');
+    assert.equal(ast.body[0].params, 'url("a.css") screen');
+    assert.equal(ast.body[0].body, null);
+  });
+
+  it('parses block at-rules with an array body', () => {
+    const ast = parseCSS('@media (min-width: 1px) { .a { color: red; } }');
+    const media = ast.body[0];
+    assert.equal(media.type, 'AtRule');
+    assert.equal(media.name, 'media');
+    assert.ok(Array.isArray(media.body));
+    assert.equal(media.body[0].type, 'Rule');
+    assert.equal(media.body[0].body[0].type, 'Declaration');
+  });
+
+  it('parses declarations, nested rules and comments in one block', () => {
+    resetEngine({ preserveComments: true });
+    const ast = parseCSS('.a { color: red; .b { margin: 0; } /* tail */ }');
+    const rule = ast.body[0];
+    assert.equal(rule.type, 'Rule');
+    assert.equal(rule.body[0].type, 'Declaration');
+    assert.equal(rule.body[1].type, 'Rule');
+    assert.equal(rule.body[2].type, 'Comment');
+  });
+
+  it('honours preserveComments', () => {
+    resetEngine({ preserveComments: true });
+    const withComments = parseCSS('/* a */ .a { /* b */ color: red; }');
+    assert.equal(withComments.body[0].type, 'Comment');
+    assert.equal(withComments.body[1].body[0].type, 'Comment');
+
+    resetEngine({ preserveComments: false });
+    const withoutComments = parseCSS('/* a */ .a { /* b */ color: red; }');
+    assert.equal(withoutComments.body.length, 1);
+    assert.equal(withoutComments.body[0].body.length, 1);
+  });
+
+  it('keeps structural characters inside strings', () => {
+    const ast = parseCSS('.a { content: "a;b}c{/*x*/"; background: url("a;b}.png"); }');
+    const declarations = ast.body[0].body;
+    assert.equal(declarations.length, 2);
+    assert.equal(declarations[0].type, 'Declaration');
+    assert.equal(declarations[1].type, 'Declaration');
+  });
+
+  it('handles CRLF input', () => {
+    const output = renderMode('.a {\r\n  color: red;\r\n}\r\n.b { color: blue; }', 'minify');
+    assert.equal(output, '.a{color:red}.b{color:blue}');
+  });
+
+  it('handles a final declaration without a semicolon', () => {
+    assert.equal(renderMode('.a { color: red }', 'minify'), '.a{color:red}');
+  });
+
+  it('keeps custom property blocks as declaration values', () => {
+    const ast = parseCSS('.a { --x: { color: red }; color: blue; }');
+    const declarations = ast.body[0].body;
+    assert.equal(declarations.length, 2);
+    assert.equal(declarations[0].property, '--x');
+    assert.equal(declarations[1].property, 'color');
+  });
+
+  it('parses @scope preludes and applies the scope root when denesting', () => {
+    assert.equal(
+      renderMode('@scope (.card) to (.content) { .title { color: red; } }', 'denest-minify'),
+      '@scope (.card) to (.content){.card .title{color:red}}'
+    );
+  });
+});
+
+const IDEMPOTENCE_CORPUS = [
+  '.a { color: red; } .a .b { color: blue; } .a .b .c { color: green; }',
+  '@media (min-width: 1px) { .a { color: red; } }',
+  '.a { & .b { color: red; } &:hover { color: blue; } }',
+  '@layer base { .a { color: red; } }',
+  '@import url("a.css"); @charset "UTF-8"; .a { color: red; }',
+  '@font-face { font-family: Test; src: url(test.woff2); } .a { color: red; }',
+  '@keyframes spin { from { opacity: 0; } to { opacity: 1; } }',
+  '.a { color: red; .b { color: blue; } background: white; }',
+];
+
+describe('mode idempotence', () => {
+  for (const mode of ['beautify', 'minify', 'denest', 'nest']) {
+    it(`${mode} output is stable when processed again`, () => {
+      for (const css of IDEMPOTENCE_CORPUS) {
+        const once = renderMode(css, mode);
+        const twice = renderMode(once, mode);
+        assert.equal(twice, once, `${mode} is not idempotent for:\n${css}\n\nfirst:\n${once}\n\nsecond:\n${twice}`);
+      }
+    });
+  }
+
+  it('minifying a beautified result matches minifying the original', () => {
+    for (const css of IDEMPOTENCE_CORPUS) {
+      const direct = renderMode(css, 'minify');
+      assert.equal(
+        renderMode(renderMode(css, 'beautify'), 'minify'),
+        direct,
+        `minify(beautify(input)) differs from minify(input) for:\n${css}`
+      );
+    }
+  });
+});
+
+describe('nesting depth contract', () => {
+  const selectors = ['.depth0'];
+  for (let i = 1; i < 7; i++) {
+    selectors.push(`${selectors[i - 1]} .depth${i}`);
+  }
+  const deepCss = selectors.map((selector, i) => `${selector} { --v${i}: ${i}; }`).join('\n');
+
+  for (const strategy of ['balanced', 'maximize', 'flattened']) {
+    for (const maxDepth of [0, 1, 2, 3, 4, 6, Infinity]) {
+      it(`${strategy} with maxDepth=${maxDepth} respects the depth limit and keeps declarations`, () => {
+        const output = renderMode(deepCss, 'nest', { strategy, maxDepth });
+        const depth = maxRuleNesting(parseCSS(output));
+
+        if (Number.isFinite(maxDepth)) {
+          assert.ok(depth <= maxDepth, `${strategy}/maxDepth=${maxDepth} produced depth ${depth}:\n${output}`);
+        }
+
+        for (let i = 0; i < selectors.length; i++) {
+          assert.match(output, new RegExp(`--v${i}\\s*:\\s*${i}`), `${strategy}/maxDepth=${maxDepth} lost --v${i}`);
+        }
+        assertBalancedBraces(output, `${strategy}/maxDepth=${maxDepth}`);
+      });
+    }
+  }
+});
+
+describe('deduplication', () => {
+  it('merges duplicate rules and keeps the last declaration when enabled', () => {
+    const input = '.a { color: red; color: blue; } .a { margin: 0; } .b { color: red; }';
+    assert.equal(renderMode(input, 'minify', { deduplicate: true }), '.a{color:blue;margin:0}.b{color:red}');
+  });
+
+  it('leaves duplicate rules and declarations alone when disabled', () => {
+    const input = '.a { color: red; color: blue; } .a { margin: 0; } .b { color: red; }';
+    assert.equal(renderMode(input, 'minify', { deduplicate: false }), '.a{color:red;color:blue}.a{margin:0}.b{color:red}');
+  });
+
+  it('does not deduplicate or drop at-rules', () => {
+    const input = '@import url("a.css"); .a { color: red; } .a { color: blue; }';
+    const output = renderMode(input, 'minify', { deduplicate: true });
+    assert.ok(output.startsWith('@import url("a.css");'));
+    assert.equal(output, '@import url("a.css");.a{color:blue}');
+  });
+});
+
+describe('comments', () => {
+  const input = '/* top */\n.a { /* inside */ color: red; /* after */ background: blue; }\n/* tail */';
+
+  it('preserves comments when enabled', () => {
+    const output = renderMode(input, 'minify', { preserveComments: true });
+    assert.equal(output, '/*top*/.a{/*inside*/color:red;/*after*/background:blue}/*tail*/');
+  });
+
+  it('removes comments when disabled', () => {
+    assert.equal(renderMode(input, 'minify'), '.a{color:red;background:blue}');
+  });
+
+  it('preserves comments in values and selectors', () => {
+    assert.equal(
+      renderMode('.a /* s */ .b { color: red /* mid */ blue; }', 'minify', { preserveComments: true }),
+      '.a /* s */ .b{color:red/* mid */blue}'
+    );
+  });
+
+  it('keeps comments next to statement at-rules', () => {
+    const output = renderMode('/* before */ @import url("a.css"); /* after */', 'nest', { preserveComments: true });
+    assert.ok(output.includes('/* before */'));
+    assert.ok(output.includes('@import url("a.css");'));
+    assert.ok(output.includes('/* after */'));
+  });
+});
+
+describe('strings, escapes and selector edge cases', () => {
+  it('does not split declarations on structural characters inside strings', () => {
+    const output = renderMode('.a { content: "a;b}c{/*x*/@import"; background: url("a;b}.png"); }', 'minify');
+    assert.equal(output, '.a{content:"a;b}c{/*x*/@import";background:url("a;b}.png")}');
+  });
+
+  it('keeps escaped selectors intact', () => {
+    assert.equal(renderMode('.\\31 23 { color: red; } .a\\&b { color: blue; }', 'minify'), '.\\31 23{color:red}.a\\&b{color:blue}');
+  });
+
+  it('does not treat & inside attribute values as a nesting selector', () => {
+    assert.equal(
+      renderMode('.a[data-x="a&b"] { color: red; } .a[data-x=a\\&b] { color: blue; }', 'minify'),
+      '.a[data-x="a&b"]{color:red}.a[data-x=a\\&b]{color:blue}'
+    );
+  });
+
+  it('handles :is(), :not() and :has() without breaking their arguments', () => {
+    const input = ':is(.a, .b) .c:not(.d) > .e:has(.f) { color: red; }';
+    assert.equal(renderMode(input, 'minify'), ':is(.a, .b) .c:not(.d)>.e:has(.f){color:red}');
+  });
+});
+
+describe('real-world stylesheet smoke test', () => {
+  const REAL_WORLD_CSS = `@charset "UTF-8";
+@import url("base.css") screen and (min-width: 600px);
+@layer reset, base, components;
+/* theme */
+@font-face { font-family: Brand; src: url(brand.woff2); }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@property --brand { syntax: "<color>"; inherits: false; initial-value: #0af; }
+:root { --brand: #0af; color: white; }
+.nav { display: flex; @media (min-width: 600px) { gap: 1rem; } .link { color: var(--brand); &:hover { color: red; } } }
+@supports (display: grid) { .grid { display: grid; } }
+@scope (.card) to (.content) { .title { color: red; } }
+`;
+
+  for (const mode of ALL_MODES) {
+    it(`preserves the important pieces in ${mode} mode`, () => {
+      const output = renderMode(REAL_WORLD_CSS, mode);
+      assertBalancedBraces(output, mode);
+
+      for (const fragment of [
+        /@charset/,
+        /@import url\("base\.css"\)/,
+        /@layer reset, base, components;/,
+        /@font-face/,
+        /@keyframes fade/,
+        /@property --brand/,
+        /@supports \(display: grid\)/,
+        /@scope \(\.card\) to \(\.content\)/,
+        /--brand\s*:\s*#0af/,
+        /display\s*:\s*grid/,
+      ]) {
+        assert.match(output, fragment, `${mode} mode lost ${fragment}:\n${output}`);
+      }
+    });
+  }
+
+  it('round-trips denest -> nest without losing declarations', () => {
+    const nested = renderMode(REAL_WORLD_CSS, 'denest');
+    const renested = renderMode(nested, 'nest');
+    assert.match(renested, /--brand\s*:\s*#0af/);
+    assert.match(renested, /color\s*:\s*var\(--brand\)/);
+    assert.match(renested, /@import url\("base\.css"\)/);
+    assertBalancedBraces(renested, 'denest -> nest');
+  });
+});
+
+function generateFuzzCase(seed, random) {
+  const declarations = [];
+  const statementAtRules = [];
+  let ruleId = 0;
+  let declId = 0;
+
+  const declaration = () => {
+    const name = `v${seed}d${declId}`;
+    const value = String(declId);
+    declId++;
+    declarations.push({ name, value });
+    return `--${name}: ${value};`;
+  };
+
+  const makeRule = (depth) => {
+    const selector = `.f${seed}r${ruleId++}`;
+    const body = [declaration()];
+    if (random() < 0.5) body.push(declaration());
+
+    if (depth < 2 && random() < 0.4) {
+      body.push(`& .child${ruleId++} { ${declaration()} }`);
+    }
+    if (depth < 1 && random() < 0.3) {
+      body.push(`@media (min-width: ${1 + Math.floor(random() * 100)}px) { ${declaration()} }`);
+    }
+
+    return `${selector} { ${body.join(' ')} }`;
+  };
+
+  const parts = [];
+  for (let i = 0; i < 1 + Math.floor(random() * 3); i++) {
+    const bucket = random();
+    if (bucket < 0.2) {
+      const atRule = pick(random, [
+        '@import url("fuzz.css") screen;',
+        '@namespace svg url(http://www.w3.org/2000/svg);',
+        '@layer reset, base;',
+        '@custom-media --narrow (max-width: 30em);',
+        '@unknown foo bar;',
+      ]);
+      statementAtRules.push(atRule);
+      parts.push(atRule);
+    } else if (bucket < 0.4) {
+      parts.push(`@media (min-width: ${1 + Math.floor(random() * 100)}px) { ${makeRule(0)} }`);
+    } else if (bucket < 0.5) {
+      parts.push(`@font-face { font-family: Fuzz${seed}; src: url(fuzz${seed}.woff2); }`);
+    } else if (bucket < 0.6) {
+      parts.push(`@keyframes k${seed} { from { opacity: 0; } to { opacity: 1; } }`);
+    } else {
+      parts.push(makeRule(0));
+    }
+  }
+
+  if (!parts.some(part => part.includes('--v'))) {
+    parts.push(makeRule(0));
+  }
+
+  return { css: parts.join('\n'), declarations, statementAtRules };
+}
+
+describe('randomized invariants', () => {
+  it('keeps every declaration and valid structure across all modes (150 seeds)', () => {
+    for (let seed = 1; seed <= 150; seed++) {
+      const random = mulberry32(seed);
+      const { css, declarations, statementAtRules } = generateFuzzCase(seed, random);
+
+      for (const mode of ALL_MODES) {
+        const output = renderMode(css, mode);
+        assert.equal(typeof output, 'string', `seed ${seed}, ${mode}`);
+        assertBalancedBraces(output, `seed ${seed}, ${mode}`);
+        assert.ok(!output.includes('undefined'), `seed ${seed}, ${mode} emitted undefined:\n${output}`);
+        assert.ok(!output.includes('null'), `seed ${seed}, ${mode} emitted null:\n${output}`);
+
+        for (const statementAtRule of statementAtRules) {
+          assert.ok(output.includes(statementAtRule), `seed ${seed}, ${mode} lost ${statementAtRule}:\n${css}\n---\n${output}`);
+        }
+
+        for (const declaration of declarations) {
+          const needle = MINIFIED_MODES.has(mode)
+            ? `--${declaration.name}:${declaration.value}`
+            : `--${declaration.name}: ${declaration.value}`;
+          assert.ok(
+            output.includes(needle),
+            `seed ${seed}, ${mode} lost ${needle}:\n${css}\n---\n${output}`
+          );
+        }
+      }
+
+      const minified = renderMode(css, 'minify');
+      assert.equal(renderMode(minified, 'minify'), minified, `seed ${seed}, minify is not idempotent`);
+
+      const beautified = renderMode(css, 'beautify');
+      assert.equal(renderMode(beautified, 'beautify'), beautified, `seed ${seed}, beautify is not idempotent`);
+    }
+  });
+});
+
+describe('large stylesheet stress test', () => {
+  it('does not lose declarations across 200 rules', () => {
+    const rules = [];
+    for (let i = 0; i < 200; i++) {
+      rules.push(`.stress${i} { --stress${i}: ${i}; }`);
+      if (i < 199) rules.push(`.stress${i} .stress${i + 1} { --nested${i}: ${i}; }`);
+    }
+    const css = rules.join('\n');
+
+    for (const mode of ['minify', 'denest-minify', 'nest-minify']) {
+      const output = renderMode(css, mode);
+      assertBalancedBraces(output, `stress ${mode}`);
+      for (let i = 0; i < 200; i++) {
+        assert.ok(output.includes(`--stress${i}:${i}`), `${mode} lost --stress${i}`);
+        if (i < 199) assert.ok(output.includes(`--nested${i}:${i}`), `${mode} lost --nested${i}`);
+      }
+    }
+  });
+});
+
+describe('obscure but valid CSS syntax', () => {
+  const lineContinuationSelector = '.a\\\n.b { color: red; }';
+
+  const cases = [
+    {
+      name: 'at-rule prelude without leading whitespace',
+      css: '@media(min-width:1px){.a{color:red}}',
+      minify: '@media (min-width:1px){.a{color:red}}',
+      nestContains: ['@media (min-width:1px)', 'color: red;'],
+    },
+    {
+      name: 'comment as whitespace in an at-rule prelude',
+      css: String.raw`@import/*c*/url("x.css") screen;`,
+      minify: String.raw`@import /*c*/url("x.css") screen;`,
+    },
+    {
+      name: 'comment between at-rule name and parenthesized prelude',
+      css: '@media/*c*/(min-width:1px){.a{color:red}}',
+      minify: '@media /*c*/(min-width:1px){.a{color:red}}',
+      nestContains: ['@media /*c*/(min-width:1px)'],
+    },
+    {
+      name: 'string prelude without whitespace',
+      css: '@import"x.css";',
+      minify: '@import "x.css";',
+    },
+    {
+      name: 'scope prelude without whitespace',
+      css: '@scope(.card){.title{color:red}}',
+      minify: '@scope (.card){.title{color:red}}',
+      nestContains: ['@scope (.card)', '.card .title', 'color: red;'],
+    },
+    {
+      name: 'colon inside a comment before the declaration colon',
+      css: String.raw`.a { color/*:*/: red; }`,
+      minify: String.raw`.a{color/*:*/:red}`,
+      nestContains: [String.raw`color/*:*/: red;`],
+    },
+    {
+      name: 'escaped colon in a property name',
+      css: String.raw`.a { color\:x: red; }`,
+      minify: String.raw`.a{color\:x:red}`,
+      nestContains: [String.raw`color\:x: red;`],
+    },
+    {
+      name: 'escaped space in a selector',
+      css: String.raw`.a\ b { color: red; }`,
+      minify: String.raw`.a\ b{color:red}`,
+      nestContains: [String.raw`.a\ b`],
+    },
+    {
+      name: 'escaped quote inside an attribute string',
+      css: String.raw`[data-x="a\"b"] { color: red; }`,
+      minify: String.raw`[data-x="a\"b"]{color:red}`,
+      nestContains: [String.raw`[data-x="a\"b"]`],
+    },
+    {
+      name: 'escaped closing bracket in an unquoted attribute value',
+      css: String.raw`[data-x=a\]b] { color: red; }`,
+      minify: String.raw`[data-x=a\]b]{color:red}`,
+      nestContains: [String.raw`[data-x=a\]b]`],
+    },
+    {
+      name: 'escaped closing parenthesis in an unquoted url()',
+      css: String.raw`.a { background: url(foo\)bar); }`,
+      minify: String.raw`.a{background:url(foo\)bar)}`,
+      nestContains: [String.raw`url(foo\)bar)`],
+    },
+    {
+      name: 'escaped space in an unquoted url()',
+      css: String.raw`.a { background: url(foo\ bar); }`,
+      minify: String.raw`.a{background:url(foo\ bar)}`,
+      nestContains: [String.raw`url(foo\ bar)`],
+    },
+    {
+      name: 'escaped space in a value',
+      css: String.raw`.a { font-family: A\ B; }`,
+      minify: String.raw`.a{font-family:A\ B}`,
+      nestContains: [String.raw`font-family: A\ B;`],
+    },
+    {
+      name: 'escaped colon in a custom property value',
+      css: String.raw`.a { --x: a\:b; }`,
+      minify: String.raw`.a{--x:a\:b}`,
+      nestContains: [String.raw`--x: a\:b;`],
+    },
+    {
+      name: 'escaped braces in a custom property value',
+      css: String.raw`.a { --x: a\{b\}; }`,
+      minify: String.raw`.a{--x:a\{b\}}`,
+      nestContains: [String.raw`--x: a\{b\};`],
+    },
+    {
+      name: 'escaped semicolon in a custom property value',
+      css: String.raw`.a { --x: a\;b; }`,
+      minify: String.raw`.a{--x:a\;b}`,
+      nestContains: [String.raw`--x: a\;b;`],
+    },
+    {
+      name: 'backslash-newline selector continuation',
+      css: lineContinuationSelector,
+      minify: '.a\\\n.b{color:red}',
+      nestContains: ['.a\\\n.b'],
+    },
+    {
+      name: 'comment between value tokens',
+      css: String.raw`.a { color: re/*c*/d; }`,
+      minify: String.raw`.a{color:re/*c*/d}`,
+      nestContains: [String.raw`color: re /*c*/ d;`],
+    },
+    {
+      name: 'comment immediately after a declaration colon',
+      css: String.raw`.a { color:/*c*/red; }`,
+      minify: String.raw`.a{color:/*c*/red}`,
+      nestContains: [String.raw`color: /*c*/ red;`],
+    },
+    {
+      name: 'comment before !important',
+      css: String.raw`.a { --x: red/*c*/!important; }`,
+      minify: String.raw`.a{--x:red/*c*/!important}`,
+      nestContains: [String.raw`--x: red /*c*/ !important;`],
+    },
+    {
+      name: 'shadow parts, slotted pseudo-elements and host selectors',
+      css: '::part(foo) { color: red; } ::slotted(.a) { color: blue; } :host(.b) { color: green; }',
+      minify: '::part(foo){color:red}::slotted(.a){color:blue}:host(.b){color:green}',
+      nestContains: ['::part(foo)', '::slotted(.a)', ':host(.b)'],
+    },
+    {
+      name: 'nth-child of a selector list',
+      css: ':nth-child(2n+1 of :is(.a, .b)) { color: red; }',
+      minify: ':nth-child(2n+1 of :is(.a, .b)){color:red}',
+    },
+    {
+      name: 'image-set with descriptors',
+      css: '.a { background: image-set(url(a) 1x, url(b) 2x); }',
+      minify: '.a{background:image-set(url(a) 1x,url(b) 2x)}',
+    },
+    {
+      name: 'color-mix with percentages',
+      css: '.a { color: color-mix(in oklch, red 40%, blue); }',
+      minify: '.a{color:color-mix(in oklch,red 40%,blue)}',
+    },
+    {
+      name: 'relative color syntax',
+      css: '.a { color: rgb(from red r g b / 50%); }',
+      minify: '.a{color:rgb(from red r g b / 50%)}',
+    },
+    {
+      name: 'calc with a custom property fallback',
+      css: '.a { width: calc(100% - var(--gap, 1rem)); }',
+      minify: '.a{width:calc(100% - var(--gap,1rem))}',
+    },
+    {
+      name: 'font shorthand with a line-height slash and a quoted family',
+      css: '.a { font: italic small-caps 700 16px/1.5 "A B", sans-serif; }',
+      minify: '.a{font:italic small-caps 700 16px/1.5"A B",sans-serif}',
+    },
+    {
+      name: 'attr() with a type-or-unit tail',
+      css: '.a { content: attr(data-x) / "alt"; }',
+      minify: '.a{content:attr(data-x)/"alt"}',
+    },
+    {
+      name: 'grid-template-areas with adjacent strings',
+      css: '.a { grid-template-areas: "a a" "b b"; }',
+      minify: '.a{grid-template-areas:"a a""b b"}',
+    },
+    {
+      name: 'clip-path polygon',
+      css: '.a { clip-path: polygon(0 0, 100% 0, 100% 100%); }',
+      minify: '.a{clip-path:polygon(0 0,100% 0,100% 100%)}',
+    },
+    {
+      name: 'offset-path with a path() string',
+      css: '.a { offset-path: path("M0 0 L10 10"); }',
+      minify: '.a{offset-path:path("M0 0 L10 10")}',
+    },
+    {
+      name: 'legacy vendor value containing a colon',
+      css: '.a { filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50); }',
+      minify: '.a{filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50)}',
+    },
+    {
+      name: 'font-feature-values with a nested at-rule',
+      css: '@font-feature-values Font { @styleset { nice: 1; } }',
+      minify: '@font-feature-values Font{@styleset{nice:1}}',
+    },
+    {
+      name: 'page with a margin at-rule',
+      css: '@page :first { margin: 1cm; @top-left { content: "x"; } }',
+      minify: '@page :first{margin:1cm;@top-left{content:"x"}}',
+    },
+    {
+      name: 'counter-style descriptors',
+      css: '@counter-style thumbs { system: cyclic; symbols: "A"; suffix: " "; }',
+      minify: '@counter-style thumbs{system:cyclic;symbols:"A";suffix:" "}',
+    },
+    {
+      name: 'view-transition descriptor',
+      css: '@view-transition { navigation: auto; }',
+      minify: '@view-transition{navigation:auto}',
+    },
+    {
+      name: 'position-try block',
+      css: '@position-try --x { top: 0; }',
+      minify: '@position-try --x{top:0}',
+    },
+    {
+      name: 'starting-style block',
+      css: '@starting-style { .a { opacity: 0; } }',
+      minify: '@starting-style{.a{opacity:0}}',
+    },
+    {
+      name: 'property syntax with a type union',
+      css: '@property --x { syntax: "<length> | <percentage>"; inherits: false; initial-value: 0px; }',
+      minify: '@property --x{syntax:"<length> | <percentage>";inherits:false;initial-value:0px}',
+    },
+    {
+      name: 'layer block with dotted name',
+      css: '@layer a.b { .x { color: red; } }',
+      minify: '@layer a.b{.x{color:red}}',
+    },
+    {
+      name: 'form feed whitespace',
+      css: '.a\f{\fcolor:\fred;\f}',
+      minify: '.a{color:red}',
+      nestContains: ['color: red;'],
+    },
+    {
+      name: 'BOM at the start of the stylesheet',
+      css: '\uFEFF.a { color: red; }',
+      minify: '.a{color:red}',
+    },
+    {
+      name: 'unicode identifiers',
+      css: '.café, #日本語, .--x { color: red; }',
+      minify: '.café,#日本語,.--x{color:red}',
+    },
+    {
+      name: 'emoji escape in an identifier',
+      css: String.raw`.\1F600 { color: red; }`,
+      minify: String.raw`.\1F600{color:red}`,
+    },
+    {
+      name: 'uppercase at-rule name with scope semantics',
+      css: '@SCOPE (.card) { .title { color: red; } }',
+      minify: '@SCOPE (.card){.title{color:red}}',
+      nestContains: ['@SCOPE (.card)', '.card .title'],
+    },
+    {
+      name: 'escaped at-rule name',
+      css: String.raw`@\6d edia (min-width:1px) { .a { color: red; } }`,
+      minify: String.raw`@\6d edia (min-width:1px){.a{color:red}}`,
+      nestContains: [String.raw`@\6d edia (min-width:1px)`],
+    },
+    {
+      name: '& in a custom property value is not a nesting selector',
+      css: '.a { --x: &; }',
+      minify: '.a{--x:&}',
+      nestContains: ['--x: &;'],
+    },
+    {
+      name: '& inside a comment',
+      css: '.a { /* & */ color: red; }',
+      minify: '.a{/*&*/color:red}',
+    },
+    {
+      name: 'braced custom property with !important',
+      css: '.a { --x: { color: red } !important; }',
+      minify: '.a{--x:{color:red}!important}',
+      nestContains: ['--x: { color: red } !important;'],
+    },
+    {
+      name: 'font src with format() and tech()',
+      css: '@font-face { src: local("A"), url(a.woff2) format("woff2") tech(color-COLRv1); }',
+      minify: '@font-face{src:local("A"),url(a.woff2) format("woff2") tech(color-COLRv1)}',
+    },
+    {
+      name: 'media query list',
+      css: '@media screen and (min-width: 1px), print { .a { color: red; } }',
+      minify: '@media screen and (min-width: 1px), print{.a{color:red}}',
+    },
+    {
+      name: 'media range syntax',
+      css: '@media (400px <= width <= 700px) { .a { color: red; } }',
+      minify: '@media (400px <= width <= 700px){.a{color:red}}',
+    },
+    {
+      name: 'quoted url containing a closing parenthesis',
+      css: '.a { background: url("foo)bar"); }',
+      minify: '.a{background:url("foo)bar")}',
+    },
+    {
+      name: 'escaped backslash in a string',
+      css: String.raw`.a { content: "\\\\"; }`,
+      minify: String.raw`.a{content:"\\\\"}`,
+      nestContains: [String.raw`content: "\\\\";`],
+    },
+    {
+      name: 'emoji in a counter-style symbol',
+      css: '@counter-style x { symbols: "\u{1F44D}"; }',
+      minify: '@counter-style x{symbols:"\u{1F44D}"}',
+    },
+    {
+      name: ':lang() and :dir()',
+      css: ':lang(en-US):dir(rtl) { color: red; }',
+      minify: ':lang(en-US):dir(rtl){color:red}',
+    },
+    {
+      name: ':state() and ::highlight()',
+      css: ':state(foo)::highlight(bar) { color: red; }',
+      minify: ':state(foo)::highlight(bar){color:red}',
+    },
+    {
+      name: '@supports selector(:has(> img))',
+      css: '@supports selector(:has(> img)) { .a { color: red; } }',
+      minify: '@supports selector(:has(> img)){.a{color:red}}',
+    },
+    {
+      name: '@container style query',
+      css: '@container style(--x: 1) { .a { color: red; } }',
+      minify: '@container style(--x: 1){.a{color:red}}',
+    },
+    {
+      name: '@scope selector list',
+      css: '@scope (.a, .b) to (.c, .d) { .x { color: red; } }',
+      minify: '@scope (.a, .b) to (.c, .d){.x{color:red}}',
+      nestContains: [':is(.a, .b) .x'],
+    },
+    {
+      name: '@import with layer() and supports()',
+      css: '@import url("x.css") layer(base) supports(display: grid) screen;',
+      minify: '@import url("x.css") layer(base) supports(display: grid) screen;',
+    },
+    {
+      name: '@namespace with a string URL',
+      css: '@namespace svg "http://www.w3.org/2000/svg";',
+      minify: '@namespace svg "http://www.w3.org/2000/svg";',
+    },
+    {
+      name: 'hex escape with a terminating space in a value',
+      css: String.raw`.a { color: r\65 d; }`,
+      minify: String.raw`.a{color:r\65 d}`,
+      nestContains: [String.raw`color: r\65 d;`],
+    },
+    {
+      name: 'hex escape in a property name',
+      css: String.raw`.a { c\6flor: red; }`,
+      minify: String.raw`.a{c\6flor:red}`,
+      nestContains: [String.raw`c\6flor: red;`],
+    },
+    {
+      name: 'unicode escape in a string',
+      css: String.raw`.a { content: "\201C"; }`,
+      minify: String.raw`.a{content:"\201C"}`,
+      nestContains: [String.raw`content: "\201C";`],
+    },
+    {
+      name: 'escaped quote in a string',
+      css: String.raw`.a { content: "a\"b"; }`,
+      minify: String.raw`.a{content:"a\"b"}`,
+      nestContains: [String.raw`content: "a\"b";`],
+    },
+    {
+      name: 'NUL escape in a value',
+      css: String.raw`.a { --x: \0; }`,
+      minify: String.raw`.a{--x:\0}`,
+      nestContains: [String.raw`--x: \0;`],
+    },
+    {
+      name: 'surrogate-pair escape in a value',
+      css: String.raw`.a { --x: \1F600; }`,
+      minify: String.raw`.a{--x:\1F600}`,
+      nestContains: [String.raw`--x: \1F600;`],
+    },
+    {
+      name: 'backslash-newline inside a string',
+      css: '.a { content: "a\\' + '\n' + 'b"; }',
+      minify: '.a{content:"a\\' + '\n' + 'b"}',
+      nestContains: ['content: "a\\' + '\n' + 'b";'],
+    },
+    {
+      name: 'hex escape followed by CRLF in a string',
+      css: '.a { content: "\\41\r\nB"; }',
+      minify: '.a{content:"\\41\r\nB"}',
+      nestContains: ['content: "\\41\r\nB";'],
+    },
+    {
+      name: 'escaped !important keyword',
+      css: String.raw`.a { color: red !\69mportant; }`,
+      minify: String.raw`.a{color:red!\69mportant}`,
+      nestContains: [String.raw`color: red !\69mportant;`],
+    },
+    {
+      name: 'nested @supports',
+      css: '@supports (display:grid){@supports (gap:1rem){.a{color:red}}}',
+      minify: '@supports (display:grid){@supports (gap:1rem){.a{color:red}}}',
+    },
+    {
+      name: 'nested @layer',
+      css: '@layer a { @layer b { .x { color: red; } } }',
+      minify: '@layer a{@layer b{.x{color:red}}}',
+    },
+    {
+      name: 'nested @container',
+      css: '@container (width > 400px) { @container (height > 200px) { .a { color: red; } } }',
+      minify: '@container (width > 400px){@container (height > 200px){.a{color:red}}}',
+    },
+    {
+      name: '@media containing @supports',
+      css: '@media (min-width:1px){@supports (display:grid){.a{color:red}}}',
+      minify: '@media (min-width:1px){@supports (display:grid){.a{color:red}}}',
+    },
+  ];
+
+  for (const testCase of cases) {
+    it(`handles ${testCase.name} in every mode`, () => {
+      for (const mode of ['minify', 'beautify', 'denest', 'nest']) {
+        const output = renderMode(testCase.css, mode, { preserveComments: true });
+        assert.equal(typeof output, 'string', `${mode}: ${testCase.name}`);
+        assertBalancedBraces(output, `${mode}: ${testCase.name}`);
+        assert.ok(!output.includes('undefined'), `${mode}: ${testCase.name} emitted undefined`);
+
+        if (mode === 'minify') {
+          assert.equal(output, testCase.minify, `minify mismatch for ${testCase.name}`);
+        }
+
+        if (mode === 'nest' && testCase.nestContains) {
+          for (const fragment of testCase.nestContains) {
+            assert.ok(output.includes(fragment), `nest lost "${fragment}" for ${testCase.name}:\n${output}`);
+          }
+        }
+      }
+    });
+  }
+
+  it('parses at-rule names without requiring whitespace', () => {
+    resetEngine({ preserveComments: true });
+
+    const media = parseCSS('@media(min-width:1px){.a{color:red}}').body[0];
+    assert.equal(media.name, 'media');
+    assert.equal(media.params, '(min-width:1px)');
+
+    const scope = parseCSS('@scope(.card){.title{color:red}}').body[0];
+    assert.equal(scope.name, 'scope');
+    assert.equal(scope.params, '(.card)');
+
+    const imported = parseCSS('@import"x.css";').body[0];
+    assert.equal(imported.name, 'import');
+    assert.equal(imported.params, '"x.css"');
+  });
+
+  it('parses at-rule names across comments', () => {
+    resetEngine({ preserveComments: true });
+
+    const imported = parseCSS(String.raw`@import/*c*/url("x.css") screen;`).body[0];
+    assert.equal(imported.name, 'import');
+    assert.equal(imported.params, String.raw`/*c*/url("x.css") screen`);
+
+    const media = parseCSS('@media/*c*/(min-width:1px){.a{color:red}}').body[0];
+    assert.equal(media.name, 'media');
+    assert.equal(media.params, '/*c*/(min-width:1px)');
+  });
+
+  it('finds the real declaration colon instead of a colon in a comment or escaped name', () => {
+    resetEngine({ preserveComments: true });
+    const commented = parseCSS('.a { color/*:*/: red; }').body[0].body[0];
+    assert.equal(commented.property, 'color/*:*/');
+    assert.deepEqual(commented.value, ['red']);
+
+    resetEngine({ preserveComments: false });
+    const stripped = parseCSS('.a { color/*:*/: red; }').body[0].body[0];
+    assert.equal(stripped.property, 'color');
+
+    resetEngine({ preserveComments: false });
+    const escaped = parseCSS(String.raw`.a { color\:x: red; }`).body[0].body[0];
+    assert.equal(escaped.property, String.raw`color\:x`);
+    assert.deepEqual(escaped.value, ['red']);
   });
 });

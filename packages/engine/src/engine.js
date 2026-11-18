@@ -430,6 +430,38 @@ function startsCustomPropertyBlock(text) {
     return property.startsWith('--') && rest === '';
 }
 
+/**
+ * Splits an at-rule prelude into its name and parameters. CSS allows the
+ * parameters to start immediately after the at-keyword (for example
+ * `@media(min-width: 40em)`) and allows comments to separate tokens, so the
+ * split must happen at the end of the identifier rather than at the first
+ * space.
+ */
+function splitAtRuleSegment(segment) {
+    let pos = 1;
+
+    while (pos < segment.length) {
+        const char = segment[pos];
+
+        if (char === '\\') {
+            pos = consumeEscape(segment, pos);
+            continue;
+        }
+
+        if (/[a-zA-Z0-9_-]/.test(char) || char.codePointAt(0) > 0x7F) {
+            pos++;
+            continue;
+        }
+
+        break;
+    }
+
+    return {
+        name: segment.slice(1, pos),
+        params: segment.slice(pos).trim()
+    };
+}
+
 export function parseCSS(cssString) {
     let pos = 0;
     const len = cssString.length;
@@ -628,11 +660,11 @@ export function parseCSS(cssString) {
             newNode.body = [];
             
             if (segment.startsWith('@')) {
-                const firstSpace = segment.indexOf(' ');
+                const { name, params } = splitAtRuleSegment(segment);
 
                 newNode.type = 'AtRule';
-                newNode.name = segment.substring(1, firstSpace === -1 ? segment.length : firstSpace);
-                newNode.params = firstSpace === -1 ? '' : segment.substring(firstSpace + 1).trim();
+                newNode.name = name;
+                newNode.params = params;
             } else {
                 newNode.type = 'Rule';
                 newNode.selector = parseSelector(segment);
@@ -642,8 +674,8 @@ export function parseCSS(cssString) {
             stack.push(newNode);
             pos++;
         } else { 
-            if (segment.includes(':') && context.type !== 'Stylesheet') {
-                const colonIndex = segment.indexOf(':');
+            const colonIndex = findTopLevelColon(segment);
+            if (colonIndex !== -1 && context.type !== 'Stylesheet') {
                 const property = segment.substring(0, colonIndex).trim();
                 const value = segment.substring(colonIndex + 1).trim();
                 
@@ -654,11 +686,11 @@ export function parseCSS(cssString) {
                 
                 context.body.push(newNode);
             } else if (segment.startsWith('@')) {
-                const firstSpace = segment.indexOf(' ');
+                const { name, params } = splitAtRuleSegment(segment);
 
                 newNode.type = 'AtRule';
-                newNode.name = segment.substring(1, firstSpace === -1 ? segment.length : firstSpace);
-                newNode.params = firstSpace === -1 ? '' : segment.substring(firstSpace + 1).trim();
+                newNode.name = name;
+                newNode.params = params;
                 newNode.body = null;
 
                 context.body.push(newNode);
@@ -1314,15 +1346,16 @@ export function denestCSS(ast, preserveWrappers = false) {
             }
 
             if (node.type === 'AtRule') {
+                const nodeName = node.name.toLowerCase();
                 let combinedAtRuleParams = node.params;
-                if (context.atRule && context.atRule.name === 'media' && node.name === 'media') {
+                if (context.atRule && context.atRule.name.toLowerCase() === 'media' && nodeName === 'media') {
                      combinedAtRuleParams = `${context.atRule.params} and (${node.params})`;
                 }
                 
                 const newAtRuleContext = { name: node.name, params: combinedAtRuleParams };
 
                 let childSelector = context.selector;
-                if (node.name === 'scope') {
+                if (nodeName === 'scope') {
                     const scopeRoot = getScopeRoot(combinedAtRuleParams);
                     if (scopeRoot) {
                         try { childSelector = parseSelector(scopeRoot); } catch (e) { childSelector = context.selector; }
@@ -1895,6 +1928,11 @@ export function renestCSS(ast) {
             const child = node.body[i];
             
             if (child.type === 'Rule' || child.type === 'AtRule') {
+                // Statement at-rules such as `@import`, `@charset`,
+                // `@namespace`, `@layer a, b;`, and `@custom-media` have no
+                // block (body === null). They are content, not empty rules.
+                if (child.type === 'AtRule' && child.body === null) continue;
+
                 removeEmptyRules(child);
                 
                 const hasContent = child.body && child.body.some(n => 

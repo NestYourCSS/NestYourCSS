@@ -126,6 +126,10 @@ html {
 
     &#settings-toggle {
         translate: -50%;
+
+        svg {
+            vertical-align: middle;
+        }
     }
 }
 
@@ -401,8 +405,6 @@ main {
         }
 
         .editorTab {
-            --background-colour: rgb(from var(--shades-darkest) r g b / 0.25);
-            --window-text-colour: rgb(from var(--shades-darker) r g b / var(--opacity-medium));
             line-height: 100%;
             color: rgb(from var(--shades-medium) r g b / 50%);
             font-size: 1rem;
