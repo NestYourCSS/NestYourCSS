@@ -21,7 +21,6 @@ async function nestCode(e) {
     // Match the main app: do not convert input that the Ace linter rejects.
     const annotations = inputEditor.getSession().getAnnotations().filter((a) => a.type == 'error');
     if (annotations.length) {
-        console.log('Code Errors:', annotations);
         outputEditor.getSession().setValue(i18n.cssContainsErrors);
         announce(i18n.cssContainsErrors);
         if (wrapper) wrapper.removeAttribute('aria-busy');

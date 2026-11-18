@@ -118,7 +118,6 @@ h1 {
     minimap.setFontSize(2.5);
     minimap.setShowPrintMargin(false);
     minimap.renderer.setShowGutter(false);
-    minimap.setOption('showLineNumbers', false);
     minimap.setReadOnly(true);
     minimap.setTheme('ace/theme/nycss');
     if (!window.__store.showMinimap) minimapEl.style.display = 'none';

@@ -14,12 +14,16 @@
   <!-- Vercel Web Analytics -->
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      var vaScript = document.createElement('script');
+      vaScript.defer = true;
+      vaScript.src = '/_vercel/insights/script.js';
+      document.head.appendChild(vaScript);
+    }
   </script>
-  <script defer src="/_vercel/insights/script.js"></script>
 
   <script src="./lib/ace.min.js"></script>
   <script src="./lib/theme-nycss.min.js" defer></script>
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <link href="./styles/main.css" rel="stylesheet">
   <link rel="preload" href="./lib/theme-nycss.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -32,7 +36,10 @@
       <div class="header-controls" role="toolbar" aria-label="Editor controls" aria-orientation="horizontal">
         <div class="settings-container">
           <button id="settings-toggle" class="header-btn vibrant" title="Settings" aria-label="Settings">
-            <i class="ph ph-gear-six"></i>
+            <svg viewBox="0 0 32 32" width="1.5em" height="1.5em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="16" cy="16" r="3"/>
+              <path d="M16 2v4M16 26v4M2 16h4M26 16h4M5.9 5.9l2.8 2.8M23.3 23.3l2.8 2.8M5.9 26.1l2.8-2.8M23.3 8.7l2.8-2.8"/>
+            </svg>
           </button>
 
           <aside id="mainSettings" aria-label="Editor settings" hidden>

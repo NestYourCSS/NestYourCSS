@@ -23,8 +23,13 @@
   <!-- Vercel Web Analytics -->
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      var vaScript = document.createElement('script');
+      vaScript.defer = true;
+      vaScript.src = '/_vercel/insights/script.js';
+      document.head.appendChild(vaScript);
+    }
   </script>
-  <script defer src="/_vercel/insights/script.js"></script>
 
   <script type="application/ld+json">  
     {  
@@ -165,9 +170,9 @@
     Preloading Fonts  
   -->  
   <link rel="preconnect" href="https://ucarecdn.com" crossorigin>
-  <link rel="preload" href="./assets/fonts/poppins-black-latin.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="./assets/fonts/poppins-black-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" as="image" imagesrcset="https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/160x/-/format/auto/-/quality/smart/ 160w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/240x/-/format/auto/-/quality/smart/ 240w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/320x/-/format/auto/-/quality/smart/ 320w, https://ucarecdn.com/1960e3cd-25ec-4ea4-9b3a-43ec1eea6545/-/resize/425x/-/format/auto/-/quality/smart/ 425w" imagesizes="(max-height: 1600px) 26.455dvh, 425px" fetchpriority="high">
-  <link rel="preload" href="./assets/fonts/firacode-regular-latin.otf" as="font" type="font/otf" crossorigin>  
+  <link rel="preload" href="./assets/fonts/firacode-regular-latin.woff2" as="font" type="font/woff2" crossorigin>
 </head>  
 <body itemscope itemtype="https://schema.org/WebPage">  
   <a class="skip-to-section" href="#reducingBoilerplateCode" onkeydown="if (event.key === ' ' || event.keyCode === 32) event.preventDefault() , this.click();">Learn why we should nest our code.</a>  
@@ -615,10 +620,6 @@
   -->  
   <script src="/lib/lenis/lenis.min.js" defer></script>  
     
-  <link rel="preload" href="/lib/ace/scripts/ace.min.js" as="script" crossorigin>
-  <link rel="preload" href="/lib/ace/scripts/mode-css.min.js" as="script" crossorigin>
-  <link rel="preload" href="/lib/ace/scripts/theme-nycss.min.js" as="script" crossorigin>
-  <link rel="preload" href="/lib/ace/scripts/ext-searchbox.min.js" as="script" crossorigin>
   <!-- <script src="./lib/ace/scripts/ext-diff.min.js"></script> -->  
   <!-- <script src="./lib/ace/scripts/ext-stickyscroll.js"></script> -->  
   <!-- <script src="./lib/ace/scripts/ext-language_tools.min.js"></script> -->  

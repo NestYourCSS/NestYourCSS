@@ -3,8 +3,6 @@ import { configureEngine } from '@nycss/engine/config';
 import '@nycss/ui';
 import { registerSW } from '@nycss/pwa';
 
-console.log('[QUICKLY MAIN] Starting entry point');
-
 // Initialize Proxy Store
 const store = createStore({
   typefaces: "Fira Code",
@@ -32,10 +30,7 @@ const store = createStore({
     mode: (value) => { window.processMode = value; },
     auto: (value) => { window.processAuto = value; window.autoProcess = value; },
     deduplicate: (value) => {
-      console.log('[QUICKLY_MAIN_ONSET] deduplicate handler called with value:', value);
-      console.log('[QUICKLY_MAIN_ONSET] Setting window.deduplicate =', value);
       window.deduplicate = value;
-      console.log('[QUICKLY_MAIN_ONSET] Calling configureEngine({ deduplicate:', value, '})');
       configureEngine({ deduplicate: value });
     },
   },
@@ -77,5 +72,3 @@ window.__store = store;
 
 // Register PWA
 registerSW('./sw.js');
-
-console.log('[QuicklyNYCSS] Monorepo entry point loaded');
