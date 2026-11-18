@@ -365,7 +365,7 @@ main {
     align-items: center;
     height: 100%;
     padding: var(--header-top) 2rem 2rem 2rem;
-    gap: 2.625rem;
+    gap: 2rem;
     position: relative;
 
     @media (width < 1024px) {
@@ -382,6 +382,7 @@ main {
         --editor-width: 5;
         --total-width: calc(var(--gutter-width) + (2 * var(--editor-width)));
         display: flex;
+        margin: 2rem;
         gap: calc((var(--gutter-width) / var(--total-width)) * 100%);
 
         @media (width < 1024px) {

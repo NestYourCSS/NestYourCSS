@@ -1043,18 +1043,14 @@
     & {
       --gutter-width: 0.25;
       --editor-width: 5;
-      --total-width: (
-        var(--editor-width) + var(--gutter-width) + var(--editor-width)
-      );
+      --total-width: (var(--editor-width) + var(--gutter-width) + var(--editor-width));
       --vertical-padding: (2 * var(--padding));
       --horizontal-padding: (2 * var(--padding));
       --code-editor-height: (100cqh);
       --code-editor-width: (100cqw);
       --content-height: (var(--code-editor-height) - var(--vertical-padding));
       --total-editor-width: ((var(--total-width) / 7) * var(--content-height));
-      --single-editor-width: (
-        (var(--editor-width) / 7) * var(--content-height)
-      );
+      --single-editor-width: ((var(--editor-width) / 7) * var(--content-height));
       --gutter-real-width: ((var(--gutter-width) / 7) * var(--content-height));
       --settings-panel-width: (58.441558ch * 1.232);
     }
@@ -1065,8 +1061,9 @@
       display: flex;
       justify-content: center;
       width: calc(
-        (var(--code-editor-height) - var(--vertical-padding)) *
-          (var(--editor-width) / 7)
+        (var(--code-editor-height) - var(--vertical-padding))
+          *
+        (var(--editor-width) / 7)
       );
       transition: opacity 0.5s ease-out, height 2s;
 
