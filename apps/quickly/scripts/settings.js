@@ -284,22 +284,25 @@
 
     // Wait for editors to be ready before firing initial onSet callbacks and attaching cursor tracking
     const initCheck = setInterval(() => {
-      if (window.inputEditor && window.outputEditor) {
-        clearInterval(initCheck);
-        // Ensure file-size is cleared on all tab buttons
-        [window.inputEditor, window.outputEditor].forEach(editor => {
-          const fileNameEl = editor.container.parentElement?.querySelector('.fileName');
-          if (fileNameEl) fileNameEl.removeAttribute('file-size');
-        });
-        store._init(Object.keys(snapshot));
+      const editors = [window.inputEditor, window.outputEditor];
+      // Elements with these ids are exposed as globals before Ace replaces them,
+      // so wait until both are actual editor instances with a container/session.
+      if (!editors.every(editor => editor?.container && editor?.session)) return;
 
-        // Cursor tracking for coordinates
-        [window.inputEditor, window.outputEditor].forEach(editor => {
-          editor.selection.on('changeCursor', () => {
-            if (store.coordinates !== 0) updateCoordDisplay();
-          });
+      clearInterval(initCheck);
+      // Ensure file-size is cleared on all tab buttons
+      editors.forEach(editor => {
+        const fileNameEl = editor.container.parentElement?.querySelector('.fileName');
+        if (fileNameEl) fileNameEl.removeAttribute('file-size');
+      });
+      store._init(Object.keys(snapshot));
+
+      // Cursor tracking for coordinates
+      editors.forEach(editor => {
+        editor.selection.on('changeCursor', () => {
+          if (store.coordinates !== 0) updateCoordDisplay();
         });
-      }
+      });
     }, 100);
   }
 

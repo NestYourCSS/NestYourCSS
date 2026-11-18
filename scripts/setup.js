@@ -11,33 +11,10 @@ function initializeAceEditors() {
     await window.waitForVar('cssSampleDefault');
     let sample = window.cssSampleDefault;
    
-    var linterWorker, lintSessions = {}, lintTimeouts = {}, lintId = 0;
-    try { linterWorker = new Worker('/lib/ace-linters/linter.worker.js'); } catch (_) {}
-    if (linterWorker) {
-      linterWorker.onmessage = function (e) {
-        if (e.data.type === 'lintResult') {
-          var s = lintSessions[e.data.sessionId];
-          if (s) s.setAnnotations(e.data.annotations);
-        }
-      };
+    var languageProvider = { registerEditor: function () {} };
+    if (typeof window.whenNycssLanguageProvider === 'function') {
+      languageProvider = (await window.whenNycssLanguageProvider(3000)) || languageProvider;
     }
-    function createLinterProxy() {
-      return {
-        registerEditor: function (editor) {
-          if (!linterWorker) return;
-          var es = editor.getSession();
-          var sid = 'ed_' + (++lintId);
-          lintSessions[sid] = es;
-          es.on('change', function () {
-            clearTimeout(lintTimeouts[sid]);
-            lintTimeouts[sid] = setTimeout(function () {
-              linterWorker.postMessage({ type: 'lint', sessionId: sid, code: es.getValue() });
-            }, 400);
-          });
-        }
-      };
-    }
-    var languageProvider = createLinterProxy();
   
     window.inputEditorInstance = initEditor("inputEditor", window.i18n.inputEditorLabel, sample || window.i18n.inputPlaceholder);
     window.outputEditorInstance = initEditor("outputEditor", window.i18n.outputEditorLabel, window.i18n.outputPlaceholder);

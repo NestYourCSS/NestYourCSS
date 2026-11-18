@@ -5,8 +5,9 @@ async function setupEditors() {
     CssMode.prototype.createWorker = function () { return null; };
   } catch (_) {}
 
-  await waitForVar('LanguageProvider');
-  let provider = LanguageProvider.fromCdn("https://www.unpkg.com/ace-linters@1.2.3/build/");
+  const provider = typeof window.whenNycssLanguageProvider === 'function'
+    ? await window.whenNycssLanguageProvider(3000)
+    : null;
       
   function initializeEditor(editorId, value) {
     const editor = ace.edit(editorId, {
@@ -37,7 +38,7 @@ async function setupEditors() {
     textarea.setAttribute("aria-label", editorId === "inputEditor" ? i18n.inputEditorLabel : i18n.outputEditorLabel);
 
     editor.setValue(value, -1);
-    provider.registerEditor(editor);
+    if (provider) provider.registerEditor(editor);
 
     return editor;
   }

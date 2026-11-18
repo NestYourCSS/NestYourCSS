@@ -624,6 +624,10 @@
   <!-- <script src="./lib/ace/scripts/ext-language_tools.min.js"></script> -->  
   
   <script>window._aceScripts=[{src:"/lib/ace/scripts/ace.min.js"},{src:"/lib/ace/scripts/mode-css.min.js"},{src:"/lib/ace/scripts/theme-nycss.min.js"},{src:"/lib/ace/scripts/ext-searchbox.min.js"},];window._loadAce=function(){window._aceLoading=!0;var p=[];window._aceScripts.forEach(function(s){p.push(new Promise(function(r){var e=document.createElement('script');e.src=s.src;e.async=!1;e.crossOrigin='anonymous';e.onload=r;document.body.appendChild(e)}))});return Promise.all(p)};</script>
+
+  <!-- Self-hosted Ace Linters (CSS language service only) -->
+  <script src="/lib/ace-linters/ace-linters.min.js" defer></script>
+  <script src="/lib/ace-linters/provider.js" defer></script>
   
   <!--  
     Application Scripts - Vite bundle

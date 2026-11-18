@@ -18,25 +18,34 @@ async function nestCode(e) {
     const wrapper = document.getElementById('code-editor-wrapper');
     if (wrapper) wrapper.setAttribute('aria-busy', 'true');
 
+    // Match the main app: do not convert input that the Ace linter rejects.
     const annotations = inputEditor.getSession().getAnnotations().filter((a) => a.type == 'error');
-    if (annotations.length == 0) {
-        const result = convertToNestedCSS(inputEditor.getValue());
-        outputEditor.getSession().setValue(result || i18n.outputPlaceholder);
-        announce(i18n.conversionComplete);
-        if (wrapper) wrapper.removeAttribute('aria-busy');
-        return true;
-    } else {
+    if (annotations.length) {
         console.log('Code Errors:', annotations);
         outputEditor.getSession().setValue(i18n.cssContainsErrors);
         announce(i18n.cssContainsErrors);
         if (wrapper) wrapper.removeAttribute('aria-busy');
         return false;
-
-        // Show a list of the errors if any.
-
-        // "Your code doesn't seem to be valid, do you want to try nesting anyways?"
-        // "It may not work properly."
     }
+
+    let result = '';
+    try {
+        result = convertToNestedCSS(inputEditor.getValue());
+    } catch (error) {
+        console.error('CSS conversion failed:', error);
+    }
+
+    if (result) {
+        outputEditor.getSession().setValue(result);
+        announce(i18n.conversionComplete);
+        if (wrapper) wrapper.removeAttribute('aria-busy');
+        return true;
+    }
+
+    outputEditor.getSession().setValue(i18n.cssContainsErrors);
+    announce(i18n.cssContainsErrors);
+    if (wrapper) wrapper.removeAttribute('aria-busy');
+    return false;
 };
 
 document.getElementById('nest-btn').addEventListener('click', nestCode);

@@ -50,6 +50,7 @@ async function main() {
     await minifyDir(resolve(dist, 'scripts'));
   }
   if (site === 'both' || site === 'quickly') {
+    copyDir(resolve(root, 'lib/ace-linters'), resolve(dist, 'apps/quickly/lib/ace-linters'));
     copyDir(resolve(root, 'apps/quickly/lib'), resolve(dist, 'apps/quickly/lib'));
     copyDir(resolve(root, 'apps/quickly/scripts'), resolve(dist, 'apps/quickly/scripts'));
     copyDir(resolve(root, 'apps/quickly/styles'), resolve(dist, 'apps/quickly/styles'));
