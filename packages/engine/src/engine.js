@@ -1,7 +1,7 @@
 import { _preserveComments, _indentChar, _maxDepth, _strategy, _deduplicate, configureEngine } from './config.js';
 export { configureEngine } from './config.js';
 
-const NESTING_COMBINATORS = ['>', '+', '~'];
+const NESTING_COMBINATORS = ['>', '+', '~', '||'];
 
 /**
  * Returns the index just past the CSS escape sequence that starts at `pos`
@@ -114,6 +114,15 @@ function transformNestingSelectors(part, replace) {
             continue;
         }
 
+        // `||` is the Selectors 4 column combinator. Treat it like the
+        // other combinators when deciding whether `&` starts a compound.
+        if (char === '|' && part[pos + 1] === '|' && attributeDepth === 0) {
+            result += '||';
+            pos += 2;
+            compoundStart = true;
+            continue;
+        }
+
         result += char;
 
         if (char === ' ' || char === '\t' || char === '\r' || char === '\n'
@@ -208,6 +217,21 @@ function parseSelector(selectorText) {
                 }
                 
                 pos++;
+                continue;
+            }
+
+            if (char === '|' && selectorText[pos + 1] === '|') {
+                if (buffer) {
+                    groups[groups.length - 1].parts.push(buffer);
+                    buffer = '';
+                }
+
+                const lastGroup = groups[groups.length - 1];
+                if (lastGroup.parts.length > 0 && lastGroup.parts.at(-1) === ' ') {
+                    lastGroup.parts.pop();
+                }
+                lastGroup.parts.push('||');
+                pos += 2;
                 continue;
             }
 
@@ -483,6 +507,12 @@ export function parseCSS(cssString) {
                 spacesAbove++;
                 pos++;
                 continue;
+            } else if (context.type === 'Stylesheet' && cssString.startsWith('<!--', pos)) {
+                // CDO token: ignored only in the top-level stylesheet.
+                pos += 4;
+            } else if (context.type === 'Stylesheet' && cssString.startsWith('-->', pos)) {
+                // CDC token: ignored only in the top-level stylesheet.
+                pos += 3;
             } else if (currentChar === '/' && cssString[pos + 1] === '*') {
                 pos += 2;
                 const commentStart = pos;
@@ -647,7 +677,9 @@ export function parseCSS(cssString) {
         }
         
         const lastNode = context.body.at(-1);
-        const segment = segmentBuilder.trim();
+        const rawSegment = segmentBuilder;
+        const segment = rawSegment.trim();
+        const leadingTrim = rawSegment.length - rawSegment.trimStart().length;
 
         const declarationSpacesAbove = Math.max(0, Math.min(spacesAbove, 1));
         if (typeof lastNode === 'undefined') spacesAbove = Math.max(-1, Math.min(spacesAbove, 1));
@@ -677,11 +709,13 @@ export function parseCSS(cssString) {
             const colonIndex = findTopLevelColon(segment);
             if (colonIndex !== -1 && context.type !== 'Stylesheet') {
                 const property = segment.substring(0, colonIndex).trim();
-                const value = segment.substring(colonIndex + 1).trim();
+                const rawValue = rawSegment.substring(leadingTrim + colonIndex + 1);
+                const value = rawValue.trim();
                 
                 newNode.type = 'Declaration';
                 newNode.property = property;
                 newNode.value = parseValue(value);
+                newNode.valueWasWhitespaceOnly = property.startsWith('--') && value === '' && rawValue.length > 0;
                 newNode.spacesAbove = declarationSpacesAbove;
                 
                 context.body.push(newNode);
@@ -829,7 +863,7 @@ export function minifyCSS(ast) {
                 case 'Comment':
                     return `/*${child.value}*/`;
                 case 'Declaration':
-                    return `${child.property}:${minifyValue(child.value)};`;
+                    return `${child.property}:${child.valueWasWhitespaceOnly ? ' ' : ''}${minifyValue(child.value)};`;
                 case 'AtRule':
                     const atRuleString = `@${child.name}${child.params ? ' ' + child.params : ''}`;
                     if (child.body) {
@@ -898,7 +932,7 @@ function beautifySelector(groups, indent) {
     let result = '';
     
     function stringifyGroup(parts) {
-        const combinators = ['>', '+', '~'];
+        const combinators = ['>', '+', '~', '||'];
         let result = '';
         for (let i = 0; i < parts.length; i++) {
             const part = parts[i];
@@ -1581,7 +1615,7 @@ function findSingleGroupNestingRelationship(parentGroup, childGroup) {
     if (!parentGroup._str) parentGroup._str = parentParts.join('');
     const parentStr = parentGroup._str;
 
-    const combinators = ['>', '+', '~'];
+    const combinators = ['>', '+', '~', '||'];
 
     let isMatch = childParts.length > parentParts.length;
     if (isMatch) {

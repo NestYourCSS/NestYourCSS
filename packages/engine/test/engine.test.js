@@ -1544,3 +1544,191 @@ describe('obscure but valid CSS syntax', () => {
     assert.deepEqual(escaped.value, ['red']);
   });
 });
+
+describe('spec-valid obscure stylesheets', () => {
+  it('keeps hex escapes in property and value names', () => {
+    const css = String.raw`.card {
+  \63\6f\6c\6f\72: r\65 d;
+}`;
+    const declaration = parseCSS(css).body[0].body[0];
+
+    assert.equal(declaration.property, String.raw`\63\6f\6c\6f\72`);
+    assert.deepEqual(declaration.value, [String.raw`r\65 d`]);
+
+    const pretty = `.card {\n\t${String.raw`\63\6f\6c\6f\72`}: ${String.raw`r\65 d`};\n}`;
+    assert.equal(renderMode(css, 'beautify'), pretty);
+    assert.equal(renderMode(css, 'minify'), String.raw`.card{\63\6f\6c\6f\72:r\65 d}`);
+    assert.equal(renderMode(css, 'denest'), pretty);
+    assert.equal(renderMode(css, 'nest'), pretty);
+  });
+
+  it('accepts a custom property named exactly --', () => {
+    const css = `:root {
+  --: darkblue;
+}
+
+body {
+  color: var(--);
+}`;
+    const declaration = parseCSS(css).body[0].body[0];
+
+    assert.equal(declaration.property, '--');
+    assert.deepEqual(declaration.value, ['darkblue']);
+    assert.deepEqual(parseCSS(css).body[1].body[0].value, ['var(--)']);
+    assert.equal(renderMode(css, 'minify'), ':root{--:darkblue}body{color:var(--)}');
+  });
+
+  it('ignores CDO and CDC tokens at the top level only', () => {
+    const css = `<!--
+body {
+  color: green;
+}
+-->`;
+
+    assert.deepEqual(parseCSS(css).body.map(node => node.type), ['Rule']);
+    assert.equal(renderMode(css, 'beautify'), 'body {\n\tcolor: green;\n}');
+    assert.equal(renderMode(css, 'minify'), 'body{color:green}');
+    assert.equal(renderMode(css, 'denest'), 'body {\n\tcolor: green;\n}');
+    assert.equal(renderMode(css, 'nest'), 'body {\n\tcolor: green;\n}');
+  });
+
+  it('ignores CDO and CDC around a top-level @import', () => {
+    const css = `<!--
+@import url("base.css");
+-->`;
+
+    assert.equal(renderMode(css, 'minify'), '@import url("base.css");');
+    assert.equal(renderMode(css, 'nest'), '@import url("base.css");');
+  });
+
+  it('accepts scientific notation in numbers and dimensions', () => {
+    const css = `.box {
+  width: 1e2px;
+  animation-duration: 2.5e-1s;
+  line-height: 2e0;
+}`;
+    const declarations = parseCSS(css).body[0].body;
+
+    assert.deepEqual(declarations.map(d => d.value[0]), ['1e2px', '2.5e-1s', '2e0']);
+    assert.equal(
+      renderMode(css, 'minify'),
+      '.box{width:1e2px;animation-duration:2.5e-1s;line-height:2e0}'
+    );
+  });
+
+  it('preserves the whitespace token in a whitespace-only custom property', () => {
+    const css = `:root {
+  --empty: ;
+}
+
+.box {
+  background-color: var(--empty) red;
+}`;
+    const declaration = parseCSS(css).body[0].body[0];
+
+    assert.equal(declaration.property, '--empty');
+    assert.deepEqual(declaration.value, []);
+    assert.equal(declaration.valueWasWhitespaceOnly, true);
+    assert.equal(parseCSS('.a { color: ; }').body[0].body[0].valueWasWhitespaceOnly, false);
+
+    assert.equal(
+      renderMode(css, 'minify'),
+      ':root{--empty: }.box{background-color:var(--empty) red}'
+    );
+    assert.equal(
+      renderMode(css, 'beautify'),
+      ':root {\n\t--empty: ;\n}\n\n.box {\n\tbackground-color: var(--empty) red;\n}'
+    );
+  });
+
+  it('tokenizes the || column combinator without splitting namespaces', () => {
+    const css = 'col.highlight || td {\n  background: yellow;\n}';
+    const selector = parseCSS(css).body[0].selector[0];
+
+    assert.deepEqual(selector.parts, ['col.highlight', '||', 'td']);
+    assert.equal(renderMode(css, 'minify'), 'col.highlight||td{background:yellow}');
+    assert.equal(renderMode(css, 'beautify'), 'col.highlight || td {\n\tbackground: yellow;\n}');
+    assert.equal(
+      renderMode('col.highlight { || td { background: yellow; } }', 'denest'),
+      'col.highlight || td {\n\tbackground: yellow;\n}'
+    );
+    assert.equal(
+      renderMode('col.highlight { & || td { background: yellow; } }', 'nest'),
+      'col.highlight || td {\n\tbackground: yellow;\n}'
+    );
+    assert.equal(
+      renderMode('col.highlight || td { background: yellow; }\ncol.highlight || td:hover { color: red; }', 'nest'),
+      'col.highlight || td {\n\tbackground: yellow;\n\n\t&:hover {\n\t\tcolor: red;\n\t}\n}'
+    );
+
+    assert.equal(renderMode('svg|a, *|*, |a { color: red; }', 'minify'), 'svg|a,*|*,|a{color:red}');
+    assert.equal(renderMode('[data-x="a||b"] { color: red; }', 'minify'), '[data-x="a||b"]{color:red}');
+    assert.equal(
+      renderMode(':is(col.highlight || td) { background: yellow; }', 'minify'),
+      ':is(col.highlight || td){background:yellow}'
+    );
+  });
+
+  it('accepts trig functions and constants inside calc()', () => {
+    const css = '.spinner {\n  transform: rotate(calc(1turn * sin(pi / 6)));\n}';
+
+    assert.deepEqual(parseCSS(css).body[0].body[0].value, ['rotate(calc(1turn * sin(pi / 6)))']);
+    assert.equal(
+      renderMode(css, 'minify'),
+      '.spinner{transform:rotate(calc(1turn * sin(pi / 6)))}'
+    );
+  });
+
+  it('round-trips the combined cursed stylesheet and drops only the invalid -- declaration', () => {
+    const css = String.raw`<!--
+:root {
+  --;
+  --: 1e2px;
+}
+
+.\31st-place {
+  \63\6f\6c\6f\72: r\65 d;
+  width: var(--);
+  transform: rotate(calc(cos(0rad) * 1turn));
+  ;;;
+}
+-->`;
+
+    const minified = renderMode(css, 'minify');
+    assert.equal(
+      minified,
+      String.raw`:root{--:1e2px}.\31st-place{\63\6f\6c\6f\72:r\65 d;width:var(--);transform:rotate(calc(cos(0rad) * 1turn))}`
+    );
+    assert.ok(!minified.includes('<!--'));
+    assert.ok(!minified.includes('-->'));
+    assert.ok(!minified.includes('--;'));
+
+    const nested = renderMode(css, 'nest');
+    assert.ok(nested.includes(String.raw`.\31st-place`));
+    assert.ok(nested.includes(String.raw`\63\6f\6c\6f\72: r\65 d;`));
+    assert.ok(nested.includes('--: 1e2px;'));
+    assert.ok(!nested.includes('--;'));
+
+    assert.equal(renderMode(':root { --; color: red; }', 'minify'), ':root{color:red}');
+  });
+
+  it('keeps every spec-valid oddity stable when processed again', () => {
+    const snippets = [
+      String.raw`.card { \63\6f\6c\6f\72: r\65 d; }`,
+      ':root { --: darkblue; } body { color: var(--); }',
+      '<!-- body { color: green; } -->',
+      '.box { width: 1e2px; animation-duration: 2.5e-1s; line-height: 2e0; }',
+      ':root { --empty: ; } .box { background-color: var(--empty) red; }',
+      'col.highlight || td { background: yellow; }',
+      '.spinner { transform: rotate(calc(1turn * sin(pi / 6))); }',
+    ];
+
+    for (const css of snippets) {
+      for (const mode of ['beautify', 'minify', 'denest', 'nest']) {
+        const once = renderMode(css, mode);
+        const twice = renderMode(once, mode);
+        assert.equal(twice, once, `${mode} is not idempotent for ${css}`);
+      }
+    }
+  });
+});
