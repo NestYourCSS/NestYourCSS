@@ -1,8 +1,39 @@
+function labelAceTextInputs() {
+  if (window.__aceTextInputLabelsBound || !document.body) return;
+  window.__aceTextInputLabelsBound = true;
+
+  let nextId = 1;
+  const label = (textarea) => {
+    if (textarea.id) {
+      if (document.getElementById(textarea.id) === textarea) return;
+      textarea.removeAttribute('id');
+    }
+    if (textarea.name) return;
+    let id;
+    do {
+      id = `ace-text-input-${nextId++}`;
+    } while (document.getElementById(id));
+    textarea.id = id;
+  };
+
+  document.querySelectorAll('.ace_text-input').forEach(label);
+  new MutationObserver((records) => {
+    for (const record of records) {
+      for (const node of record.addedNodes) {
+        if (!(node instanceof Element)) continue;
+        if (node.matches('.ace_text-input')) label(node);
+        node.querySelectorAll('.ace_text-input').forEach(label);
+      }
+    }
+  }).observe(document.body, { childList: true, subtree: true });
+}
+
 function initializeAceEditors() {
   window.setupEditors = async () => {
     if (typeof window.ace === 'undefined') {
       if (window._loadAce) await window._loadAce();
     }
+    labelAceTextInputs();
     try {
       const CssMode = window.ace.require('ace/mode/css').Mode;
       CssMode.prototype.createWorker = function () { return null; };

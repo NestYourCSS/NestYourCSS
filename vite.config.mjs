@@ -18,9 +18,10 @@ export default defineConfig({
   customLogger: logger,
 
   optimizeDeps: {
-    include: [
+    exclude: [
       '@nycss/ui',
       '@nycss/engine',
+      '@nycss/engine/config',
       '@nycss/state',
       '@nycss/pwa',
     ],
