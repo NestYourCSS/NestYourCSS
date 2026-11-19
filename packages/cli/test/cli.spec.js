@@ -287,4 +287,47 @@ describe('@nycss/cli', () => {
     const result = runCli([nonExistent]);
     assert(result.status !== 0);
   });
+  it('should support --selector-strategy multiply', () => {
+    const inputFile = join(tmpDir, 'ss.css');
+    writeFileSync(inputFile, '.a, .b { & > .c { color: red; } }');
+    const result = runCli([inputFile, '-m', 'denest', '--selector-strategy', 'multiply']);
+    assert.strictEqual(result.status, 0);
+    assert(result.stdout.includes('.a>.c,.b>.c') || result.stdout.includes('.a > .c, .b > .c') || result.stdout.includes('.a>.c') );
+  });
+
+  it('should support --scope-strategy downlevel', () => {
+    const inputFile = join(tmpDir, 'sc.css');
+    writeFileSync(inputFile, '@scope (.card) to (.content) { .title { color: red; } }');
+    const result = runCli([inputFile, '-m', 'denest', '--scope-strategy', 'downlevel']);
+    assert.strictEqual(result.status, 0);
+    assert(!result.stdout.includes('@scope'));
+    assert(result.stdout.includes('.card .title'));
+  });
+
+  it('should support --value-format single-line', () => {
+    const inputFile = join(tmpDir, 'vf.css');
+    writeFileSync(inputFile, '.a { background: linear-gradient(\n  to right,\n  red,\n  blue\n); }');
+    const result = runCli([inputFile, '-m', 'beautify', '--value-format', 'single-line']);
+    assert.strictEqual(result.status, 0);
+    assert(result.stdout.includes('linear-gradient(to right, red, blue)'));
+  });
+
+  it('should support --selector-width and --selector-single-line', () => {
+    const inputFile = join(tmpDir, 'sw.css');
+    writeFileSync(inputFile, '.foo, .bar, .baz, .qux { color: red; }');
+    const r1 = runCli([inputFile, '-m', 'beautify', '--selector-width', '20']);
+    assert.strictEqual(r1.status, 0);
+    assert(r1.stdout.includes(',\n'));
+
+    const r2 = runCli([inputFile, '-m', 'beautify', '--selector-single-line']);
+    assert.strictEqual(r2.status, 0);
+    assert(!r2.stdout.includes(',\n'));
+  });
+
+  it('should reject invalid --selector-strategy', () => {
+    const inputFile = join(tmpDir, 'x.css');
+    writeFileSync(inputFile, 'a { color: red; }');
+    const result = runCli([inputFile, '--selector-strategy', 'foo']);
+    assert.notEqual(result.status, 0);
+  });
 });

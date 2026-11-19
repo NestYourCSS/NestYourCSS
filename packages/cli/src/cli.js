@@ -62,6 +62,11 @@ function transformCSS(cssString, opts) {
     indentChar: opts._indentChar,
     maxDepth: opts.depth !== undefined ? (parseInt(opts.depth, 10) || Infinity) : undefined,
     deduplicate: opts.dedupe,
+    selectorStrategy: opts.selectorStrategy,
+    scopeStrategy: opts.scopeStrategy,
+    valueFormat: opts.valueFormat,
+    selectorWidth: opts.selectorWidth !== undefined ? parseInt(opts.selectorWidth, 10) : undefined,
+    selectorSingleLine: opts.selectorSingleLine,
   });
 
   const ast = parseCSS(cssString);
@@ -146,6 +151,11 @@ export async function main() {
     .option('--base <dir>', 'Base directory for preserving output structure')
     .option('-w, --watch', 'Watch input files for changes')
     .option('--dedupe', 'Remove duplicate rules and declarations', { default: false })
+      .option('--selector-strategy <strategy>', 'Selector list strategy: is or multiply')
+      .option('--scope-strategy <strategy>', 'Scope desugaring: native or downlevel')
+      .option('--value-format <format>', 'Value formatting: preserve or single-line')
+      .option('--selector-width <number>', 'Max column width before wrapping selector lists')
+      .option('--selector-single-line', 'Force selector lists onto a single line')
     .action(async (files, options) => {
       if (!files || files.length === 0) {
         if (!process.stdin.isTTY) {
@@ -179,6 +189,26 @@ export async function main() {
         const d = parseInt(options.depth, 10);
         if (!Number.isFinite(d) || d < 0) {
           console.error(pc.red('Error:') + ' --depth must be a non-negative integer');
+          process.exit(1);
+        }
+      }
+
+      if (options.selectorStrategy !== undefined && !['is', 'multiply'].includes(options.selectorStrategy)) {
+        console.error(pc.red('Error:') + ' --selector-strategy must be "is" or "multiply"');
+        process.exit(1);
+      }
+      if (options.scopeStrategy !== undefined && !['native', 'downlevel'].includes(options.scopeStrategy)) {
+        console.error(pc.red('Error:') + ' --scope-strategy must be "native" or "downlevel"');
+        process.exit(1);
+      }
+      if (options.valueFormat !== undefined && !['preserve', 'single-line'].includes(options.valueFormat)) {
+        console.error(pc.red('Error:') + ' --value-format must be "preserve" or "single-line"');
+        process.exit(1);
+      }
+      if (options.selectorWidth !== undefined) {
+        const w = parseInt(options.selectorWidth, 10);
+        if (!Number.isFinite(w) || w < 20 || w > 160) {
+          console.error(pc.red('Error:') + ' --selector-width must be a number between 20 and 160');
           process.exit(1);
         }
       }
