@@ -769,6 +769,29 @@ describe('parseCSS structure', () => {
       '@scope (.card) to (.content){.card .title{color:red}}'
     );
   });
+
+  it('keeps the scoping-root reference when denesting an @scope', () => {
+    // Expanding `&` to `#app` would stop matching: the scoping root is
+    // excluded from the styles scoped beneath it.
+    assert.equal(
+      renderMode('@scope (#app) { & { color: red; } }', 'denest-minify'),
+      '@scope (#app){&{color:red}}'
+    );
+  });
+
+  it('nests a scoping-root rule back under its @scope', () => {
+    assert.equal(
+      renderMode('@scope (#app) { & { color: red; > main { display: flex; } } }', 'nest-minify'),
+      '@scope (#app){&{color:red;>main{display:flex}}}'
+    );
+  });
+
+  it('does not re-apply a relative @scope prelude to its descendants', () => {
+    assert.equal(
+      renderMode('@scope (#app) { @scope (& > main) { .title { color: red; } } }', 'denest-minify'),
+      '@scope (#app){@scope (& > main){& .title{color:red}}}'
+    );
+  });
 });
 
 const IDEMPOTENCE_CORPUS = [
@@ -1730,5 +1753,166 @@ body {
         assert.equal(twice, once, `${mode} is not idempotent for ${css}`);
       }
     }
+  });
+});
+
+describe('Nest mode comment and media placement', () => {
+  const fixture = `:root { --x: 1px; }
+
+.header-controls {
+    display: flex;
+    gap: 1rem;
+
+    @media (width < 1024px) {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.header-btn {
+    cursor: pointer;
+    padding: 1rem 1.75ch;
+
+    @media not (prefers-reduced-motion: reduce) {
+        transition: background-position 0.125s ease-out, translate 0.2s, filter 0.2s;
+    }
+
+    &#settings-toggle svg {
+        vertical-align: middle;
+    }
+}
+
+#mainSettings {
+    position: absolute;
+    translate: 4rem;
+
+    @media (width < 1024px) {
+        left: 0;
+        right: 0;
+        width: 100%;
+        translate: 0;
+    }
+}
+
+#mainSettings > section {
+    border-radius: 2rem;
+    padding: 2rem;
+
+    @media (width < 1024px) {
+        padding: 1.25rem;
+    }
+}
+
+#mainSettings > section > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+        display: grid;
+
+        > span {
+            font-size: 1.125rem;
+        }
+
+        > div {
+            display: flex;
+            flex-direction: row;
+
+            > :first-child {
+                flex: 1;
+            }
+        }
+    }
+}
+
+/* Dropdown list - quickly-specific visuals */
+#mainSettings .dropdown > ul {
+    background: rgb(from color-mix(in srgb, var(--shades-darkest), var(--pri-colour-darkest) 75%) r g b / 0.75);
+    backdrop-filter: blur(25px);
+}
+
+/* Stepper - quickly uses inline arrows */
+#mainSettings .number > output > input {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    width: 2ch;
+}
+
+/* Override UA's absolute stepper arrows */
+#mainSettings .number > output > input ~ div {
+    position: static;
+    translate: none;
+}
+
+/* Toggle - quickly uses full-coverage invisible input */
+#mainSettings .toggle {
+    overflow: hidden;
+}
+
+#code-editor-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: var(--header-top) 2rem 2rem 2rem;
+    gap: 2rem;
+
+    @media (width < 1024px) {
+        padding-left: var(--margin-gap);
+        padding-right: var(--margin-gap);
+        gap: 1.625rem;
+    }
+
+    > #code-editor {
+        flex: 1;
+        max-width: 100%;
+        display: flex;
+        margin: 2rem;
+
+        .editorTab {
+            line-height: 100%;
+            color: rgb(from var(--shades-medium) r g b / 50%);
+            font-size: 1rem;
+
+            > .tabButtons > button {
+                height: 2rem;
+                width: 2rem;
+
+                @media not (prefers-reduced-motion: reduce) {
+                    transition: 0.1s;
+                }
+            }
+        }
+    }
+}`;
+
+  it('attaches comments to their rules instead of orphaning them at the root', () => {
+    const output = renderMode(fixture, 'nest', { preserveComments: true });
+    for (const comment of [
+      '/* Dropdown list - quickly-specific visuals */',
+      '/* Stepper - quickly uses inline arrows */',
+      '/* Override UA\'s absolute stepper arrows */',
+      '/* Toggle - quickly uses full-coverage invisible input */',
+    ]) {
+      assert.ok(output.includes('\t' + comment), `comment is not attached to a rule: ${comment}`);
+      assert.ok(!output.includes('\n' + comment + '\n'), `comment was left at the root: ${comment}`);
+    }
+  });
+
+  it('keeps responsive media queries nested inside their rules', () => {
+    const output = renderMode(fixture, 'nest');
+    assert.ok(output.includes('\t@media (width < 1024px) {\n\t\twidth: 100%;'));
+    assert.ok(output.includes('\t@media not (prefers-reduced-motion: reduce) {\n\t\ttransition: background-position'));
+    assert.ok(output.includes('\t@media (width < 1024px) {\n\t\tpadding-left: var(--margin-gap);'));
+    assert.ok(output.includes('\t\t\t\t@media not (prefers-reduced-motion: reduce) {\n\t\t\t\t\ttransition: 0.1s;'));
+  });
+
+  it('is idempotent on the fixture', () => {
+    const once = renderMode(fixture, 'nest');
+    const twice = renderMode(once, 'nest');
+    assert.equal(twice, once);
   });
 });

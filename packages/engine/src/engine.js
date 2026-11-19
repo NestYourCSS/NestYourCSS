@@ -1347,7 +1347,21 @@ export function denestCSS(ast, preserveWrappers = false) {
             flushDeclarations();
 
             if (node.type === 'Rule') {
-                const newSelector = combineSelectors(context.selector, node.selector);
+                // Inside an @scope, a rule whose selector is the scope root
+                // must not be combined with the scope root again.
+                const inScope = !!context.inScope || (context.atRule && String(context.atRule.name).toLowerCase() === 'scope');
+                const scopeRootText = inScope ? (context.scopeRootText || (context.selector ? stringifySelector(context.selector) : '')) : '';
+                const atScopeRoot = inScope && scopeRootText !== '' && !!context.selector && stringifySelector(context.selector) === scopeRootText;
+                const childText = stringifySelector(node.selector);
+                // A rule written with `&` at the top of an @scope targets the
+                // scoping root itself. Expanding it to the literal root would
+                // stop matching, because the root is excluded from the styles
+                // scoped beneath it, so keep `&` as the root reference.
+                const referencesScopeRoot = atScopeRoot && childText.includes('&');
+                const alreadyQualified = inScope && !referencesScopeRoot && scopeRootText !== '' && (childText === scopeRootText || (childText.startsWith(scopeRootText) && !/[a-zA-Z0-9_-]/.test(childText[scopeRootText.length] || '')) || scopeRootText.endsWith(childText));
+                const newSelector = referencesScopeRoot
+                    ? combineSelectors(parseSelector('&'), node.selector)
+                    : alreadyQualified ? cloneASTNode(node.selector) : combineSelectors(context.selector, node.selector);
                 const newContext = { ...context, selector: newSelector };
                 const childNodes = _denest(node.body, newContext);
                 
@@ -1389,18 +1403,34 @@ export function denestCSS(ast, preserveWrappers = false) {
                 const newAtRuleContext = { name: node.name, params: combinedAtRuleParams };
 
                 let childSelector = context.selector;
+                const parentInScope = !!context.inScope;
+                let thisInScope = parentInScope;
                 if (nodeName === 'scope') {
                     const scopeRoot = getScopeRoot(combinedAtRuleParams);
                     if (scopeRoot) {
-                        try { childSelector = parseSelector(scopeRoot); } catch (e) { childSelector = context.selector; }
+                        // A plain root (`.card`, `#siteWrapper`) can prefix
+                        // descendant selectors to produce fully denested
+                        // output. A relative root (`& > main`) must not be
+                        // re-applied as a prefix: inside the new scope, `&`
+                        // already refers to that scope root, so prefix with
+                        // `&` instead.
+                        const isRelative = scopeRoot.includes('&') || /^[>+~]/.test(scopeRoot.trim());
+                        try {
+                            childSelector = isRelative ? parseSelector('&') : parseSelector(scopeRoot);
+                        } catch (e) {
+                            childSelector = context.selector;
+                        }
                     } else {
                         childSelector = null;
                     }
+                    thisInScope = true;
                 }
 
                 const childContext = {
                     selector: childSelector,
                     atRule: newAtRuleContext,
+                    inScope: thisInScope,
+                    scopeRootText: nodeName === 'scope' && childSelector ? stringifySelector(childSelector) : context.scopeRootText,
                 };
                 
                 const childNodes = _denest(node.body, childContext);
@@ -1546,6 +1576,61 @@ function findIsListNestingRelationship(parentGroups, childGroups) {
 function findNestingRelationship(parentGroups, childGroups) {
     const parentStr = stringifySelector(parentGroups);
     const childStr = stringifySelector(childGroups);
+
+    // `:is(... > &)` (optionally with a suffix such as `::before`) inside a
+    // parent should stay nested in that parent. The denested form is
+    // `:is(... > parent)suffix`, so re-nest it as `:is(... > &)suffix`.
+    const isWrapped = childGroups.map((group) => {
+        const first = group.parts[0];
+        if (typeof first !== 'string' || !first.startsWith(':is(')) return null;
+        let depth = 1;
+        let end = -1;
+        for (let k = 4; k < first.length; k++) {
+            if (first[k] === '(') depth++;
+            else if (first[k] === ')') {
+                depth--;
+                if (depth === 0) { end = k; break; }
+            }
+        }
+        if (end === -1) return null;
+        return { inner: first.slice(4, end), suffix: first.slice(end + 1) };
+    });
+    if (isWrapped.every(Boolean) && parentGroups.length === childGroups.length) {
+        const newGroups = [];
+        for (let gi = 0; gi < childGroups.length; gi++) {
+            const { inner, suffix } = isWrapped[gi];
+            const innerCompact = inner.replace(/\s+/g, '');
+            const parentGroup = parentGroups[gi];
+            let parentCompact = stringifySelector([parentGroup]).replace(/\s+/g, '');
+            // The parent may already carry the same pseudo-element suffix
+            // (e.g. `#x::before`); strip it so the inner selector matches.
+            if (suffix && parentCompact.endsWith(suffix)) {
+                parentCompact = parentCompact.slice(0, parentCompact.length - suffix.length);
+            }
+            // When the parent is a selector list, `&` denests to
+            // `:is(list)`, so also accept that wrapper.
+            const parentListExpression = parentGroups.length > 1
+                ? ':is(' + parentGroups.map(g => g.parts.join('')).join(',') + ')'
+                : null;
+            const parentListCompact = parentListExpression !== null ? parentListExpression.replace(/\s+/g, '') : null;
+            let matchedSuffix = null;
+            if (innerCompact.endsWith(parentCompact)) {
+                matchedSuffix = parentCompact;
+            } else if (parentListCompact !== null && innerCompact.endsWith(parentListCompact)) {
+                matchedSuffix = parentListCompact;
+            }
+            if (matchedSuffix === null) { newGroups.length = 0; break; }
+            const prefix = innerCompact.slice(0, innerCompact.length - matchedSuffix.length);
+            newGroups.push({ parts: [':is(' + prefix + '&)' + suffix], newlinesBefore: 0 });
+        }
+        if (newGroups.length > 0) {
+            try {
+                return { type: 'NEST', newSelector: newGroups };
+            } catch (e) {
+                // fall through to normal matching
+            }
+        }
+    }
 
     if (parentStr === childStr) {
         return { type: 'MERGE', newSelector: parentGroups };
@@ -1698,7 +1783,7 @@ export function renestCSS(ast) {
         if (!node.body || node.body.length === 0) {
             return;
         }
-        
+
         const body = node.body;
         const n = body.length;
         const parentOf = new Int32Array(n).fill(-1);
@@ -1732,6 +1817,57 @@ export function renestCSS(ast) {
                     if (isPrefix) {
                         if (!isPrefixMap.has(isPrefix)) isPrefixMap.set(isPrefix, []);
                         isPrefixMap.get(isPrefix).push(i);
+                    }
+
+                    // A flattened `:is(... > &)` rule should be able to re-nest
+                    // into the parent it was originally nested under. Register
+                    // the inner selector's tokens so candidate matching finds it.
+                    if (typeof first === 'string' && first.startsWith(':is(')) {
+                        try {
+                            let depth = 1;
+                            let closeIdx = -1;
+                            for (let k = 4; k < first.length; k++) {
+                                if (first[k] === '(') depth++;
+                                else if (first[k] === ')') { depth--; if (depth === 0) { closeIdx = k; break; } }
+                            }
+                            const innerText = closeIdx === -1 ? first.slice(4) : first.slice(4, closeIdx);
+                            const innerSuffix = closeIdx === -1 ? '' : first.slice(closeIdx + 1);
+                            const tokensToRegister = [];
+                            tokensToRegister.push(...parseSelector(innerText));
+                            // Register tokens from any nested `:is(...)` lists
+                            // (the denested form of `&` under a selector list).
+                            for (let s = 0; s < innerText.length; s++) {
+                                if (innerText.startsWith(':is(', s)) {
+                                    let d = 1;
+                                    let e = -1;
+                                    for (let k = s + 4; k < innerText.length; k++) {
+                                        if (innerText[k] === '(') d++;
+                                        else if (innerText[k] === ')') { d--; if (d === 0) { e = k; break; } }
+                                    }
+                                    if (e !== -1) {
+                                        try { tokensToRegister.push(...parseSelector(innerText.slice(s + 4, e))); } catch (err) { /* ignore */ }
+                                        s = e;
+                                    }
+                                }
+                            }
+                            for (const innerGroup of tokensToRegister) {
+                                const innerFirst = innerGroup.parts[0];
+                                const innerLast = innerGroup.parts.at(-1);
+                                if (!firstTokenMap.has(innerFirst)) firstTokenMap.set(innerFirst, []);
+                                firstTokenMap.get(innerFirst).push(i);
+                                if (!lastTokenMap.has(innerLast)) lastTokenMap.set(innerLast, []);
+                                lastTokenMap.get(innerLast).push(i);
+                                // The parent may carry a pseudo-element suffix
+                                // (e.g. `::before`) that the `:is()` inner lacks.
+                                const suffixedLast = innerLast + innerSuffix;
+                                if (suffixedLast !== innerLast) {
+                                    if (!lastTokenMap.has(suffixedLast)) lastTokenMap.set(suffixedLast, []);
+                                    lastTokenMap.get(suffixedLast).push(i);
+                                }
+                            }
+                        } catch (e) {
+                            // ignore malformed :is() contents
+                        }
                     }
                 }
             }
@@ -1924,8 +2060,16 @@ export function renestCSS(ast) {
         }
 
         const newBody = [];
+        let pendingComments = [];
         for (let i = 0; i < n; i++) {
+            if (body[i].type === 'Comment') {
+                pendingComments.push(body[i]);
+                continue;
+            }
+
             if (parentOf[i] === -1) {
+                newBody.push(...pendingComments);
+                pendingComments = [];
                 newBody.push(body[i]);
             } else {
                 const parentIdx = parentOf[i];
@@ -1934,16 +2078,29 @@ export function renestCSS(ast) {
                 const rel = rels[i];
 
                 parentNode.body = parentNode.body || [];
+                if (pendingComments.length > 0) {
+                    const movedComments = pendingComments.map((comment) => cloneASTNode(comment));
+                    childNode.body = [...movedComments, ...(childNode.body || [])];
+                    pendingComments = [];
+                }
+
                 if (rel.type === 'MERGE') {
-                    const topMostRule = childNode.body.find((node) => ['Rule', 'AtRule'].includes(node.type));
-                    if (parentNode.body.length > 0 && topMostRule) topMostRule.spacesAbove = 1;
+                    for (const movedNode of childNode.body) {
+                        if ((movedNode.type === 'Rule' || movedNode.type === 'AtRule') && parentNode.body.length > 0) {
+                            movedNode.spacesAbove = 1;
+                        }
+                    }
                     parentNode.body.push(...childNode.body);
                 } else {
+                    if (parentNode.body.length > 0 && (childNode.type === 'Rule' || childNode.type === 'AtRule')) {
+                        childNode.spacesAbove = 1;
+                    }
                     childNode.selector = rel.newSelector;
                     parentNode.body.push(childNode);
                 }
             }
         }
+        newBody.push(...pendingComments);
         node.body = newBody;
 
         for (const childNode of node.body) {
@@ -1953,7 +2110,104 @@ export function renestCSS(ast) {
         }
     }
 
+
+
+    nestHoistedAtRules(ast);
     _renest(ast, 0);
+
+
+    function stringifySelectorForNesting(groups) {
+        return groups.map((group) => (group.parts || []).join('')).join(', ');
+    }
+
+    function nestHoistedAtRules(root) {
+        if (!root || !Array.isArray(root.body)) return;
+
+        const oldBody = root.body;
+        const newBody = [];
+        let pendingComments = [];
+
+        for (let i = 0; i < oldBody.length; i++) {
+            const node = oldBody[i];
+
+            if (node.type === 'Comment') {
+                pendingComments.push(node);
+                continue;
+            }
+
+            // Only nest hoisted at-rules whose body is a flat list of rules.
+            // At-rules that wrap nested at-rules (e.g. @media { @scope { ... } })
+            // or multiple unrelated scopes must stay hoisted to preserve semantics.
+            const hasNestedAtRule = Array.isArray(node.body) && node.body.some((child) => child.type === 'AtRule');
+            if (node.type === 'AtRule' && Array.isArray(node.body) && !hasNestedAtRule && node.body.some((child) => child.type === 'Rule')) {
+                const matchedRules = node.body.filter((child) => child.type === 'Rule');
+                const parents = new Map();
+
+
+                function findParentRule(selectorGroups) {
+                    const selector = stringifySelectorForNesting(selectorGroups);
+
+                    // Prefer the rule whose selector is exactly the media's
+                    // inner selector. Otherwise a shorter prefix such as
+                    // `#code-editor-wrapper` can steal a media that belongs to
+                    // `#code-editor-wrapper > #code-editor`.
+                    const exactMatches = oldBody.filter(c => c.type === 'Rule' && stringifySelectorForNesting(c.selector) === selector);
+                    const preferredExact = exactMatches.find(c => c.body && c.body.length > 0) || exactMatches[0];
+                    if (preferredExact) return preferredExact;
+
+                    const prefixMatches = oldBody.filter(c => c.type === 'Rule' && findNestingRelationship(c.selector, selectorGroups));
+                    const preferredPrefix = prefixMatches.find(c => c.body && c.body.length > 0) || prefixMatches[0];
+                    if (preferredPrefix) return preferredPrefix;
+
+                    return null;
+                }
+
+                for (const rule of matchedRules) {
+                    const parent = findParentRule(rule.selector);
+
+                    if (!parent) {
+                        parents.clear();
+                        break;
+                    }
+
+                    if (!parents.has(parent)) parents.set(parent, []);
+                    parents.get(parent).push(rule);
+                }
+
+                if (parents.size > 0) {
+                    let firstParent = true;
+                    for (const [parent, rules] of parents) {
+                        const nestedAtRule = cloneASTNode(node);
+                        nestedAtRule.body = [];
+                        for (const rule of rules) {
+                            nestedAtRule.body.push(...cloneASTNode(rule.body || []));
+                        }
+
+                        if (firstParent) {
+                            const movedComments = pendingComments.map((comment) => cloneASTNode(comment));
+                            nestedAtRule.body = [...movedComments, ...nestedAtRule.body];
+                            firstParent = false;
+                        }
+
+                        nestedAtRule.spacesAbove = parent.body && parent.body.length > 0 ? 1 : 0;
+                        parent.body = parent.body || [];
+                        parent.body.push(nestedAtRule);
+                    }
+
+                    pendingComments = [];
+                    continue;
+                }
+            }
+
+            newBody.push(...pendingComments);
+            pendingComments = [];
+            newBody.push(node);
+        }
+
+        newBody.push(...pendingComments);
+        root.body = newBody;
+    }
+
 
     function removeEmptyRules(node) {
         if (!node || !node.body) return;
