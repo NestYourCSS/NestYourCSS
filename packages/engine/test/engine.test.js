@@ -16,18 +16,22 @@ function resetEngine(overrides = {}) {
 
 beforeEach(() => resetEngine());
 
+function stripTrailingNewline(value) {
+  return typeof value === 'string' && value.endsWith('\n') ? value.slice(0, -1) : value;
+}
+
 function nest(input, maxDepth) {
   configureEngine({ maxDepth, indentChar: '\t' });
   const ast = parseCSS(input);
   renestCSS(ast);
-  return beautifyCSS(ast);
+  return stripTrailingNewline(beautifyCSS(ast));
 }
 
 function nestWithStrategy(input, maxDepth, strategy) {
   configureEngine({ maxDepth, indentChar: '\t', strategy });
   const ast = parseCSS(input);
   renestCSS(ast);
-  return beautifyCSS(ast);
+  return stripTrailingNewline(beautifyCSS(ast));
 }
 
 function nestingDepth(css) {
@@ -271,12 +275,12 @@ describe('nesting strategies', () => {
 
 function denest(input) {
   configureEngine({ maxDepth: Infinity, indentChar: '\t', preserveComments: false, deduplicate: false });
-  return minifyCSS(denestCSS(parseCSS(input)));
+  return stripTrailingNewline(minifyCSS(denestCSS(parseCSS(input))));
 }
 
 function minify(input) {
   configureEngine({ maxDepth: Infinity, indentChar: '\t', preserveComments: false, deduplicate: false });
-  return minifyCSS(parseCSS(input));
+  return stripTrailingNewline(minifyCSS(parseCSS(input)));
 }
 
 describe('denesting & under selector lists (issue #14)', () => {
@@ -415,7 +419,7 @@ describe('nest round-trip of generated :is() selectors', () => {
     const ast = parseCSS(input);
     denestCSS(ast);
     renestCSS(ast);
-    return minifyCSS(ast);
+    return stripTrailingNewline(minifyCSS(ast));
   }
 
   it('nests a generated :is() child selector back under its parent list', () => {
@@ -459,12 +463,12 @@ function renderMode(input, mode, overrides = {}) {
   const ast = parseCSS(input);
 
   switch (mode) {
-    case 'beautify': return beautifyCSS(ast);
-    case 'minify': return minifyCSS(ast);
-    case 'denest': return beautifyCSS(denestCSS(ast));
-    case 'denest-minify': return minifyCSS(denestCSS(ast));
-    case 'nest': return beautifyCSS(renestCSS(ast));
-    case 'nest-minify': return minifyCSS(renestCSS(ast));
+    case 'beautify': return stripTrailingNewline(beautifyCSS(ast));
+    case 'minify': return stripTrailingNewline(minifyCSS(ast));
+    case 'denest': return stripTrailingNewline(beautifyCSS(denestCSS(ast)));
+    case 'denest-minify': return stripTrailingNewline(minifyCSS(denestCSS(ast)));
+    case 'nest': return stripTrailingNewline(beautifyCSS(renestCSS(ast)));
+    case 'nest-minify': return stripTrailingNewline(minifyCSS(renestCSS(ast)));
     default: throw new Error(`Unknown mode: ${mode}`);
   }
 }
@@ -1914,5 +1918,149 @@ describe('Nest mode comment and media placement', () => {
     const once = renderMode(fixture, 'nest');
     const twice = renderMode(once, 'nest');
     assert.equal(twice, once);
+  });
+});
+
+describe('trailing newline and comment formatting', () => {
+  it('beautifyCSS appends exactly one trailing newline', () => {
+    resetEngine();
+    const ast = parseCSS('.a { color: red; }');
+    const out = beautifyCSS(ast);
+    assert.ok(out.endsWith('\n'));
+    assert.ok(!out.endsWith('\n\n'));
+    assert.equal(out, out.trimEnd() + '\n');
+  });
+
+  it('minifyCSS appends exactly one trailing newline', () => {
+    resetEngine();
+    const ast = parseCSS('.a { color: red; }');
+    const out = minifyCSS(ast);
+    assert.ok(out.endsWith('\n'));
+    assert.ok(!out.endsWith('\n\n'));
+    assert.equal(out, out.trimEnd() + '\n');
+  });
+
+  it('denestCSS output ends with exactly one newline', () => {
+    resetEngine();
+    const ast = parseCSS('.a { color: red; }');
+    const out = beautifyCSS(denestCSS(ast));
+    assert.ok(out.endsWith('\n'));
+    assert.ok(!out.endsWith('\n\n'));
+  });
+
+  it('renestCSS output ends with exactly one newline', () => {
+    resetEngine();
+    const ast = parseCSS('.a { color: red; }');
+    const out = beautifyCSS(renestCSS(ast));
+    assert.ok(out.endsWith('\n'));
+    assert.ok(!out.endsWith('\n\n'));
+  });
+
+  it('repeated beautify passes do not accumulate newlines', () => {
+    resetEngine();
+    const first = beautifyCSS(parseCSS('.a { color: red; }'));
+    const second = beautifyCSS(parseCSS(first));
+    assert.equal(second, first);
+  });
+
+  it('empty output is empty', () => {
+    resetEngine();
+    const ast = parseCSS('');
+    assert.equal(beautifyCSS(ast), '');
+    assert.equal(minifyCSS(ast), '');
+  });
+
+  it('formats multiline block comments without /* * corruption', () => {
+    resetEngine({ preserveComments: true, indentChar: '\t' });
+    const css = '.a {\n  /*   \n   * Remove the slide in animation  \n   * And make the editors stack  \n   */\n  color: red;\n}';
+    const out = beautifyCSS(parseCSS(css));
+    assert.ok(!out.includes('/* *'), 'comment must not be corrupted into /* *');
+    assert.ok(out.includes('/*'), 'opening comment marker missing');
+    assert.ok(out.includes('*/'), 'closing comment marker missing');
+    assert.ok(out.includes('Remove the slide in animation'), 'comment text missing');
+    assert.ok(out.includes('And make the editors stack'), 'comment text missing');
+  });
+
+  it('indents multiline comments to current nesting', () => {
+    resetEngine({ preserveComments: true, indentChar: '\t', maxDepth: Infinity });
+    const css = '.a {\n  /* line one \n   * line two \n   */\n  color: red;\n}';
+    const ast = parseCSS(css);
+    renestCSS(ast);
+    const out = beautifyCSS(ast);
+    // nested under .a, the comment lines should carry the rule indent
+    assert.ok(out.includes('\t/*'), 'comment should be indented under the rule');
+  });
+});
+describe('comment formatting variants', () => {
+  function bc(css) {
+    resetEngine({ preserveComments: true, indentChar: '\t', maxDepth: Infinity });
+    return beautifyCSS(parseCSS(css));
+  }
+
+  it('no padding normalizes to single spaces', () => {
+    assert.ok(bc('.a { /*clean*/ color: red; }').includes('/* clean */'));
+  });
+
+  it('excessive padding trims to one space', () => {
+    assert.ok(bc('.a { /*   wide   */ color: red; }').includes('/* wide */'));
+  });
+
+  it('leading newline collapses to single line', () => {
+    assert.ok(bc('.a { /*\nHello world */ color: red; }').includes('/* Hello world */'));
+  });
+
+  it('trailing newline collapses to single line', () => {
+    assert.ok(bc('.a { /* Hello world\n*/ color: red; }').includes('/* Hello world */'));
+  });
+
+  it('padded newlines collapse to single line', () => {
+    assert.ok(bc('.a { /*\n Hello world \n*/ color: red; }').includes('/* Hello world */'));
+  });
+
+  it('empty /**/ normalizes to /* */', () => {
+    assert.ok(bc('.a { /**/ color: red; }').includes('/* */'));
+  });
+
+  it('empty /*   */ normalizes to /* */', () => {
+    assert.ok(bc('.a { /*   */ color: red; }').includes('/* */'));
+  });
+
+  it('empty /*\\n*/ normalizes to /* */', () => {
+    assert.ok(bc('.a { /*\n*/ color: red; }').includes('/* */'));
+  });
+
+  it('jsdoc asterisk block stays multiline and indented', () => {
+    const out = bc('.card {\n/*\n* Title\n* Desc\n*/\n  color: red;\n}');
+    assert.ok(out.includes('\t/*\n\t * Title\n\t * Desc\n\t */'));
+  });
+
+  it('plain multiline block stays multiline without asterisks', () => {
+    const out = bc('.card {\n/*\nLine one\nLine two\n*/\n  color: red;\n}');
+    assert.ok(out.includes('\t/*\n\tLine one\n\tLine two\n\t*/'));
+  });
+
+  it('divider art is preserved verbatim', () => {
+    const out = bc('.card {\n/********************/\n/* SECTION */\n/********************/\n  color: red;\n}');
+    assert.ok(out.includes('\t/********************/'));
+    assert.ok(out.includes('\t/* SECTION */'));
+  });
+
+  it('trailing comment spacing normalized to one space', () => {
+    const out = bc('.a { width: 100px;/*comment*/\nheight: 200px;     /* wide gap */ }');
+    assert.ok(out.includes('width: 100px; /* comment */'));
+    assert.ok(out.includes('height: 200px; /* wide gap */'));
+  });
+
+  it('inter-token comment preserved without spaces', () => {
+    assert.ok(bc('.a { color/*:*/: red; }').includes('color/*:*/: red;'));
+  });
+
+  it('bang license normalizes padding', () => {
+    assert.ok(bc('/*!  Package License v1.0.0  */\n.a { color: red; }').includes('/*! Package License v1.0.0 */'));
+  });
+
+  it('single line comment collapses', () => {
+    const out = bc('/*\nThe actual main CSS file for this website */');
+    assert.equal(out.trim(), '/* The actual main CSS file for this website */');
   });
 });

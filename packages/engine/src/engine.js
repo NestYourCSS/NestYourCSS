@@ -520,7 +520,8 @@ export function parseCSS(cssString) {
                     pos++;
                 }
 
-                if (_preserveComments) {
+                const isBangComment = cssString.substring(commentStart, pos).trimStart().startsWith('!');
+                if (_preserveComments || isBangComment) {
                     const lastNode = context.body.at(-1);
 
                     const isFirstNodeInBlock = typeof lastNode === 'undefined';
@@ -531,9 +532,13 @@ export function parseCSS(cssString) {
                     const shouldUseDefaultFormatterBehavior = isInSpecialPosition && isInline;
                     const clampedSpacesAbove = Math.max(0, Math.min(spacesAbove, 1));
                     
+                    const commentEnd = pos < len ? pos + 2 : len;
                     const commentNode = {
                         type: 'Comment',
                         value: cssString.substring(commentStart, pos).trim(),
+                        // Keep the full original comment so the beautifier can
+                        // preserve its multiline shape and indentation.
+                        raw: cssString.substring(commentStart - 2, commentEnd),
                         spacesAbove: shouldUseDefaultFormatterBehavior ? initSpacesAbove : (['Rule', 'AtRule'].includes(lastNode?.type) ? 1 : clampedSpacesAbove)
                     };
                     context.body.push(commentNode);
@@ -682,7 +687,12 @@ export function parseCSS(cssString) {
         const leadingTrim = rawSegment.length - rawSegment.trimStart().length;
 
         const declarationSpacesAbove = Math.max(0, Math.min(spacesAbove, 1));
+        const lastHasComment = lastNode !== undefined && (
+            String(lastNode.property ?? '').includes('/*') ||
+            JSON.stringify(lastNode.value ?? '').includes('/*')
+        );
         if (typeof lastNode === 'undefined') spacesAbove = Math.max(-1, Math.min(spacesAbove, 1));
+        else if (curlyFound && lastNode?.type === 'Declaration' && lastHasComment) spacesAbove = 1;
         else if (['Rule', 'AtRule'].includes(lastNode?.type)) spacesAbove = 1;
         else spacesAbove = Math.max(0, Math.min(spacesAbove, 1));
 
@@ -883,7 +893,8 @@ export function minifyCSS(ast) {
         }).join('');
     }
 
-    return factorIsSelectors(_minify(ast));
+    const output = factorIsSelectors(_minify(ast));
+    return output ? output + '\n' : '';
 }
 
 function beautifyMathContent(content) {
@@ -926,6 +937,89 @@ function beautifyMathContent(content) {
     }
     flush();
     return result.replace(/\s+/g, ' ').trim();
+}
+
+function isArtComment(raw) {
+    // Detect decorative headers/dividers/ASCII art that must be preserved.
+    if (/[|+]/.test(raw)) return true;
+    // Repeated punctuation runs (****, ----, ====, ####) of 4+ chars.
+    if (/[*\-=#]{4,}/.test(raw)) return true;
+    // Box-drawing or slash runs.
+    if (/\/{3,}/.test(raw)) return true;
+    return false;
+}
+
+function beautifyComment(comment, indent) {
+    const raw = typeof comment.raw === 'string' ? comment.raw : null;
+    const value = String(comment.value ?? '');
+
+    // Protected art/divider blocks: preserve inner whitespace verbatim,
+    // only re-anchoring the whole block to the current indent.
+    if (raw !== null && isArtComment(raw)) {
+        const lines = raw.split(/\r?\n/).map((line) => line.replace(/[ \t]+$/, ''));
+        return lines.map((line, i) => (i === 0 ? line : indent + line)).join('\n');
+    }
+
+    // Protected (bang) comments keep `!` glued to `/*`.
+    if (value.trimStart().startsWith('!')) {
+        const inner = value.trim().replace(/^!\s*/, '! ');
+        return `/*${inner} */`.replace('/* ! */', '/* ! */');
+    }
+
+    // Collapse comments whose text fits on a single line, even if the
+    // original `/*` was on its own line. Only preserve a multiline block
+    // shape when the comment text itself spans multiple lines.
+    if (raw === null || !value.includes('\n')) {
+        if (value.trim() === '') return '/* */';
+        return `/* ${value.trim()} */`;
+    }
+
+    let inner = raw.replace(/\r\n?/g, '\n');
+    if (inner.startsWith('/*')) inner = inner.slice(2);
+    if (inner.endsWith('*/')) inner = inner.slice(0, -2);
+
+    const lines = inner.split('\n').map((line) => line.replace(/[ \t]+$/, ''));
+    while (lines.length > 0 && lines[0].trim() === '') lines.shift();
+    while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
+    if (lines.length === 0) return '/* */';
+
+    const blockStyle = raw !== null && /\/\*\s*\n/.test(raw);
+    const first = lines[0].trim();
+    let opening = '/*';
+    let contentLines = lines;
+    if (!blockStyle && first !== '' && !first.startsWith('*')) {
+        opening = `/* ${first}`;
+        contentLines = lines.slice(1);
+    }
+
+    const indents = contentLines
+        .filter((line) => line.trim() !== '')
+        .map((line) => (line.match(/^[ \t]*/) || [''])[0].length);
+    const commonIndent = indents.length > 0 ? Math.min(...indents) : 0;
+
+    let hasAsterisk = false;
+    let lastContent = '';
+    let result = opening;
+    for (const line of contentLines) {
+        if (line.trim() === '') {
+            result += '\n' + indent;
+            continue;
+        }
+        const lineIndent = (line.match(/^[ \t]*/) || [''])[0].length;
+        const content = line.slice(Math.min(commonIndent, lineIndent));
+        const trimmedContent = content.replace(/[ \t]+$/, '');
+        if (trimmedContent.startsWith('*')) hasAsterisk = true;
+        const separator = trimmedContent.startsWith('*') ? ' ' : '';
+        result += '\n' + indent + separator + trimmedContent;
+        lastContent = trimmedContent;
+    }
+    const closing = hasAsterisk ? ' */' : '*/';
+    if (lastContent.endsWith('}')) {
+        result += ' ' + closing.trimStart();
+    } else {
+        result += '\n' + indent + closing;
+    }
+    return result;
 }
 
 function beautifySelector(groups, indent) {
@@ -1018,7 +1112,7 @@ export function beautifyCSS(ast, initialIndent = '') {
 
             switch (child.type) {
                 case 'Comment':
-                    css += `/* ${child.value} */`;
+                    css += beautifyComment(child, indent);
                     break;
                 case 'Declaration':
                     css += `${child.property}: ${beautifyValue(child.value)};`;
@@ -1052,7 +1146,8 @@ export function beautifyCSS(ast, initialIndent = '') {
         return css;
     }
 
-    return factorIsSelectors(_beautify(ast, initialIndent).trim());
+    const output = factorIsSelectors(_beautify(ast, initialIndent).trim());
+    return output ? output + '\n' : '';
 }
 
 function cloneASTNode(node) {

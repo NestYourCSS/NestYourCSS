@@ -84,7 +84,7 @@ function transformCSS(cssString, opts) {
     case 'minify':
       return minifyCSS(finalAst);
     default:
-      return beautifyCSS(finalAst) + '\n';
+      return beautifyCSS(finalAst);
   }
 }
 

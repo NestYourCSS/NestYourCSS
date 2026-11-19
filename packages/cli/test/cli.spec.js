@@ -66,7 +66,8 @@ describe('@nycss/cli', () => {
 
     const output = readFileSync(outputFile, 'utf-8');
     assert(output.includes('color:red'));
-    assert(!output.includes('\n'));
+    assert.equal(output, output.trimEnd() + '\n');
+    assert(!output.slice(0, -1).includes('\n'));
   });
 
   it('should support --mode denest', () => {
