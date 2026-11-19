@@ -24,6 +24,8 @@ const settingsConfig = {
   valueFormat: { defaultValue: 'preserve' },
   selectorStrategy: { defaultValue: false },
   scopeStrategy: { defaultValue: 'native' },
+  selectorWidth: { defaultValue: 80 },
+  selectorSingleLine: { defaultValue: false },
   showMinimap: { defaultValue: false },
 };
 
@@ -57,6 +59,14 @@ const store = createStore(defaults, {
       window.scopeStrategy = value;
       configureEngine({ scopeStrategy: value });
     },
+    selectorWidth: (value) => {
+      window.selectorWidth = value;
+      configureEngine({ selectorWidth: value });
+    },
+    selectorSingleLine: (value) => {
+      window.selectorSingleLine = value;
+      configureEngine({ selectorSingleLine: value });
+    },
     indentationSize: () => {
       if (window.editorIndentChar?.startsWith(' ') || window.editorIndentChar === '') {
         window.editorIndentChar = ' '.repeat(store.indentationSize);
@@ -72,6 +82,8 @@ configureEngine({
   valueFormat: store.valueFormat,
   selectorStrategy: store.selectorStrategy ? 'multiply' : 'is',
   scopeStrategy: store.scopeStrategy,
+  selectorWidth: store.selectorWidth,
+  selectorSingleLine: store.selectorSingleLine,
 });
 
 window.configureEngine = configureEngine;
@@ -85,6 +97,8 @@ window.coordDisplayMode ??= store.coordinates;
 window.deduplicate ??= store.deduplicate;
 window.valueFormat ??= store.valueFormat;
 window.selectorStrategy ??= store.selectorStrategy ? 'multiply' : 'is';
+window.selectorWidth ??= store.selectorWidth;
+window.selectorSingleLine ??= store.selectorSingleLine;
 window.scopeStrategy ??= store.scopeStrategy;
 
 // Register PWA

@@ -1,4 +1,4 @@
-import { _preserveComments, _indentChar, _maxDepth, _strategy, _deduplicate, _valueFormat, _selectorStrategy, _scopeStrategy, configureEngine } from './config.js';
+import { _preserveComments, _indentChar, _maxDepth, _strategy, _deduplicate, _valueFormat, _selectorStrategy, _scopeStrategy, _selectorWidth, _selectorSingleLine, configureEngine } from './config.js';
 export { configureEngine } from './config.js';
 
 const NESTING_COMBINATORS = ['>', '+', '~', '||'];
@@ -1088,25 +1088,22 @@ function beautifySelector(groups, indent) {
         return result;
     }
 
-    groups.forEach((group, index) => {
-        result += stringifyGroup(group.parts);
-        
-        if (group.commentAfter) {
-            result += ' ' + group.commentAfter;
-        }
-
-        if (index < groups.length - 1) {
-            const nextGroup = groups[index + 1];
-            result += ',';
-            if (nextGroup.newlinesBefore === 1) {
-                result += '\n';
-                result += indent;
-            } else {
-                result += ' ';
-            }
-        }
+    const groupStrings = groups.map((group) => {
+        let s = stringifyGroup(group.parts);
+        if (group.commentAfter) s += ' ' + group.commentAfter;
+        return s;
     });
-    return result;
+
+    const inline = groupStrings.join(', ');
+
+    // Single-line forced or fits within width: keep on one line.
+    if (_selectorSingleLine || (indent.length + inline.length + ' {'.length <= _selectorWidth)) {
+        return inline;
+    }
+
+    // Otherwise wrap every selector onto its own line.
+    if (groupStrings.length <= 1) return inline;
+    return groupStrings.join(',\n' + indent);
 }
 
 function beautifyValue(valueTokens) {

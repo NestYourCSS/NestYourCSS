@@ -11,6 +11,8 @@ const ENGINE_DEFAULTS = {
   valueFormat: 'preserve',
   selectorStrategy: 'is',
   scopeStrategy: 'native',
+  selectorWidth: 80,
+  selectorSingleLine: false,
 };
 
 function resetEngine(overrides = {}) {
@@ -1962,6 +1964,34 @@ describe('engine settings', () => {
     const ast = parseCSS('.a { background: linear-gradient(\n  to right,\n  red,\n  blue\n); }');
     const out = beautifyCSS(ast);
     assert.ok(out.includes('to right'));
+  });
+
+  it('selector wrap: long list wraps each on own line', () => {
+    resetEngine({ selectorWidth: 20, selectorSingleLine: false });
+    const ast = parseCSS('.foo, .bar, .baz, .qux { color: red; }');
+    const out = beautifyCSS(ast);
+    assert.ok(out.includes(',\n'), 'expected wrapping');
+  });
+
+  it('selector wrap: short list stays inline', () => {
+    resetEngine({ selectorWidth: 80, selectorSingleLine: false });
+    const ast = parseCSS('.a, .b { color: red; }');
+    const out = beautifyCSS(ast);
+    assert.ok(out.includes('.a, .b {'), 'expected inline');
+  });
+
+  it('selector wrap: single-line override keeps long list inline', () => {
+    resetEngine({ selectorWidth: 30, selectorSingleLine: true });
+    const ast = parseCSS('.a, .b, .c, .d, .e { color: red; }');
+    const out = beautifyCSS(ast);
+    assert.ok(!out.includes(',\n'), 'expected no wrapping');
+  });
+
+  it('selector wrap: custom width 160 keeps lists inline', () => {
+    resetEngine({ selectorWidth: 160, selectorSingleLine: false });
+    const ast = parseCSS('.a, .b, .c { color: red; }');
+    const out = beautifyCSS(ast);
+    assert.ok(out.includes('.a, .b, .c {'), 'expected inline at wide width');
   });
 });
 

@@ -22,6 +22,8 @@ const store = createStore({
   valueFormat: 'preserve',
   selectorStrategy: false,
   scopeStrategy: 'native',
+  selectorWidth: 80,
+  selectorSingleLine: false,
   showMinimap: false,
 }, {
   key: 'nycss-settings',
@@ -48,11 +50,19 @@ const store = createStore({
       window.scopeStrategy = value;
       configureEngine({ scopeStrategy: value });
     },
+    selectorWidth: (value) => {
+      window.selectorWidth = value;
+      configureEngine({ selectorWidth: value });
+    },
+    selectorSingleLine: (value) => {
+      window.selectorSingleLine = value;
+      configureEngine({ selectorSingleLine: value });
+    },
   },
 });
 
 // Configure engine
-configureEngine({ preserveComments: true, indentChar: '\t', valueFormat: 'preserve', selectorStrategy: 'is', scopeStrategy: 'native' });
+configureEngine({ preserveComments: true, indentChar: '\t', valueFormat: 'preserve', selectorStrategy: 'is', scopeStrategy: 'native', selectorWidth: 80, selectorSingleLine: false });
 
 window.configureEngine = configureEngine;
 
@@ -83,6 +93,8 @@ window.editorIndentChar = '\t';
 window.deduplicate = store.deduplicate;
 window.valueFormat = store.valueFormat;
 window.selectorStrategy = store.selectorStrategy ? 'multiply' : 'is';
+window.selectorWidth = store.selectorWidth;
+window.selectorSingleLine = store.selectorSingleLine;
 window.scopeStrategy = store.scopeStrategy;
 
 // Export store

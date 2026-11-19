@@ -193,6 +193,19 @@
         configureEngine({ selectorStrategy: value ? 'multiply' : 'is' });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
       },
+      selectorWidth: (value) => {
+        configureEngine({ selectorWidth: value });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      selectorSingleLine: (value) => {
+        const stepper = document.getElementById('selectorWidth');
+        if (stepper) {
+          stepper.toggleAttribute('disabled', !!value);
+          stepper.querySelector('input')?.toggleAttribute('disabled', !!value);
+        }
+        configureEngine({ selectorSingleLine: value });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
       scopeStrategy: (value) => {
         configureEngine({ scopeStrategy: value });
         if (window.processAuto && typeof nestCode === 'function') nestCode();

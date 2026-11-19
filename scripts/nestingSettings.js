@@ -147,9 +147,21 @@
         if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       selectorStrategy: (value) => {
-        // toggle: on = multiply, off = is
         const strategy = value ? 'multiply' : 'is';
         window.configureEngine({ selectorStrategy: strategy });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
+      },
+      selectorWidth: (value) => {
+        window.configureEngine({ selectorWidth: value });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
+      },
+      selectorSingleLine: (value) => {
+        const stepper = document.getElementById('selectorWidth');
+        if (stepper) {
+          stepper.toggleAttribute('disabled', !!value);
+          stepper.querySelector('input')?.toggleAttribute('disabled', !!value);
+        }
+        window.configureEngine({ selectorSingleLine: value });
         if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       scopeStrategy: (value) => {

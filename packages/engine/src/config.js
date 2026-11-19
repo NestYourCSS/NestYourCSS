@@ -6,6 +6,8 @@ export let _deduplicate = false;
 export let _valueFormat = 'preserve';
 export let _selectorStrategy = 'is';
 export let _scopeStrategy = 'native';
+export let _selectorWidth = 80;
+export let _selectorSingleLine = false;
 
 export function configureEngine(opts = {}) {
   if (opts.preserveComments !== undefined) _preserveComments = opts.preserveComments;
@@ -16,4 +18,9 @@ export function configureEngine(opts = {}) {
   if (opts.valueFormat !== undefined && ['preserve', 'auto-wrap', 'single-line'].includes(opts.valueFormat)) _valueFormat = opts.valueFormat;
   if (opts.selectorStrategy !== undefined && ['is', 'multiply'].includes(opts.selectorStrategy)) _selectorStrategy = opts.selectorStrategy;
   if (opts.scopeStrategy !== undefined && ['native', 'downlevel'].includes(opts.scopeStrategy)) _scopeStrategy = opts.scopeStrategy;
+  if (opts.selectorWidth !== undefined) {
+    const n = Number(opts.selectorWidth);
+    if (!Number.isNaN(n)) _selectorWidth = Math.min(160, Math.max(20, n));
+  }
+  if (opts.selectorSingleLine !== undefined) _selectorSingleLine = !!opts.selectorSingleLine;
 }
