@@ -1502,7 +1502,7 @@ export function denestCSS(ast, preserveWrappers = false) {
             if (node.type === 'Rule') {
                 // Inside an @scope, a rule whose selector is the scope root
                 // must not be combined with the scope root again.
-                const inScope = !!context.inScope || (context.atRule && String(context.atRule.name).toLowerCase() === 'scope');
+                const inScope = !context.downlevelScope && (!!context.inScope || (context.atRule && String(context.atRule.name).toLowerCase() === 'scope'));
                 const scopeRootText = inScope ? (context.scopeRootText || (context.selector ? stringifySelector(context.selector) : '')) : '';
                 const atScopeRoot = inScope && scopeRootText !== '' && !!context.selector && stringifySelector(context.selector) === scopeRootText;
                 const childText = stringifySelector(node.selector);
@@ -1557,10 +1557,13 @@ export function denestCSS(ast, preserveWrappers = false) {
 
                 let childSelector = context.selector;
                 const parentInScope = !!context.inScope;
-                const downlevelScope = nodeName === 'scope' && _scopeStrategy === 'downlevel';
+                const scopeRoot = getScopeRoot(combinedAtRuleParams);
+                const isRelativeScope = !!(scopeRoot && (scopeRoot.includes('&') || /^[>+~]/.test(scopeRoot.trim())));
+                // Downleveling a relative scope root cannot be safely flattened
+                // to a concrete selector, so keep the @scope wrapper instead.
+                const downlevelScope = nodeName === 'scope' && _scopeStrategy === 'downlevel' && !isRelativeScope;
                 let thisInScope = parentInScope;
                 if (nodeName === 'scope') {
-                    const scopeRoot = getScopeRoot(combinedAtRuleParams);
                     if (downlevelScope) {
                         // Downlevel: flatten the scope into descendant
                         // combinators, dropping the donut boundary.
@@ -1594,6 +1597,7 @@ export function denestCSS(ast, preserveWrappers = false) {
                     selector: childSelector,
                     atRule: newAtRuleContext,
                     inScope: thisInScope,
+                    downlevelScope: downlevelScope || !!context.downlevelScope,
                     scopeRootText: nodeName === 'scope' && childSelector ? stringifySelector(childSelector) : context.scopeRootText,
                 };
                 
