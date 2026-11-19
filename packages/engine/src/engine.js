@@ -1,4 +1,4 @@
-import { _preserveComments, _indentChar, _maxDepth, _strategy, _deduplicate, configureEngine } from './config.js';
+import { _preserveComments, _indentChar, _maxDepth, _strategy, _deduplicate, _valueFormat, _selectorStrategy, _scopeStrategy, configureEngine } from './config.js';
 export { configureEngine } from './config.js';
 
 const NESTING_COMBINATORS = ['>', '+', '~', '||'];
@@ -725,6 +725,7 @@ export function parseCSS(cssString) {
                 newNode.type = 'Declaration';
                 newNode.property = property;
                 newNode.value = parseValue(value);
+                newNode.valueRaw = rawValue;
                 newNode.valueWasWhitespaceOnly = property.startsWith('--') && value === '' && rawValue.length > 0;
                 newNode.spacesAbove = declarationSpacesAbove;
                 
@@ -1022,6 +1023,49 @@ function beautifyComment(comment, indent) {
     return result;
 }
 
+function hasTopLevelNewline(text) {
+    let inString = null;
+    let inComment = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inComment) {
+            if (ch === '*' && text[i + 1] === '/') { inComment = false; i++; }
+            continue;
+        }
+        if (inString) {
+            if (ch === '\\') { i++; continue; }
+            if (ch === inString) inString = null;
+            continue;
+        }
+        if (ch === '/' && text[i + 1] === '*') { inComment = true; i++; continue; }
+        if (ch === '"' || ch === "'") { inString = ch; continue; }
+        if (ch === '\n') return true;
+    }
+    return false;
+}
+
+function beautifyPreservedValue(raw, indent, indentChar) {
+    const lines = String(raw).replace(/\r\n?/g, '\n').split('\n');
+    while (lines.length > 1 && lines[lines.length - 1].trim() === '') lines.pop();
+    if (lines.length > 1 && lines[0].trim() === '') lines.shift();
+    if (lines.length <= 1) return beautifyValue(parseValue(raw.trim()));
+    const first = lines[0].trim();
+    const contLines = lines.slice(1);
+    const indents = contLines.filter(l => l.trim() !== '').map(l => (l.match(/^[ \t]*/) || [''])[0].length);
+    const minIndent = indents.length > 0 ? Math.min(...indents) : 0;
+    let out = first;
+    for (const l of contLines) {
+        if (l.trim() === '') {
+            out += '\n' + indent;
+            continue;
+        }
+        const rel = (l.match(/^[ \t]*/) || [''])[0].length - minIndent;
+        const content = l.trim();
+        out += '\n' + indent + indentChar + (rel > 0 ? ' '.repeat(rel) : '') + content;
+    }
+    return out;
+}
+
 function beautifySelector(groups, indent) {
     let result = '';
     
@@ -1115,7 +1159,13 @@ export function beautifyCSS(ast, initialIndent = '') {
                     css += beautifyComment(child, indent);
                     break;
                 case 'Declaration':
-                    css += `${child.property}: ${beautifyValue(child.value)};`;
+                    if (_valueFormat === 'single-line') {
+                        css += `${child.property}: ${beautifyValue(child.value)};`;
+                    } else if (_valueFormat === 'preserve' && typeof child.valueRaw === 'string' && hasTopLevelNewline(child.valueRaw)) {
+                        css += `${child.property}: ${beautifyPreservedValue(child.valueRaw, indent, indentChar)};`;
+                    } else {
+                        css += `${child.property}: ${beautifyValue(child.value)};`;
+                    }
                     break;
                 case 'AtRule':
                     css += `@${child.name}${child.params ? ' ' + child.params : ''}`;
@@ -1336,6 +1386,17 @@ function getScopeRoot(params) {
 function combineSelectors(parentGroups, childGroups) {
     const combinators = NESTING_COMBINATORS;
 
+    // Selector multiplication strategy: when the parent is a selector list,
+    // distribute the child over each parent instead of wrapping the list
+    // in `:is()`. This keeps specificity isolated per parent.
+    if (_selectorStrategy === 'multiply' && parentGroups && parentGroups.length > 1) {
+        const result = [];
+        for (const pg of parentGroups) {
+            result.push(...combineSelectors([pg], childGroups));
+        }
+        return result;
+    }
+
     if (!parentGroups || parentGroups.length === 0) {
         return childGroups.map(g => ({
             ...g,
@@ -1499,26 +1560,37 @@ export function denestCSS(ast, preserveWrappers = false) {
 
                 let childSelector = context.selector;
                 const parentInScope = !!context.inScope;
+                const downlevelScope = nodeName === 'scope' && _scopeStrategy === 'downlevel';
                 let thisInScope = parentInScope;
                 if (nodeName === 'scope') {
                     const scopeRoot = getScopeRoot(combinedAtRuleParams);
-                    if (scopeRoot) {
-                        // A plain root (`.card`, `#siteWrapper`) can prefix
-                        // descendant selectors to produce fully denested
-                        // output. A relative root (`& > main`) must not be
-                        // re-applied as a prefix: inside the new scope, `&`
-                        // already refers to that scope root, so prefix with
-                        // `&` instead.
-                        const isRelative = scopeRoot.includes('&') || /^[>+~]/.test(scopeRoot.trim());
-                        try {
-                            childSelector = isRelative ? parseSelector('&') : parseSelector(scopeRoot);
-                        } catch (e) {
+                    if (downlevelScope) {
+                        // Downlevel: flatten the scope into descendant
+                        // combinators, dropping the donut boundary.
+                        if (scopeRoot) {
+                            const isRelative = scopeRoot.includes('&') || /^[>+~]/.test(scopeRoot.trim());
+                            try {
+                                childSelector = isRelative ? parseSelector('&') : parseSelector(scopeRoot);
+                            } catch (e) {
+                                childSelector = context.selector;
+                            }
+                        } else {
                             childSelector = context.selector;
                         }
+                        thisInScope = false;
                     } else {
-                        childSelector = null;
+                        if (scopeRoot) {
+                            const isRelative = scopeRoot.includes('&') || /^[>+~]/.test(scopeRoot.trim());
+                            try {
+                                childSelector = isRelative ? parseSelector('&') : parseSelector(scopeRoot);
+                            } catch (e) {
+                                childSelector = context.selector;
+                            }
+                        } else {
+                            childSelector = null;
+                        }
+                        thisInScope = true;
                     }
-                    thisInScope = true;
                 }
 
                 const childContext = {
@@ -1530,12 +1602,19 @@ export function denestCSS(ast, preserveWrappers = false) {
                 
                 const childNodes = _denest(node.body, childContext);
 
-                if (childNodes.length > 0) {
+                if (downlevelScope && childNodes.length > 0) {
+                    if (denestedNodes.length > 0 && ['Rule', 'AtRule'].includes(denestedNodes.at(-1)?.type)) {
+                        if (childNodes[0].spacesAbove === 0) childNodes[0].spacesAbove = 1;
+                    }
+                    denestedNodes.push(...childNodes);
+                } else if (childNodes.length > 0) {
                     const atRuleWrapper = cloneASTNode(node);
                     atRuleWrapper.params = combinedAtRuleParams;
                     atRuleWrapper.body = childNodes;
                     if (denestedNodes.length > 0) atRuleWrapper.spacesAbove = 1;
                     denestedNodes.push(atRuleWrapper);
+                } else if (downlevelScope) {
+                    // Downlevel empty/leaf scope produces no wrapper.
                 } else if (node.body === null) {
                     denestedNodes.push(cloneASTNode(node));
                 } else if (node.body.length === 0) {

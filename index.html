@@ -327,56 +327,84 @@
             </ul>
           </section>
           <section>
-            <h2>Functionality</h2>  
-            <ul>  
-              <li>  
-                <span id="preserveComments-label">Comments?</span>  
-                <div>  
-                  <nycss-toggle id="preserveComments" off-text="Yes" on-text="No"></nycss-toggle>  
-                </div>  
-              </li> 
-              <li>  
-                <span id="mode-group-label">Mode</span>  
-                <div>  
-                  <nycss-radio-group id="mode" label="Mode">  
-                    <label>Minify</label>  
-                    <label>Beautify</label>  
-                    <label>Denest</label>  
-                    <label>Nest</label>  
-                  </nycss-radio-group>  
-                </div>  
-              </li>  
-              <li>  
-                <span id="auto-label">Auto</span>  
-                <div>  
-                  <nycss-toggle id="auto" on-text="On" off-text="Off"></nycss-toggle>  
-                </div>  
-              </li>  
-              <li>  
-                <span id="nestingStrategy-label">Strategy</span>  
-                <div>  
+            <h2>Engine</h2>
+            <ul>
+              <li>
+                <span id="preserveComments-label">Comments?</span>
+                <div>
+                  <nycss-toggle id="preserveComments" off-text="Yes" on-text="No"></nycss-toggle>
+                </div>
+              </li>
+              <li>
+                <span id="mode-group-label">Mode</span>
+                <div>
+                  <nycss-radio-group id="mode" label="Mode">
+                    <label>Minify</label>
+                    <label>Beautify</label>
+                    <label>Denest</label>
+                    <label>Nest</label>
+                  </nycss-radio-group>
+                </div>
+              </li>
+              <li>
+                <span id="auto-label">Auto</span>
+                <div>
+                  <nycss-toggle id="auto" on-text="On" off-text="Off"></nycss-toggle>
+                </div>
+              </li>
+              <li>
+                <span id="valueFormat-label">Value Wrap</span>
+                <div>
+                  <nycss-dropdown id="valueFormat" label="Value Wrap">
+                    <span role="option" value="preserve">Preserve</span>                    <span role="option" value="single-line">Single-line</span>
+                  </nycss-dropdown>
+                </div>
+              </li>
+              <li>
+                <span id="deduplicate-label">De-duplicate</span>
+                <div>
+                  <nycss-toggle id="deduplicate" on-text="On" off-text="Off"></nycss-toggle>
+                </div>
+              </li>
+            </ul>
+          </section>
+          <section>
+            <h2>Nesting</h2>
+            <ul>
+              <li>
+                <span id="selectorStrategy-label">Selector List</span>
+                <div>
+                  <nycss-toggle id="selectorStrategy" off-text=":is() Spec" on-text="Multiply"></nycss-toggle>
+                </div>
+              </li>
+              <li>
+                <span id="scopeStrategy-label">Scope Mode</span>
+                <div>
+                  <nycss-dropdown id="scopeStrategy" label="Scope Mode">
+                    <span role="option" value="native">Native</span>
+                    <span role="option" value="downlevel">Flatten</span>
+                  </nycss-dropdown>
+                </div>
+              </li>
+              <li>
+                <span id="max-depth-label">Max Depth</span>
+                <div>
+                  <nycss-stepper id="nestingDepth" label="Level:" min="3" max="10" placeholder="3"></nycss-stepper>
+                  <nycss-toggle id="nestingDepthInfinite" on-text="Infinite" off-text="Limited"></nycss-toggle>
+                </div>
+              </li>
+              <li>
+                <span id="nestingStrategy-label">Strategy</span>
+                <div>
                   <nycss-dropdown id="nestingStrategy" label="Strategy">
                     <span role="option" value="balanced">Balanced Split</span>
                     <span role="option" value="maximize">Maximize Depth</span>
                     <span role="option" value="flattened">Flattened Overflow</span>
                   </nycss-dropdown>
-                </div>  
-              </li> 
-              <li>  
-                <span id="max-depth-label">Max Depth</span>  
-                <div>  
-                  <nycss-stepper id="nestingDepth" label="Level:" min="3" max="10" placeholder="3"></nycss-stepper>  
-                  <nycss-toggle id="nestingDepthInfinite" on-text="Infinite" off-text="Limited"></nycss-toggle>  
-                </div>  
-              </li>    
-              <li>  
-                <span id="deduplicate-label">De-duplicate</span>  
-                <div>  
-                  <nycss-toggle id="deduplicate" on-text="On" off-text="Off"></nycss-toggle>  
-                </div>  
-              </li> 
-            </ul>  
-          </section>  
+                </div>
+              </li>
+            </ul>
+          </section>
           <section role="alert">  
             <h2 id="error-table">Errors</h2>  
             <div aria-live="polite">  

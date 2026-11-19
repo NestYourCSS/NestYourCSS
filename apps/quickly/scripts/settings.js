@@ -185,6 +185,18 @@
           nestCode();
         }
       },
+      valueFormat: (value) => {
+        configureEngine({ valueFormat: value });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      selectorStrategy: (value) => {
+        configureEngine({ selectorStrategy: value ? 'multiply' : 'is' });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
+      scopeStrategy: (value) => {
+        configureEngine({ scopeStrategy: value });
+        if (window.processAuto && typeof nestCode === 'function') nestCode();
+      },
       nestingDepth: (value) => {
         const infinite = store.nestingDepthInfinite;
         const stepper = document.getElementById('nestingDepth');

@@ -21,6 +21,9 @@ const settingsConfig = {
   nestingDepthInfinite: { defaultValue: true },
   nestingStrategy: { defaultValue: 'balanced' },
   deduplicate: { defaultValue: false },
+  valueFormat: { defaultValue: 'preserve' },
+  selectorStrategy: { defaultValue: false },
+  scopeStrategy: { defaultValue: 'native' },
   showMinimap: { defaultValue: false },
 };
 
@@ -42,6 +45,18 @@ const store = createStore(defaults, {
       window.deduplicate = value;
       configureEngine({ deduplicate: value });
     },
+    valueFormat: (value) => {
+      window.valueFormat = value;
+      configureEngine({ valueFormat: value });
+    },
+    selectorStrategy: (value) => {
+      window.selectorStrategy = value ? 'multiply' : 'is';
+      configureEngine({ selectorStrategy: value ? 'multiply' : 'is' });
+    },
+    scopeStrategy: (value) => {
+      window.scopeStrategy = value;
+      configureEngine({ scopeStrategy: value });
+    },
     indentationSize: () => {
       if (window.editorIndentChar?.startsWith(' ') || window.editorIndentChar === '') {
         window.editorIndentChar = ' '.repeat(store.indentationSize);
@@ -54,6 +69,9 @@ const store = createStore(defaults, {
 configureEngine({
   preserveComments: !store.preserveComments,
   indentChar: '\t',
+  valueFormat: store.valueFormat,
+  selectorStrategy: store.selectorStrategy ? 'multiply' : 'is',
+  scopeStrategy: store.scopeStrategy,
 });
 
 window.configureEngine = configureEngine;
@@ -65,6 +83,9 @@ window.preserveComments ??= !store.preserveComments;
 window.editorIndentChar ??= '\t';
 window.coordDisplayMode ??= store.coordinates;
 window.deduplicate ??= store.deduplicate;
+window.valueFormat ??= store.valueFormat;
+window.selectorStrategy ??= store.selectorStrategy ? 'multiply' : 'is';
+window.scopeStrategy ??= store.scopeStrategy;
 
 // Register PWA
 registerSW();

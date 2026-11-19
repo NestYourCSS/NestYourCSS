@@ -8,6 +8,9 @@ const ENGINE_DEFAULTS = {
   maxDepth: Infinity,
   strategy: 'balanced',
   deduplicate: false,
+  valueFormat: 'preserve',
+  selectorStrategy: 'is',
+  scopeStrategy: 'native',
 };
 
 function resetEngine(overrides = {}) {
@@ -1918,6 +1921,47 @@ describe('Nest mode comment and media placement', () => {
     const once = renderMode(fixture, 'nest');
     const twice = renderMode(once, 'nest');
     assert.equal(twice, once);
+  });
+});
+
+describe('engine settings', () => {
+  it('selectorStrategy is keeps :is() for parent lists', () => {
+    resetEngine({ selectorStrategy: 'is' });
+    const ast = denestCSS(parseCSS('.a, .b { & > .c { color: red; } }'));
+    assert.equal(minifyCSS(ast).trim(), ':is(.a, .b)>.c{color:red}');
+  });
+
+  it('selectorStrategy multiply expands parent lists', () => {
+    resetEngine({ selectorStrategy: 'multiply' });
+    const ast = denestCSS(parseCSS('.a, .b { & > .c { color: red; } }'));
+    assert.equal(minifyCSS(ast).trim(), '.a>.c,.b>.c{color:red}');
+  });
+
+  it('scopeStrategy native preserves @scope', () => {
+    resetEngine({ scopeStrategy: 'native' });
+    const ast = denestCSS(parseCSS('@scope (.card) to (.content) { .title { color: red; } }'));
+    assert.ok(minifyCSS(ast).includes('@scope'));
+  });
+
+  it('scopeStrategy downlevel flattens @scope', () => {
+    resetEngine({ scopeStrategy: 'downlevel' });
+    const ast = denestCSS(parseCSS('@scope (.card) to (.content) { .title { color: red; } }'));
+    assert.ok(!minifyCSS(ast).includes('@scope'));
+    assert.ok(minifyCSS(ast).includes('.card .title'));
+  });
+
+  it('valueFormat single-line flattens multiline values', () => {
+    resetEngine({ valueFormat: 'single-line' });
+    const ast = parseCSS('.a { background: linear-gradient(\n  to right,\n  red,\n  blue\n); }');
+    const out = beautifyCSS(ast);
+    assert.ok(!out.includes('\n  to right'));
+  });
+
+  it('valueFormat preserve keeps multiline values', () => {
+    resetEngine({ valueFormat: 'preserve' });
+    const ast = parseCSS('.a { background: linear-gradient(\n  to right,\n  red,\n  blue\n); }');
+    const out = beautifyCSS(ast);
+    assert.ok(out.includes('to right'));
   });
 });
 

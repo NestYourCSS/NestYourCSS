@@ -142,6 +142,20 @@
           window.nestCode();
         }
       },
+      valueFormat: (value) => {
+        window.configureEngine({ valueFormat: value });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
+      },
+      selectorStrategy: (value) => {
+        // toggle: on = multiply, off = is
+        const strategy = value ? 'multiply' : 'is';
+        window.configureEngine({ selectorStrategy: strategy });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
+      },
+      scopeStrategy: (value) => {
+        window.configureEngine({ scopeStrategy: value });
+        if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
+      },
       nestingDepth: (value) => {
         const infinite = store.nestingDepthInfinite;
         const stepper = document.getElementById('nestingDepth');

@@ -19,6 +19,9 @@ const store = createStore({
   nestingDepthInfinite: true,
   nestingStrategy: 'balanced',
   deduplicate: false,
+  valueFormat: 'preserve',
+  selectorStrategy: false,
+  scopeStrategy: 'native',
   showMinimap: false,
 }, {
   key: 'nycss-settings',
@@ -33,11 +36,23 @@ const store = createStore({
       window.deduplicate = value;
       configureEngine({ deduplicate: value });
     },
+    valueFormat: (value) => {
+      window.valueFormat = value;
+      configureEngine({ valueFormat: value });
+    },
+    selectorStrategy: (value) => {
+      window.selectorStrategy = value ? 'multiply' : 'is';
+      configureEngine({ selectorStrategy: value ? 'multiply' : 'is' });
+    },
+    scopeStrategy: (value) => {
+      window.scopeStrategy = value;
+      configureEngine({ scopeStrategy: value });
+    },
   },
 });
 
 // Configure engine
-configureEngine({ preserveComments: true, indentChar: '\t' });
+configureEngine({ preserveComments: true, indentChar: '\t', valueFormat: 'preserve', selectorStrategy: 'is', scopeStrategy: 'native' });
 
 window.configureEngine = configureEngine;
 
@@ -66,6 +81,9 @@ window.autoProcess = store.auto;
 window.preserveComments = !store.preserveComments;
 window.editorIndentChar = '\t';
 window.deduplicate = store.deduplicate;
+window.valueFormat = store.valueFormat;
+window.selectorStrategy = store.selectorStrategy ? 'multiply' : 'is';
+window.scopeStrategy = store.scopeStrategy;
 
 // Export store
 window.__store = store;
