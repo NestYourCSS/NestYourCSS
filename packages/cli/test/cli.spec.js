@@ -312,6 +312,22 @@ describe('@nycss/cli', () => {
     assert(result.stdout.includes('linear-gradient(to right, red, blue)'));
   });
 
+  it('should support --value-format preserve (default)', () => {
+    const inputFile = join(tmpDir, 'vfp.css');
+    writeFileSync(inputFile, '.a { background: linear-gradient(\n  to right,\n  red,\n  blue\n); }');
+    const result = runCli([inputFile, '-m', 'beautify', '--value-format', 'preserve']);
+    assert.strictEqual(result.status, 0);
+    assert(result.stdout.includes('to right'));
+  });
+
+  it('should support --scope-strategy native', () => {
+    const inputFile = join(tmpDir, 'scn.css');
+    writeFileSync(inputFile, '@scope (.card) to (.content) { .title { color: red; } }');
+    const result = runCli([inputFile, '-m', 'denest', '--scope-strategy', 'native']);
+    assert.strictEqual(result.status, 0);
+    assert(result.stdout.includes('@scope'));
+  });
+
   it('should support --selector-width and --selector-single-line', () => {
     const inputFile = join(tmpDir, 'sw.css');
     writeFileSync(inputFile, '.foo, .bar, .baz, .qux { color: red; }');

@@ -68,6 +68,7 @@ async function setupEditors() {
     const textarea = editor.textInput.getElement();
     textarea.setAttribute("aria-label", editorId === "inputEditor" ? i18n.inputEditorLabel : i18n.outputEditorLabel);
 
+    editor.getSession().setNewLineMode('unix');
     editor.setValue(value, -1);
     if (provider) provider.registerEditor(editor);
 

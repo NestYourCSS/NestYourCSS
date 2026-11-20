@@ -149,6 +149,7 @@ function initializeAceEditors() {
       const textarea = editor.textInput.getElement();
       textarea.setAttribute("aria-label", labelDescription);
     
+      editor.getSession().setNewLineMode('unix');
       editor.setValue(value, -1);
       editor.setAnimatedScroll(!window.prefersReducedMotion);
 

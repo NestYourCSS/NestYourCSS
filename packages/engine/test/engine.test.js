@@ -1479,9 +1479,9 @@ describe('obscure but valid CSS syntax', () => {
     },
     {
       name: 'hex escape followed by CRLF in a string',
-      css: '.a { content: "\\41\r\nB"; }',
-      minify: '.a{content:"\\41\r\nB"}',
-      nestContains: ['content: "\\41\r\nB";'],
+      css: '.a { content: "\\41\nB"; }',
+      minify: '.a{content:"\\41\nB"}',
+      nestContains: ['content: "\\41\nB";'],
     },
     {
       name: 'escaped !important keyword',
@@ -2136,5 +2136,91 @@ describe('comment formatting variants', () => {
   it('single line comment collapses', () => {
     const out = bc('/*\nThe actual main CSS file for this website */');
     assert.equal(out.trim(), '/* The actual main CSS file for this website */');
+  });
+});
+
+describe('scopeStrategy downlevel & resolution', () => {
+  it('resolves & to the scope root selector', () => {
+    resetEngine({ scopeStrategy: 'downlevel' });
+    const css = '@scope (#siteWrapper) { & { margin: 0; } &:has(> .a) { color: red; } & > main { display: flex; } }';
+    const ast = denestCSS(parseCSS(css));
+    const out = minifyCSS(ast);
+    assert.ok(out.includes('#siteWrapper{'), 'root & not resolved');
+    assert.ok(out.includes('#siteWrapper:has(> .a)'), 'has() & not resolved');
+    assert.ok(out.includes('#siteWrapper>main{'), '> main & not resolved');
+    assert.ok(!out.includes('&'), 'orphaned & remains');
+  });
+
+  it('keeps @scope wrapper for relative roots', () => {
+    resetEngine({ scopeStrategy: 'downlevel' });
+    const css = '@scope (& > main) { & { color: red; } }';
+    const ast = denestCSS(parseCSS(css));
+    const out = minifyCSS(ast);
+    assert.ok(out.includes('@scope'), 'relative scope should stay wrapped');
+  });
+});
+
+describe('engine edge cases', () => {
+  it('handles empty input', () => {
+    resetEngine();
+    const ast = parseCSS('');
+    assert.equal(beautifyCSS(ast), '');
+    assert.equal(minifyCSS(ast), '');
+  });
+
+  it('handles whitespace-only input', () => {
+    resetEngine();
+    const ast = parseCSS('   \n\n\t  ');
+    assert.equal(beautifyCSS(ast).trim(), '');
+    assert.equal(minifyCSS(ast).trim(), '');
+  });
+
+  it('handles comment-only input', () => {
+    resetEngine({ preserveComments: true });
+    const ast = parseCSS('/* just a comment */');
+    const out = minifyCSS(ast);
+    assert.ok(out.includes('/*just a comment*/'));
+  });
+
+  it('handles deeply nested CSS (>10 levels)', () => {
+    resetEngine();
+    let css = '.a {';
+    for (let i = 1; i <= 11; i++) css += ` .l${i} {`;
+    css += ' color: red; ';
+    for (let i = 0; i <= 11; i++) css += '}';
+    const ast = parseCSS(css);
+    const out = beautifyCSS(ast);
+    assert.ok(out.includes('color: red'));
+    assert.ok(!out.includes('undefined'));
+  });
+
+  it('handles unicode/emoji selectors', () => {
+    resetEngine();
+    const css = '.?? { color: red; } .caf� { color: blue; }';
+    const ast = parseCSS(css);
+    const out = minifyCSS(ast);
+    assert.ok(out.includes('.??{color:red}'));
+    assert.ok(out.includes('.caf�{color:blue}'));
+  });
+  it('normalizes CRLF input to LF output', () => {
+    resetEngine({ valueFormat: 'preserve', preserveComments: true });
+    const css = '/* top */\r\n.a {\r\n  /* inside */\r\n  color: red;\r\n  background: linear-gradient(\r\n    to right,\r\n    red,\r\n    blue\r\n  );\r\n}\r\n';
+    const ast = parseCSS(css);
+    const beautified = beautifyCSS(ast);
+    const minified = minifyCSS(ast);
+    assert.ok(!beautified.includes('\r'), 'beautify output contains CR');
+    assert.ok(!minified.includes('\r'), 'minify output contains CR');
+    assert.ok(beautified.includes('\n'), 'beautify output missing LF');
+    assert.ok(beautified.includes('to right'), 'multiline value corrupted');
+    assert.ok(beautified.includes('/* inside */'), 'comment corrupted');
+  });
+
+  it('normalizes lone CR input to LF output', () => {
+    resetEngine();
+    const css = '.a {\r  color: red;\r}\r';
+    const ast = parseCSS(css);
+    const out = beautifyCSS(ast);
+    assert.ok(!out.includes('\r'));
+    assert.ok(out.includes('\n'));
   });
 });

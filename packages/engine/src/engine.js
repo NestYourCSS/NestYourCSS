@@ -487,6 +487,9 @@ function splitAtRuleSegment(segment) {
 }
 
 export function parseCSS(cssString) {
+    // Normalize all line endings to LF so mixed CRLF/CR input never
+    // corrupts AST line capture or formatting output.
+    cssString = String(cssString).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     let pos = 0;
     const len = cssString.length;
     const root = { type: 'Stylesheet', body: [] };

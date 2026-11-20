@@ -130,6 +130,7 @@ async function nestCode(onClick = false) {
     let tableBodyElem = window.errorTable.tBodies[0];  
 	const annotations = window.inputEditorInstance.getSession().getAnnotations().filter((a) => a.type == 'error');  
 	if (annotations.length == 0) {  
+		window.outputEditorInstance.getSession().setNewLineMode('unix');
 		window.outputEditorInstance.getSession().setValue(convertToNestedCSS(window.inputEditorInstance.getValue()) || window.i18n.outputPlaceholder);  
         
         if (tableBodyElem.rows.length) tableBodyElem.innerHTML = '';  

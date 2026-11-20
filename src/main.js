@@ -95,6 +95,8 @@ window.preserveComments ??= !store.preserveComments;
 window.editorIndentChar ??= '\t';
 window.coordDisplayMode ??= store.coordinates;
 window.deduplicate ??= store.deduplicate;
+// Migrate discarded 'auto-wrap' valueFormat to 'preserve'
+if (store.valueFormat === 'auto-wrap') store.valueFormat = 'preserve';
 window.valueFormat ??= store.valueFormat;
 window.selectorStrategy ??= store.selectorStrategy ? 'multiply' : 'is';
 window.selectorWidth ??= store.selectorWidth;

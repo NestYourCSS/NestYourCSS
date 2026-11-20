@@ -117,6 +117,36 @@
         const infiniteToggle = document.getElementById('nestingDepthInfinite');
         if (infiniteToggle) infiniteToggle.disabled = value !== 3;
         document.getElementById('nestingStrategy').disabled = value !== 3;
+
+        // Formatting controls have no effect in minify mode.
+        const isMinify = value === 0;
+
+        // Indentation controls have no effect in minify mode.
+        const indentationTypeEl = document.getElementById('indentationType');
+        if (indentationTypeEl) indentationTypeEl.disabled = isMinify;
+        const indentationSizeEl = document.getElementById('indentationSize');
+        if (indentationSizeEl) {
+            indentationSizeEl.disabled = isMinify;
+            indentationSizeEl.querySelector('input')?.toggleAttribute('disabled', isMinify);
+        }
+
+        const valueFormatEl = document.getElementById('valueFormat');
+        if (valueFormatEl) valueFormatEl.disabled = isMinify;
+        const selectorWidthEl = document.getElementById('selectorWidth');
+        if (selectorWidthEl) {
+            selectorWidthEl.disabled = isMinify || !!store.selectorSingleLine;
+            selectorWidthEl.querySelector('input')?.toggleAttribute('disabled', isMinify || !!store.selectorSingleLine);
+        }
+        const selectorSingleLineEl = document.getElementById('selectorSingleLine');
+        if (selectorSingleLineEl) selectorSingleLineEl.disabled = isMinify;
+
+        // Denest-only transforms: disabled outside denest/nest modes.
+        const isDenestMode = value === 2 || value === 3;
+        const selectorStrategyEl = document.getElementById('selectorStrategy');
+        if (selectorStrategyEl) selectorStrategyEl.disabled = !isDenestMode;
+        const scopeStrategyEl = document.getElementById('scopeStrategy');
+        if (scopeStrategyEl) scopeStrategyEl.disabled = !isDenestMode;
+
         if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();
       },
       auto: (value) => {
@@ -157,9 +187,10 @@
       },
       selectorSingleLine: (value) => {
         const stepper = document.getElementById('selectorWidth');
+        const disabled = !!value || window.processMode === 0;
         if (stepper) {
-          stepper.toggleAttribute('disabled', !!value);
-          stepper.querySelector('input')?.toggleAttribute('disabled', !!value);
+          stepper.toggleAttribute('disabled', disabled);
+          stepper.querySelector('input')?.toggleAttribute('disabled', disabled);
         }
         window.configureEngine({ selectorSingleLine: value });
         if (window.processAuto && typeof window.nestCode === 'function') window.nestCode();

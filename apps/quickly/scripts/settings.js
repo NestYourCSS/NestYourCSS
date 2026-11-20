@@ -160,6 +160,33 @@
         const infiniteToggle = document.getElementById('nestingDepthInfinite');
         if (infiniteToggle) infiniteToggle.disabled = value !== 3;
         document.getElementById('nestingStrategy').disabled = value !== 3;
+
+        const isMinify = value === 0;
+
+        const indentationTypeEl = document.getElementById('indentationType');
+        if (indentationTypeEl) indentationTypeEl.disabled = isMinify;
+        const indentationSizeEl = document.getElementById('indentationSize');
+        if (indentationSizeEl) {
+            indentationSizeEl.disabled = isMinify;
+            indentationSizeEl.querySelector('input')?.toggleAttribute('disabled', isMinify);
+        }
+
+        const valueFormatEl = document.getElementById('valueFormat');
+        if (valueFormatEl) valueFormatEl.disabled = isMinify;
+        const selectorWidthEl = document.getElementById('selectorWidth');
+        if (selectorWidthEl) {
+            selectorWidthEl.disabled = isMinify || !!store.selectorSingleLine;
+            selectorWidthEl.querySelector('input')?.toggleAttribute('disabled', isMinify || !!store.selectorSingleLine);
+        }
+        const selectorSingleLineEl = document.getElementById('selectorSingleLine');
+        if (selectorSingleLineEl) selectorSingleLineEl.disabled = isMinify;
+
+        const isDenestMode = value === 2 || value === 3;
+        const selectorStrategyEl = document.getElementById('selectorStrategy');
+        if (selectorStrategyEl) selectorStrategyEl.disabled = !isDenestMode;
+        const scopeStrategyEl = document.getElementById('scopeStrategy');
+        if (scopeStrategyEl) scopeStrategyEl.disabled = !isDenestMode;
+
         if (window.processAuto && typeof nestCode === 'function') nestCode();
         const modeLabels = { 0: i18n.minify, 1: i18n.beautify, 2: i18n.denest, 3: i18n.nest };
         document.title = `Quickly '${modeLabels[value] || 'Nest'}' Your CSS - Editor`;
@@ -199,9 +226,10 @@
       },
       selectorSingleLine: (value) => {
         const stepper = document.getElementById('selectorWidth');
+        const disabled = !!value || window.processMode === 0;
         if (stepper) {
-          stepper.toggleAttribute('disabled', !!value);
-          stepper.querySelector('input')?.toggleAttribute('disabled', !!value);
+          stepper.toggleAttribute('disabled', disabled);
+          stepper.querySelector('input')?.toggleAttribute('disabled', disabled);
         }
         configureEngine({ selectorSingleLine: value });
         if (window.processAuto && typeof nestCode === 'function') nestCode();
